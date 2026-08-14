@@ -342,12 +342,12 @@
 
         <!-- Main Content Grid -->
         <div class="main-grid">
-            
+
             <!-- Leave Request Form -->
             <div class="section-box">
                 <h3 id="formTitle">LEAVE REQUEST FORM</h3>
                 <form id="leaveRequestForm">
-                    
+
                     <!-- Company Name -->
                     <div class="form-group">
                         <label>COMPANY NAME <span>*</span></label>
@@ -437,6 +437,8 @@
                         <thead>
                             <tr>
                                 <th>Report Fill Date</th>
+                                <th>Company Name</th>
+                                <th>Department</th>
                                 <th>Days</th>
                                 <th>Leave Date</th>
                                 <th>Reason</th>
@@ -447,7 +449,7 @@
                         </thead>
                         <tbody id="historyTable">
                             <tr>
-                                <td colspan="7" style="text-align: center; color: #6b7280;">ડેટા લોડ થઈ રહ્યો છે...</td>
+                                <td colspan="9" style="text-align: center; color: #6b7280;">ડેટા લોડ થઈ રહ્યો છે...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -507,7 +509,7 @@
         window.filterTable = function() {
             const selectedMonth = document.getElementById('monthSelect').value;
             const rows = document.querySelectorAll('#historyTable tr');
-            
+
             let totalMonthLeaves = 0;
             let totalYearApprovedLeaves = 0;
 
@@ -550,7 +552,7 @@
                 const snapshot = await get(dbRef);
 
                 if (!snapshot.exists()) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
                     return;
                 }
 
@@ -572,9 +574,11 @@
                     newRow.setAttribute('data-date', data.fillDateRaw || '');
                     newRow.setAttribute('data-days', data.totalDays || 0);
                     newRow.setAttribute('data-status', statusClass);
-                    
+
                     newRow.innerHTML = `
                         <td>${data.reportFillDate || ''}</td>
+                        <td>${data.companyName || ''}</td>
+                        <td>${data.department || ''}</td>
                         <td>${data.totalDays || ''}</td>
                         <td>${data.leaveDates || ''}</td>
                         <td>${data.reason || ''}</td>
@@ -582,19 +586,19 @@
                         <td>${data.tlName || '-'}</td>
                         <td><button class="edit-btn" onclick="window.editDatabaseRow('${leaveId}', '${statusClass}', this)" ${isApproved ? 'disabled' : ''}>Edit</button></td>
                     `;
-                    
+
                     tbody.appendChild(newRow);
                 });
 
                 if (!hasData) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
                     return;
                 }
 
                 filterTable();
             } catch (error) {
                 console.error("Error loading leaves: ", error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444;">ડેટા લોડ કરવામાં ભૂલ આવી છે.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #ef4444;">ડેટા લોડ કરવામાં ભૂલ આવી છે.</td></tr>`;
             }
         }
 
@@ -614,9 +618,11 @@
                 document.getElementById('reportFillDate').value = `${fillDateParts[2]}-${fillDateParts[1]}-${fillDateParts[0]}`;
             }
 
-            document.getElementById('totalDays').value = cells[1].innerText;
-            document.getElementById('fullLeaveDate').value = cells[2].innerText;
-            document.getElementById('leaveReason').value = cells[3].innerText;
+            document.getElementById('companyName').value = cells[1].innerText;
+            document.getElementById('department').value = cells[2].innerText;
+            document.getElementById('totalDays').value = cells[3].innerText;
+            document.getElementById('fullLeaveDate').value = cells[4].innerText;
+            document.getElementById('leaveReason').value = cells[5].innerText;
 
             document.getElementById('formTitle').innerText = "EDIT LEAVE REQUEST";
             document.getElementById('submitBtn').innerText = "Update Request";

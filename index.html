@@ -431,7 +431,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFekL3dLq-v1NETC0PQ7zpnX7StutZs8",
@@ -484,18 +484,20 @@
 
         const getCleanKey = (email) => email.trim().toLowerCase().replace(/[.#$\[\]]/g, "_");
 
-        // 🔥 Registration logic with duplicate email prevention and multi-department support
+        // 🔥 Registration logic with Firebase Auth + Realtime Database + Employee Only Restriction
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const role = document.getElementById('regRole').value;
             const password = document.getElementById('regPassword').value;
-// 🛑 નિયમ: 1 Management અને 20 TL પહેલેથી જ આવી ગયા છે, હવે ફક્ત Employee જ રજીસ્ટ્રેશન કરી શકે!
-    if (role !== "Employee") {
-        alert("⚠️ હવે માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે! Management અને TL ની મર્યાદા પૂરી થઈ ગઈ છે.");
-        return; // આગળ વધવા નહીં દે
-    }
+
+            // 🛑 નિયમ: માત્ર Employee જ રજીસ્ટ્રેશન કરી શકે
+            if (role !== "Employee") {
+                alert("⚠️ હવે માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે! Management અને TL ની મર્યાદા પૂરી થઈ ગઈ છે.");
+                return;
+            }
+
             // Collect selected departments
             const selectedDepts = [];
             document.querySelectorAll('#deptCheckboxGroup input[type="checkbox"]:checked').forEach((checkbox) => {
@@ -518,17 +520,22 @@
                     return;
                 }
 
-                // If not exists, save new user with multiple departments array/string
+                // ૧. Firebase Authentication માં યુઝર બનાવો
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const authUser = userCredential.user;
+
+                // ૨. Realtime Database માં ડેટા સેવ કરો
                 await set(ref(db, 'users/' + userKey), {
                     name, 
                     email, 
                     role, 
-                    departments: selectedDepts, // Saved as an array
+                    departments: selectedDepts,
                     password, 
+                    uid: authUser.uid,
                     createdAt: new Date().toISOString()
                 });
                 
-                alert(`🎉 રજીસ્ટ્રેશન સફળ રહ્યું!`);
+                alert(`🎉 રજીસ્ટ્રેશન સફળ રહ્યું! Authentication અને Database બંનેમાં ડેટા સેવ થઈ ગયો છે.`);
                 document.getElementById('registerModal').style.display = 'none';
                 document.getElementById('registerForm').reset();
             } catch (error) {
@@ -536,9 +543,24 @@
             }
         });
 
+        // 🔥 Forgot Password Logic with Firebase Auth
+        document.getElementById('forgotForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("📩 પાસવર્ડ રીસેટ કરવાની લિંક તમારા ઈમેઈલ પર મોકલી દેવામાં આવી છે! કૃપા કરીને તમારો ઈમેઈલ ચેક કરો.");
+                document.getElementById('forgotModal').style.display = 'none';
+                document.getElementById('forgotForm').reset();
+            } catch (error) {
+                alert("❌ ભૂલ: " + error.message);
+            }
+        });
+
+        // 🔥 Login Logic
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const selectedRole = document.getElementById('role').value;
             const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
 

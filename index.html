@@ -329,7 +329,7 @@
 
             <div class="action-links">
                 <a href="#" class="link-btn" id="openRegBtn"><i class="fa-solid fa-user-plus"></i> New Register</a>
-                <a href="#" class="link-btn" id="openForgotBtn"><i class="fa-solid fa-key"></i> Forgot Password?</a>
+                <a href="#" class="link-btn" id="openForgotBtn"><i class="fa-solid fa-key"></i> Reset Password?</a>
             </div>
         </form>
     </div>
@@ -404,7 +404,7 @@
         </div>
     </div>
 
-    <!-- Forgot Password Modal -->
+    <!-- Reset Password Modal (Direct Database Update - No Limits) -->
     <div class="modal-overlay" id="forgotModal">
         <div class="modal-card">
             <span class="close-btn" id="closeForgotBtn"><i class="fa-solid fa-xmark"></i></span>
@@ -417,8 +417,15 @@
                         <i class="fa-solid fa-envelope"></i>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>નવો પાસવર્ડ નાખો *</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="newResetPassword" placeholder="નવો પાસવર્ડ લખો" required>
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
                 <button type="submit" class="login-btn" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
-                    <span>Send Reset Link</span>
+                    <span>Update Password</span>
                 </button>
             </form>
         </div>
@@ -427,8 +434,7 @@
     <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFekL3dLq-v1NETC0PQ7zpnX7StutZs8",
@@ -442,7 +448,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const auth = getAuth(app);
 
         document.getElementById('openRegBtn').addEventListener('click', () => {
             document.getElementById('registerModal').style.display = 'flex';
@@ -461,7 +466,7 @@
 
         const getCleanKey = (email) => email.trim().toLowerCase().replace(/[.#$\[\]]/g, "_");
 
-        // 🔥 Registration logic: Check Database First, Then Database Save, Then Auth Create
+        // 🔥 Registration logic
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -488,14 +493,12 @@
                 const userKey = getCleanKey(email);
                 const dbRef = ref(db);
                 
-                // ૧. ચકાસો કે આ ઈમેઈલ પહેલેથી ડેટાબેઝમાં મોજૂદ તો નથી ને?
                 const userSnap = await get(child(dbRef, `users/${userKey}`));
                 if (userSnap.exists()) {
-                    alert("⚠️ આ ઈમેઈલ (" + email + ") પહેલેથી જ રજિસ્ટર થયેલો છે! તમે ફરીથી રજીસ્ટ્રેશન કરી શકતા નથી.");
+                    alert("⚠️ આ ઈમેઈલ (" + email + ") પહેલેથી જ રજિસ્ટર થયેલો છે!");
                     return;
                 }
 
-                // ૨. પહેલા Realtime Database માં ડેટા સેવ કરો
                 await set(ref(db, 'users/' + userKey), {
                     name, 
                     email, 
@@ -504,16 +507,6 @@
                     password, 
                     createdAt: new Date().toISOString()
                 });
-
-                // ૩. ત્યારબાદ Firebase Authentication માં યુઝર બનાવો (જેથી પાસવર્ડ રીસેટ કામ કરી શકે)
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    // જો uid સેવ કરવો હોય તો ડેટાબેઝ અપડેટ કરી શકાય
-                    await set(ref(db, `users/${userKey}/uid`), userCredential.user.uid);
-                } catch (authError) {
-                    // જો Auth માં પહેલેથી જ એક્ઝિસ્ટ હોય તો પણ ઇગ્નોર કરી શકાય અથવા એરર હેન્ડલ કરી શકાય
-                    console.log("Auth note:", authError.message);
-                }
                 
                 alert(`🎉 રજીસ્ટ્રેશન સફળ રહ્યું! હવે તમે લોગિન કરી શકો છો.`);
                 document.getElementById('registerModal').style.display = 'none';
@@ -523,14 +516,26 @@
             }
         });
 
-        // 🔥 Forgot Password Logic
+        // 🔥 Reset Password Logic (Direct Database Update - No Limit)
         document.getElementById('forgotForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+            const newPassword = document.getElementById('newResetPassword').value;
 
             try {
-                await sendPasswordResetEmail(auth, email);
-                alert("📩 પાસવર્ડ રીસેટ કરવાની લિંક તમારા ઈમેઈલ પર મોકલી દેવામાં આવી છે! કૃપા કરીને તમારો ઈમેઈલ ચેક કરો.");
+                const userKey = getCleanKey(email);
+                const userRef = ref(db, `users/${userKey}`);
+                const userSnap = await get(userRef);
+
+                if (!userSnap.exists()) {
+                    alert("⚠️ આ ઈમેઈલ ડેટાબેઝમાં મળ્યો નથી!");
+                    return;
+                }
+
+                // સીધો ડેટાબેઝમાં પાસવર્ડ અપડેટ કરો
+                await update(userRef, { password: newPassword });
+
+                alert("✅ પાસવર્ડ સફળતાપૂર્વક બદલાઈ ગયો છે! હવે તમે નવા પાસવર્ડથી લોગિન કરી શકો છો.");
                 document.getElementById('forgotModal').style.display = 'none';
                 document.getElementById('forgotForm').reset();
             } catch (error) {

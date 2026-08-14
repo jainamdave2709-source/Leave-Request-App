@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TL Dashboard - Leave Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #1e293b;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .navbar h2 {
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        /* Action Card for Modal */
+        .card.action-card {
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card.action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .card.action-card h3 {
+            color: #e0e7ff;
+        }
+
+        .card.action-card .btn-text {
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+
+        /* Search & Filter Bar */
+        .filter-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .filter-group input, 
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .total-leave-badge {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .total-leave-badge span {
+            background: #4f46e5;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        /* Table Box */
+        .section-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-flex h3 {
+            color: #1e293b;
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+        }
+
+        /* Badges & Buttons */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .badge.company { background-color: #e0e7ff; color: #3730a3; }
+        .badge.dept { background-color: #f1f5f9; color: #334155; }
+        .badge.req-date { background-color: #fef3c7; color: #92400e; }
+        .badge.tl-badge { background-color: #fbcfe8; color: #9d174d; margin-left: 4px; }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn-approve { background-color: #10b981; color: white; }
+        .btn-reject { background-color: #ef4444; color: white; }
+        .btn-approve:hover { background-color: #059669; }
+        .btn-reject:hover { background-color: #dc2626; }
+
+        .status-text {
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .status-text.approved { color: #10b981; }
+        .status-text.rejected { color: #ef4444; }
+        .status-text.pending-mgmt { color: #d97706; font-style: italic; }
+
+        /* Modal Overlay Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            color: #374151;
+            font-size: 18px;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .form-group label span {
+            color: red;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: #4f46e5;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 3px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div class="navbar">
+        <h2 id="welcomeTitle">Welcome, Jainam Dave</h2>
+        <div>
+            <button class="logout-btn" onclick="alert('Logged Out!')">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Overview Stats Cards -->
+        <div class="stats-grid">
+            <div class="card">
+                <h3>PENDING REQUESTS</h3>
+                <p id="pendingCount" style="color: #f59e0b;">0</p>
+            </div>
+            <div class="card">
+                <h3>APPROVED TODAY</h3>
+                <p id="approvedTodayCount" style="color: #10b981;">0</p>
+            </div>
+            <div class="card">
+                <h3>REJECTED TODAY</h3>
+                <p id="rejectedTodayCount" style="color: #ef4444;">0</p>
+            </div>
+            
+            <!-- APPLY FOR LEAVE BUTTON CARD -->
+            <div class="card action-card" onclick="openLeaveModal()">
+                <h3>APPLY FOR LEAVE</h3>
+                <div class="btn-text">📝 Leave Request Form</div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="filter-card">
+            <div class="filter-group">
+                <label for="searchInput">🔍 નામથી સર્ચ કરો:</label>
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="કર્મચારીનું નામ લખો...">
+            </div>
+
+            <div class="filter-group">
+                <label for="monthSelect">📅 મહિનો:</label>
+                <select id="monthSelect" onchange="filterTable()">
+                    <option value="ALL">તમામ મહિનાઓ (All)</option>
+                    <option value="01">જાન્યુઆરી (Jan)</option>
+                    <option value="02">ફેબ્રુઆરી (Feb)</option>
+                    <option value="03">માર્ચ (Mar)</option>
+                    <option value="04">એપ્રિલ (Apr)</option>
+                    <option value="05">મે (May)</option>
+                    <option value="06">જૂન (Jun)</option>
+                    <option value="07">જુલાઈ (Jul)</option>
+                    <option value="08" selected>ઓગસ્ટ (Aug)</option>
+                    <option value="09">સપ્ટેમ્બર (Sep)</option>
+                    <option value="10">ઓક્ટોબર (Oct)</option>
+                    <option value="11">નવેમ્બર (Nov)</option>
+                    <option value="12">ડિસેમ્બર (Dec)</option>
+                </select>
+            </div>
+
+            <div class="total-leave-badge">
+                Department Total Leaves: <span id="filteredTotalLeaves">0</span> Days
+            </div>
+        </div>
+
+        <!-- Leave Requests Table Box -->
+        <div class="section-box">
+            <div class="header-flex">
+                <h3 id="tableHeaderTitle">Team Leave Requests</h3>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Request Date</th>
+                            <th>Company</th>
+                            <th>Dept</th>
+                            <th>Employee Name</th>
+                            <th>Reason</th>
+                            <th>Leave Details</th>
+                            <th>Total Days</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestTable">
+                        <!-- Data will be loaded dynamically from Firebase Realtime Database -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM -->
+    <div class="modal-overlay" id="leaveModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>LEAVE REQUEST FORM</h3>
+                <span class="close-modal" onclick="closeLeaveModal()">&times;</span>
+            </div>
+            
+            <form id="leaveRequestForm">
+                
+                <!-- Company Name -->
+                <div class="form-group">
+                    <label>COMPANY NAME <span>*</span></label>
+                    <select id="companyName" required>
+                        <option value="" disabled selected>-- કંપની પસંદ કરો --</option>
+                        <option value="WEBSANKUL">WEBSANKUL</option>
+                        <option value="HOUSIVITY">HOUSIVITY</option>
+                    </select>
+                </div>
+
+                <!-- Department -->
+                <div class="form-group">
+                    <label>DEPARTMENT <span>*</span></label>
+                    <select id="department" required>
+                        <option value="" disabled selected>-- ડિપાર્ટમેન્ટ પસંદ કરો --</option>
+                        <option value="FACULTY">FACULTY</option>
+                        <option value="TYPING">TYPING</option>
+                        <option value="CONTENT">CONTENT</option>
+                        <option value="GRAPHIC">GRAPHIC</option>
+                        <option value="VIDEO EDITING">VIDEO EDITING</option>
+                        <option value="VIDEO RECORDING">VIDEO RECORDING</option>
+                        <option value="OFFLINE">OFFLINE</option>
+                        <option value="CALLING">CALLING</option>
+                        <option value="MARKETING">MARKETING</option>
+                        <option value="SALES">SALES</option>
+                        <option value="MANAGEMENT">MANAGEMENT</option>
+                        <option value="ACCOUNT">ACCOUNT</option>
+                        <option value="IT">IT</option>
+                        <option value="BOOK">BOOK</option>
+                    </select>
+                </div>
+
+                <!-- Employee Name -->
+                <div class="form-group">
+                    <label>EMPLOYEE NAME <span>*</span></label>
+                    <input type="text" id="employeeName" placeholder="Jainam Dave" required>
+                    <div class="help-text">નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</div>
+                </div>
+
+                <!-- Leave Reason -->
+                <div class="form-group">
+                    <label>LEAVE REASON <span>*</span></label>
+                    <textarea id="leaveReason" rows="2" placeholder="રજાનું કારણ લખો..." required></textarea>
+                </div>
+
+                <!-- Leave Report Fill Date -->
+                <div class="form-group">
+                    <label>LEAVE REPORT FILL DATE <span>*</span></label>
+                    <input type="date" id="reportFillDate" onkeydown="return false;" style="cursor: pointer;" required>
+                    <div class="help-text">ફક્ત કેલેન્ડર પરથી જ તારીખ પસંદ કરો.</div>
+                </div>
+
+                <!-- Full Leave Date -->
+                <div class="form-group">
+                    <label>FULL LEAVE DATE</label>
+                    <input type="text" id="fullLeaveDate" placeholder="01/08/2026, 02/08/2026">
+                    <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસની રજા હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
+                </div>
+
+                <!-- First Half Leave Date -->
+                <div class="form-group">
+                    <label>FIRST HALF LEAVE DATE</label>
+                    <input type="text" id="firstHalfDate" placeholder="01/08/2026, 02/08/2026">
+                    <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
+                </div>
+
+                <!-- Second Half Leave Date -->
+                <div class="form-group">
+                    <label>SECOND HALF LEAVE DATE</label>
+                    <input type="text" id="secondHalfDate" placeholder="01/08/2026, 02/08/2026">
+                    <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
+                </div>
+
+                <!-- Total Days Of Leaves -->
+                <div class="form-group">
+                    <label>TOTAL DAYS OF LEAVES <span>*</span></label>
+                    <input type="number" step="0.5" min="0.5" id="totalDays" placeholder="0.5, 1, 1.5, 2" required>
+                    <div class="help-text">ફક્ત નંબર જ લખી શકાશે.</div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-btn">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Realtime Database SDKs via CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, get, update, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFekL3dLq-v1NETC0PQ7zpnX7StutZs8",
+            authDomain: "office-leave-app.firebaseapp.com",
+            databaseURL: "https://office-leave-app-default-rtdb.firebaseio.com", // Realtime Database URL
+            projectId: "office-leave-app",
+            storageBucket: "office-leave-app.appspot.com",
+            messagingSenderId: "609769671596",
+            appId: "1:609769671596:web:6a855afe57bf73b7240809"
+        };
+
+        // Initialize Firebase Realtime Database
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const loggedInTL = {
+            name: "Jainam Dave",
+            department: "IT",
+            role: "TL"
+        };
+
+        window.onload = function() {
+            document.getElementById('welcomeTitle').innerText = `Welcome, ${loggedInTL.name} (${loggedInTL.department})`;
+            document.getElementById('department').value = loggedInTL.department;
+            document.getElementById('reportFillDate').valueAsDate = new Date();
+            
+            loadLeavesFromFirebase();
+        };
+
+        window.openLeaveModal = function() {
+            document.getElementById('leaveModal').style.display = 'flex';
+        }
+
+        window.closeLeaveModal = function() {
+            document.getElementById('leaveModal').style.display = 'none';
+        }
+
+        function validateMultipleDates(dateInputString) {
+            if (!dateInputString) return true;
+            const dates = dateInputString.split(',');
+            const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
+            for (let d of dates) {
+                if (!dateRegex.test(d.trim())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Form Submit Event
+        document.getElementById('leaveRequestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const empName = document.getElementById('employeeName').value.trim();
+            const nameParts = empName.split(/\s+/);
+            if (nameParts.length < 2) {
+                alert('કૃપા કરીને નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખો! (e.g. Jainam Dave)');
+                document.getElementById('employeeName').focus();
+                return;
+            }
+
+            const fullDate = document.getElementById('fullLeaveDate').value.trim();
+            const firstHalf = document.getElementById('firstHalfDate').value.trim();
+            const secondHalf = document.getElementById('secondHalfDate').value.trim();
+
+            if (fullDate && !validateMultipleDates(fullDate)) {
+                alert('FULL LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                return;
+            }
+            if (firstHalf && !validateMultipleDates(firstHalf)) {
+                alert('FIRST HALF LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                return;
+            }
+            if (secondHalf && !validateMultipleDates(secondHalf)) {
+                alert('SECOND HALF LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                return;
+            }
+
+            if (!fullDate && !firstHalf && !secondHalf) {
+                alert('કૃપા કરીને Full, First Half કે Second Half માંથી ઓછામાં ઓછી એક તારીખ લખો.');
+                return;
+            }
+
+            const company = document.getElementById('companyName').value;
+            const dept = document.getElementById('department').value;
+            const totalDays = parseFloat(document.getElementById('totalDays').value);
+            const reason = document.getElementById('leaveReason').value;
+            const fillDateVal = document.getElementById('reportFillDate').value;
+
+            const dateParts = fillDateVal.split('-');
+            const formattedFillDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+
+            let leaveDetailsArr = [];
+            if (fullDate) leaveDetailsArr.push(`Full: ${fullDate}`);
+            if (firstHalf) leaveDetailsArr.push(`1st Half: ${firstHalf}`);
+            if (secondHalf) leaveDetailsArr.push(`2nd Half: ${secondHalf}`);
+            const leaveDetailsStr = leaveDetailsArr.join(' | ');
+
+            const isTLRequest = (empName.toLowerCase() === loggedInTL.name.toLowerCase());
+            const initialStatus = isTLRequest ? "Pending (Management)" : "Pending";
+
+            const newLeaveData = {
+                company: company,
+                department: dept,
+                employeeName: empName,
+                reason: reason,
+                leaveDetails: leaveDetailsStr,
+                totalDays: totalDays,
+                fillDateVal: fillDateVal,
+                formattedFillDate: formattedFillDate,
+                status: initialStatus,
+                isTL: isTLRequest,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                // Save to Firebase Realtime Database under 'leaves' path using push()
+                const leavesRef = ref(db, 'leaves');
+                await push(leavesRef, newLeaveData);
+
+                document.getElementById('leaveRequestForm').reset();
+                document.getElementById('department').value = loggedInTL.department;
+                document.getElementById('reportFillDate').valueAsDate = new Date();
+                closeLeaveModal();
+
+                loadLeavesFromFirebase();
+
+                if (isTLRequest) {
+                    alert('તમારો લીવ રિપોર્ટ Management ને મંજૂરી માટે મોકલી દેવામાં આવ્યો છે!');
+                } else {
+                    alert('લીવ રિક્વેસ્ટ સફળતાપૂર્વક સબમિટ થઈ ગઈ છે!');
+                }
+            } catch (error) {
+                console.error("Error adding data: ", error);
+                alert("ડેટા સેવ કરવામાં ભૂલ આવી છે!");
+            }
+        });
+
+        // Load Data from Firebase Realtime Database
+        window.loadLeavesFromFirebase = async function() {
+            const tableBody = document.getElementById('requestTable');
+            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">લોડ થઈ રહ્યું છે...</td></tr>`;
+
+            try {
+                const dbRef = ref(db);
+                const snapshot = await get(child(dbRef, 'leaves'));
+                tableBody.innerHTML = "";
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const docId = childSnapshot.key;
+                        const data = childSnapshot.val();
+
+                        let actionContent = "";
+                        if (data.status === "Approved") {
+                            actionContent = `<span class="status-text approved">✔ Approved</span>`;
+                        } else if (data.status === "Rejected") {
+                            actionContent = `<span class="status-text rejected">✖ Rejected</span>`;
+                        } else if (data.isTL) {
+                            actionContent = `<span class="status-text pending-mgmt">⏳ Pending (Management)</span>`;
+                        } else {
+                            actionContent = `
+                                <button class="btn-action btn-approve" onclick="updateLeaveStatus('${docId}', 'Approved')">Approve</button>
+                                <button class="btn-action btn-reject" onclick="updateLeaveStatus('${docId}', 'Rejected')">Reject</button>
+                            `;
+                        }
+
+                        const nameBadge = data.isTL 
+                            ? `<b>${data.employeeName}</b> <span class="badge tl-badge">TL</span>` 
+                            : `<b>${data.employeeName}</b>`;
+
+                        const rowHtml = `
+                            <tr id="row-${docId}" data-dept="${data.department}" data-date="${data.fillDateVal}" data-days="${data.totalDays}">
+                                <td><span class="badge req-date">${data.formattedFillDate}</span></td>
+                                <td><span class="badge company">${data.company}</span></td>
+                                <td><span class="badge dept">${data.department}</span></td>
+                                <td class="emp-name">${nameBadge}</td>
+                                <td>${data.reason}</td>
+                                <td>${data.leaveDetails}</td>
+                                <td>${data.totalDays}</td>
+                                <td id="action-${docId}">${actionContent}</td>
+                            </tr>
+                        `;
+                        tableBody.insertAdjacentHTML('beforeend', rowHtml);
+                    });
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">કોઈ ડેટા ઉપલબ્ધ નથી.</td></tr>`;
+                }
+
+                filterTable();
+            } catch (error) {
+                console.error("Error loading data: ", error);
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">ડેટા લાવવામાં ભૂલ થઈ છે.</td></tr>`;
+            }
+        }
+
+        // Update Status in Realtime Database (Approve / Reject)
+        window.updateLeaveStatus = async function(docId, newStatus) {
+            try {
+                const leaveRef = ref(db, `leaves/${docId}`);
+                await update(leaveRef, {
+                    status: newStatus
+                });
+
+                loadLeavesFromFirebase();
+                alert(`લીવ રિક્વેસ્ટ ${newStatus} કરવામાં આવી છે!`);
+            } catch (error) {
+                console.error("Error updating status: ", error);
+                alert("સ્ટેટસ અપડેટ કરવામાં ભૂલ થઈ છે!");
+            }
+        }
+
+        // Filter Functionality
+        window.filterTable = function() {
+            const userDept = loggedInTL.department;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedMonth = document.getElementById('monthSelect').value;
+            const rows = document.querySelectorAll('#requestTable tr');
+
+            let totalDaysCalculated = 0;
+            let pendingRequests = 0;
+            let approvedTodayCount = 0;
+            let rejectedTodayCount = 0;
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            rows.forEach(row => {
+                const rowDept = row.getAttribute('data-dept');
+                const nameCellNode = row.querySelector('.emp-name');
+                if (!nameCellNode) return;
+                
+                const nameCell = nameCellNode.innerText.toLowerCase();
+                const rowDate = row.getAttribute('data-date'); 
+                const rowMonth = rowDate ? rowDate.split('-')[1] : '';
+                const rowDays = parseFloat(row.getAttribute('data-days')) || 0;
+
+                const matchesDept = (rowDept === userDept);
+                const matchesName = (searchVal === '' || nameCell.includes(searchVal));
+                const matchesMonth = (selectedMonth === 'ALL' || rowMonth === selectedMonth);
+
+                if (matchesDept && matchesName && matchesMonth) {
+                    row.style.display = '';
+                    totalDaysCalculated += rowDays;
+
+                    if (row.querySelector('.btn-approve')) {
+                        pendingRequests++;
+                    }
+                    if (row.querySelector('.status-text.approved') && rowDate === todayStr) {
+                        approvedTodayCount++;
+                    }
+                    if (row.querySelector('.status-text.rejected') && rowDate === todayStr) {
+                        rejectedTodayCount++;
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('filteredTotalLeaves').innerText = totalDaysCalculated;
+            document.getElementById('pendingCount').innerText = pendingRequests;
+            document.getElementById('approvedTodayCount').innerText = approvedTodayCount;
+            document.getElementById('rejectedTodayCount').innerText = rejectedTodayCount;
+            document.getElementById('tableHeaderTitle').innerText = `${userDept} Department Leave Requests`;
+        }
+    </script>
+</body>
+</html>

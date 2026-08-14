@@ -136,6 +136,8 @@
             color: #64748b;
             font-size: 15px;
             transition: color 0.3s;
+            z-index: 5;
+            pointer-events: none;
         }
 
         .form-group input[type="text"],
@@ -163,43 +165,6 @@
             border-color: #818cf8;
             background: rgba(15, 23, 42, 0.9);
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-        }
-
-        .dept-checkbox-container {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 12px;
-            max-height: 160px;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-
-        .dept-checkbox-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .dept-checkbox-container::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #cbd5e1;
-            font-size: 13px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: #6366f1;
-            cursor: pointer;
         }
 
         .login-btn {
@@ -368,24 +333,28 @@
                     </div>
                 </div>
 
-                <!-- Multiple Departments Selection Checkboxes -->
+                <!-- Single Department Selection Dropdown -->
                 <div class="form-group">
-                    <label>ડિપાર્ટમેન્ટ (એક કે તેથી વધુ સિલેક્ટ કરો) *</label>
-                    <div class="dept-checkbox-container" id="deptCheckboxGroup">
-                        <label class="checkbox-label"><input type="checkbox" value="FACULTY"> FACULTY</label>
-                        <label class="checkbox-label"><input type="checkbox" value="TYPING"> TYPING</label>
-                        <label class="checkbox-label"><input type="checkbox" value="CONTENT"> CONTENT</label>
-                        <label class="checkbox-label"><input type="checkbox" value="GRAPHIC"> GRAPHIC</label>
-                        <label class="checkbox-label"><input type="checkbox" value="VIDEO EDITING"> VIDEO EDITING</label>
-                        <label class="checkbox-label"><input type="checkbox" value="VIDEO RECORDING"> VIDEO RECORDING</label>
-                        <label class="checkbox-label"><input type="checkbox" value="OFFLINE"> OFFLINE</label>
-                        <label class="checkbox-label"><input type="checkbox" value="CALLING"> CALLING</label>
-                        <label class="checkbox-label"><input type="checkbox" value="MARKETING"> MARKETING</label>
-                        <label class="checkbox-label"><input type="checkbox" value="SALES"> SALES</label>
-                        <label class="checkbox-label"><input type="checkbox" value="MANAGEMENT"> MANAGEMENT</label>
-                        <label class="checkbox-label"><input type="checkbox" value="ACCOUNT"> ACCOUNT</label>
-                        <label class="checkbox-label"><input type="checkbox" value="IT"> IT</label>
-                        <label class="checkbox-label"><input type="checkbox" value="BOOK"> BOOK</label>
+                    <label>ડિપાર્ટમેન્ટ (કોઈપણ એક સિલેક્ટ કરો) *</label>
+                    <div class="input-wrapper">
+                        <select id="regDept" required>
+                            <option value="" disabled selected>-- ડિપાર્ટમેન્ટ પસંદ કરો --</option>
+                            <option value="FACULTY">FACULTY</option>
+                            <option value="TYPING">TYPING</option>
+                            <option value="CONTENT">CONTENT</option>
+                            <option value="GRAPHIC">GRAPHIC</option>
+                            <option value="VIDEO EDITING">VIDEO EDITING</option>
+                            <option value="VIDEO RECORDING">VIDEO RECORDING</option>
+                            <option value="OFFLINE">OFFLINE</option>
+                            <option value="CALLING">CALLING</option>
+                            <option value="MARKETING">MARKETING</option>
+                            <option value="SALES">SALES</option>
+                            <option value="MANAGEMENT">MANAGEMENT</option>
+                            <option value="ACCOUNT">ACCOUNT</option>
+                            <option value="IT">IT</option>
+                            <option value="BOOK">BOOK</option>
+                        </select>
+                        <i class="fa-solid fa-building"></i>
                     </div>
                 </div>
 
@@ -404,7 +373,7 @@
         </div>
     </div>
 
-    <!-- Reset Password Modal (Direct Database Update - No Limits) -->
+    <!-- Reset Password Modal -->
     <div class="modal-overlay" id="forgotModal">
         <div class="modal-card">
             <span class="close-btn" id="closeForgotBtn"><i class="fa-solid fa-xmark"></i></span>
@@ -472,20 +441,11 @@
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const role = document.getElementById('regRole').value;
+            const department = document.getElementById('regDept').value;
             const password = document.getElementById('regPassword').value;
 
             if (role !== "Employee") {
                 alert("⚠️ માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે!");
-                return;
-            }
-
-            const selectedDepts = [];
-            document.querySelectorAll('#deptCheckboxGroup input[type="checkbox"]:checked').forEach((checkbox) => {
-                selectedDepts.push(checkbox.value);
-            });
-
-            if (selectedDepts.length === 0) {
-                alert("⚠️ કૃપા કરીને ઓછામાં ઓછું એક ડિપાર્ટમેન્ટ પસંદ કરો!");
                 return;
             }
 
@@ -503,7 +463,7 @@
                     name, 
                     email, 
                     role, 
-                    departments: selectedDepts,
+                    department: department, // સેવ કરતી વખતે સિંગલ ડિપાર્ટમેન્ટ સેવ થશે
                     password, 
                     createdAt: new Date().toISOString()
                 });
@@ -516,7 +476,7 @@
             }
         });
 
-        // 🔥 Reset Password Logic (Direct Database Update - No Limit)
+        // 🔥 Reset Password Logic
         document.getElementById('forgotForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
@@ -532,7 +492,6 @@
                     return;
                 }
 
-                // સીધો ડેટાબેઝમાં પાસવર્ડ અપડેટ કરો
                 await update(userRef, { password: newPassword });
 
                 alert("✅ પાસવર્ડ સફળતાપૂર્વક બદલાઈ ગયો છે! હવે તમે નવા પાસવર્ડથી લોગિન કરી શકો છો.");

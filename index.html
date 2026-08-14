@@ -165,7 +165,6 @@
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
         }
 
-        /* Multiple Departments Checkbox Box Styling */
         .dept-checkbox-container {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #334155;
@@ -364,8 +363,6 @@
                         <select id="regRole" required>
                             <option value="" disabled selected>-- રોલ પસંદ કરો --</option>
                             <option value="Employee">Employee</option>
-                            <option value="TL">Team Leader (TL)</option>
-                            <option value="Management">Management</option>
                         </select>
                         <i class="fa-solid fa-briefcase"></i>
                     </div>
@@ -447,28 +444,8 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        const getLoggedInUser = () => {
-            const userStr = localStorage.getItem("loggedInUser");
-            return userStr ? JSON.parse(userStr) : null;
-        };
-
-        document.getElementById('openRegBtn').addEventListener('click', async () => {
-            const currentUser = getLoggedInUser();
-            try {
-                const dbRef = ref(db);
-                const snapshot = await get(child(dbRef, "users"));
-                const hasUsers = snapshot.exists();
-
-                if (hasUsers && currentUser) {
-                    if (currentUser.role === "Management" || currentUser.role === "TL") {
-                        alert(`🚫 પરમિશન નથી! ${currentUser.role} રોલ ધરાવતી વ્યક્તિ નવું રજીસ્ટ્રેશન કરી શકે નહીં.`);
-                        return;
-                    }
-                }
-                document.getElementById('registerModal').style.display = 'flex';
-            } catch (err) {
-                document.getElementById('registerModal').style.display = 'flex';
-            }
+        document.getElementById('openRegBtn').addEventListener('click', () => {
+            document.getElementById('registerModal').style.display = 'flex';
         });
 
         document.getElementById('closeRegBtn').addEventListener('click', () => {
@@ -484,7 +461,7 @@
 
         const getCleanKey = (email) => email.trim().toLowerCase().replace(/[.#$\[\]]/g, "_");
 
-        // 🔥 Registration logic with Firebase Auth + Realtime Database + Employee Only Restriction
+        // 🔥 Registration logic: Check Database First, Then Database Save, Then Auth Create
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -492,13 +469,11 @@
             const role = document.getElementById('regRole').value;
             const password = document.getElementById('regPassword').value;
 
-            // 🛑 નિયમ: માત્ર Employee જ રજીસ્ટ્રેશન કરી શકે
             if (role !== "Employee") {
-                alert("⚠️ હવે માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે! Management અને TL ની મર્યાદા પૂરી થઈ ગઈ છે.");
+                alert("⚠️ માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે!");
                 return;
             }
 
-            // Collect selected departments
             const selectedDepts = [];
             document.querySelectorAll('#deptCheckboxGroup input[type="checkbox"]:checked').forEach((checkbox) => {
                 selectedDepts.push(checkbox.value);
@@ -513,29 +488,34 @@
                 const userKey = getCleanKey(email);
                 const dbRef = ref(db);
                 
-                // Check if email already exists in Database
+                // ૧. ચકાસો કે આ ઈમેઈલ પહેલેથી ડેટાબેઝમાં મોજૂદ તો નથી ને?
                 const userSnap = await get(child(dbRef, `users/${userKey}`));
                 if (userSnap.exists()) {
                     alert("⚠️ આ ઈમેઈલ (" + email + ") પહેલેથી જ રજિસ્ટર થયેલો છે! તમે ફરીથી રજીસ્ટ્રેશન કરી શકતા નથી.");
                     return;
                 }
 
-                // ૧. Firebase Authentication માં યુઝર બનાવો
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const authUser = userCredential.user;
-
-                // ૨. Realtime Database માં ડેટા સેવ કરો
+                // ૨. પહેલા Realtime Database માં ડેટા સેવ કરો
                 await set(ref(db, 'users/' + userKey), {
                     name, 
                     email, 
                     role, 
                     departments: selectedDepts,
                     password, 
-                    uid: authUser.uid,
                     createdAt: new Date().toISOString()
                 });
+
+                // ૩. ત્યારબાદ Firebase Authentication માં યુઝર બનાવો (જેથી પાસવર્ડ રીસેટ કામ કરી શકે)
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    // જો uid સેવ કરવો હોય તો ડેટાબેઝ અપડેટ કરી શકાય
+                    await set(ref(db, `users/${userKey}/uid`), userCredential.user.uid);
+                } catch (authError) {
+                    // જો Auth માં પહેલેથી જ એક્ઝિસ્ટ હોય તો પણ ઇગ્નોર કરી શકાય અથવા એરર હેન્ડલ કરી શકાય
+                    console.log("Auth note:", authError.message);
+                }
                 
-                alert(`🎉 રજીસ્ટ્રેશન સફળ રહ્યું! Authentication અને Database બંનેમાં ડેટા સેવ થઈ ગયો છે.`);
+                alert(`🎉 રજીસ્ટ્રેશન સફળ રહ્યું! હવે તમે લોગિન કરી શકો છો.`);
                 document.getElementById('registerModal').style.display = 'none';
                 document.getElementById('registerForm').reset();
             } catch (error) {
@@ -543,7 +523,7 @@
             }
         });
 
-        // 🔥 Forgot Password Logic with Firebase Auth
+        // 🔥 Forgot Password Logic
         document.getElementById('forgotForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
@@ -568,7 +548,7 @@
                 const userKey = getCleanKey(email);
                 const userSnap = await get(child(ref(db), `users/${userKey}`));
                 if (!userSnap.exists()) {
-                    alert("⚠️ આ ઈમેઈલ મળ્યો નથી!");
+                    alert("⚠️ આ ઈમેઈલ મળ્યો નથી! કૃપા કરીને પહેલા રજીસ્ટ્રેશન કરો.");
                     return;
                 }
                 const userData = userSnap.val();

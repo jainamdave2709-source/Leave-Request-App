@@ -491,7 +491,11 @@
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
             const role = document.getElementById('regRole').value;
             const password = document.getElementById('regPassword').value;
-
+// 🛑 નિયમ: 1 Management અને 20 TL પહેલેથી જ આવી ગયા છે, હવે ફક્ત Employee જ રજીસ્ટ્રેશન કરી શકે!
+    if (role !== "Employee") {
+        alert("⚠️ હવે માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે! Management અને TL ની મર્યાદા પૂરી થઈ ગઈ છે.");
+        return; // આગળ વધવા નહીં દે
+    }
             // Collect selected departments
             const selectedDepts = [];
             document.querySelectorAll('#deptCheckboxGroup input[type="checkbox"]:checked').forEach((checkbox) => {

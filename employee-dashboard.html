@@ -384,7 +384,7 @@
                     <div class="form-group">
                         <label>EMPLOYEE NAME <span>*</span></label>
                         <input type="text" id="employeeName" placeholder="Jainam Dave" required>
-                        <div class="help-text">નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</div>
+                        <div class="help-text">નામ અને અટક (Surname) વચ્ચે માત્ર એક જ સ્પેસ મૂકીને નામ લખવું ફરજિયાત છે.</div>
                     </div>
 
                     <!-- Leave Reason -->
@@ -403,26 +403,29 @@
                     <!-- Full Leave Date -->
                     <div class="form-group">
                         <label>FULL LEAVE DATE</label>
-                        <input type="text" id="fullLeaveDate" placeholder="01/08/2026, 02/08/2026">
-                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.</div>
+                        <input type="text" id="fullLeaveDate" placeholder="01/08/2026 અથવા 01/08/2026, 02/08/2026">
+                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું (એકથી વધુ તારીખ માટે વચ્ચે કોમા (,) વાપરવું).</div>
                     </div>
 
                     <!-- First Half Leave Date -->
                     <div class="form-group">
                         <label>FIRST HALF LEAVE DATE</label>
-                        <input type="text" id="firstHalfDate" placeholder="01/08/2026, 02/08/2026">
+                        <input type="text" id="firstHalfDate" placeholder="01/08/2026 અથવા 01/08/2026, 02/08/2026">
+                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.</div>
                     </div>
 
                     <!-- Second Half Leave Date -->
                     <div class="form-group">
                         <label>SECOND HALF LEAVE DATE</label>
-                        <input type="text" id="secondHalfDate" placeholder="01/08/2026, 02/08/2026">
+                        <input type="text" id="secondHalfDate" placeholder="01/08/2026 અથવા 01/08/2026, 02/08/2026">
+                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.</div>
                     </div>
 
                     <!-- Total Days Of Leaves -->
                     <div class="form-group">
                         <label>TOTAL DAYS OF LEAVES <span>*</span></label>
                         <input type="number" step="0.5" min="0.5" id="totalDays" placeholder="0.5, 1, 1.5, 2" required>
+                        <div class="help-text">ફક્ત આંકડા જ લખવા (દા.ત. 1 અથવા 1.5).</div>
                     </div>
 
                     <button type="submit" id="submitBtn" class="submit-btn">Submit Request</button>
@@ -487,7 +490,7 @@
 
         const currentUser = JSON.parse(userStr);
 
-        // Set User details in UI
+        // Set User details in UI (Employee name field is now fully editable)
         document.getElementById('headerEmpName').innerText = `Welcome, ${currentUser.name}`;
         document.getElementById('employeeName').value = currentUser.name;
         if(currentUser.department) {
@@ -653,12 +656,28 @@
             const reason = document.getElementById('leaveReason').value.trim();
             const fillDateVal = document.getElementById('reportFillDate').value;
 
+            // 1. Employee Name Validation: Name & Surname with mandatory single space
+            const nameParts = empName.split(/\s+/);
+            if (nameParts.length !== 2) {
+                alert('EMPLOYEE NAME માં નામ અને અટક (Surname) વચ્ચે માત્ર એક જ સ્પેસ રાખીને બંને લખવું ફરજિયાત છે!');
+                return;
+            }
+
             const fullDate = document.getElementById('fullLeaveDate').value.trim();
             const firstHalf = document.getElementById('firstHalfDate').value.trim();
             const secondHalf = document.getElementById('secondHalfDate').value.trim();
 
+            // 2. Date Formats Validation (dd/mm/yyyy separated by comma)
             if (fullDate && !validateMultipleDates(fullDate)) {
-                alert('FULL LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                alert('FULL LEAVE DATE માં તારીખ ફરજિયાત DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                return;
+            }
+            if (firstHalf && !validateMultipleDates(firstHalf)) {
+                alert('FIRST HALF LEAVE DATE માં તારીખ ફરજિયાત DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                return;
+            }
+            if (secondHalf && !validateMultipleDates(secondHalf)) {
+                alert('SECOND HALF LEAVE DATE માં તારીખ ફરજિયાત DD/MM/YYYY ફોર્મેટમાં જ લખો!');
                 return;
             }
 
@@ -667,7 +686,14 @@
                 return;
             }
 
-            const totalDays = document.getElementById('totalDays').value;
+            // 3. Total Days Validation (Only numbers allowed)
+            const totalDaysVal = document.getElementById('totalDays').value.trim();
+            if (isNaN(totalDaysVal) || totalDaysVal === "") {
+                alert('TOTAL DAYS OF LEAVES માં માત્ર આંકડા જ લખવા!');
+                return;
+            }
+            const totalDays = parseFloat(totalDaysVal);
+
             const dateParts = fillDateVal.split('-');
             const formattedFillDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
             let requestedLeaveDates = fullDate || firstHalf || secondHalf;
@@ -679,6 +705,7 @@
                     await update(leaveRef, {
                         companyName,
                         department,
+                        employeeName: empName,
                         reason,
                         reportFillDate: formattedFillDate,
                         fillDateRaw: fillDateVal,
@@ -710,7 +737,7 @@
                     alert('તમારી લીવ રિક્વેસ્ટ સફળતાપૂર્વક સબમિટ થઈ ગઈ છે!');
                 }
 
-                // Reset form fields
+                // Reset form fields (keeping name)
                 document.getElementById('leaveReason').value = '';
                 document.getElementById('fullLeaveDate').value = '';
                 document.getElementById('firstHalfDate').value = '';

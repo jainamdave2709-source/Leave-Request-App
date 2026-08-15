@@ -516,14 +516,14 @@
                 <!-- First Half Leave Date -->
                 <div class="form-group">
                     <label>FIRST HALF LEAVE DATE</label>
-                    <input type="text" id="firstHalfDate" placeholder="01/08/2026, 02/08/2026">
+                    <input type="text" id="firstHalfDate" placeholder="">
                     <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
                 </div>
 
                 <!-- Second Half Leave Date -->
                 <div class="form-group">
                     <label>SECOND HALF LEAVE DATE</label>
-                    <input type="text" id="secondHalfDate" placeholder="01/08/2026, 02/08/2026">
+                    <input type="text" id="secondHalfDate" placeholder="">
                     <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
                 </div>
 
@@ -581,10 +581,8 @@
             "MAULIK KORINGA": ["VIKAS PATEL"]
         };
 
-        // Get list of all known TL names for robust detection
         const allTLNames = Object.keys(headTlMapping);
 
-        // Robust function to extract user name and departments correctly from localStorage
         function getLoggedInUserInfo() {
             let name = "Anuj";
             let depts = ["IT"];
@@ -650,7 +648,6 @@
             document.getElementById('employeeName').value = loggedInTL.name;
             document.getElementById('reportFillDate').valueAsDate = new Date();
             
-            // Setup Department Dropdown if multiple departments exist
             const deptDropdownContainer = document.getElementById('deptDropdownContainer');
             const deptSelect = document.getElementById('deptSelect');
             
@@ -700,7 +697,7 @@
         }
 
         function validateMultipleDates(dateInputString) {
-            if (!dateInputString) return true;
+            if (!dateInputString || dateInputString.trim() === "") return true;
             const dates = dateInputString.split(',');
             const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
             for (let d of dates) {
@@ -760,7 +757,6 @@
             if (secondHalf) leaveDetailsArr.push(`2nd Half: ${secondHalf}`);
             const leaveDetailsStr = leaveDetailsArr.join(' | ');
 
-            // Check if this person submitting is any of the listed TLs from the image mapping
             const isTLRequest = allTLNames.includes(empName.toUpperCase());
             const initialStatus = isTLRequest ? "Pending (Head TL)" : "Pending";
 
@@ -801,7 +797,6 @@
             }
         });
 
-        // Load Data from Firebase Realtime Database
         window.loadLeavesFromFirebase = async function() {
             const tableBody = document.getElementById('requestTable');
             tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">લોડ થઈ રહ્યું છે...</td></tr>`;
@@ -859,7 +854,6 @@
             }
         }
 
-        // Update Status in Realtime Database (Approve / Reject)
         window.updateLeaveStatus = async function(docId, newStatus) {
             try {
                 const leaveRef = ref(db, `leaves/${docId}`);
@@ -875,12 +869,10 @@
             }
         }
 
-        // Filter Functionality
         window.filterTable = function() {
             const allowedDepts = loggedInTL.departments;
             const currentTLName = loggedInTL.name.trim().toUpperCase();
             
-            // Determine active department filter if multiple exist
             let activeDept = allowedDepts[0];
             if (allowedDepts.length > 1) {
                 const deptSelectElem = document.getElementById('deptSelect');
@@ -916,7 +908,6 @@
                 let shouldShow = false;
 
                 if (isRowTLRequest) {
-                    // Check if current logged-in TL is assigned as Head TL for this submitting TL
                     let headTls = [];
                     for (let key in headTlMapping) {
                         if (key.toUpperCase() === rowEmpName) {
@@ -928,7 +919,6 @@
                         shouldShow = true;
                     }
                 } else {
-                    // Standard employee request checking
                     const isAllowedDept = allowedDepts.includes(rowDept);
                     const matchesActiveDept = (rowDept === activeDept);
                     if (isAllowedDept && matchesActiveDept) {
@@ -949,7 +939,6 @@
                     row.style.display = 'none';
                 }
 
-                // Global stats computation
                 let isRelevantForStats = false;
                 if (isRowTLRequest) {
                     let headTls = [];
@@ -986,8 +975,6 @@
             document.getElementById('approvedTodayCount').innerText = approvedTodayCount;
             document.getElementById('rejectedTodayCount').innerText = rejectedTodayCount;
             document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `Pending Leave Requests` : `Leave Requests Dashboard`;
-            
-            filterPendingOnlyLabel = false;
         }
     </script>
 </body>

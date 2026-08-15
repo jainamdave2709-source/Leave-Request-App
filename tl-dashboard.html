@@ -557,7 +557,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Mapping based on your provided Head TL / TL hierarchy image
         const headTlMapping = {
             "MAHESH RAKHIYANIYA": ["VIKAS PATEL"],
             "MEHUL CHAUHAN": ["MAHESH RAKHIYANIYA", "VIKAS PATEL"],
@@ -725,15 +724,15 @@
             const secondHalf = document.getElementById('secondHalfDate').value.trim();
 
             if (fullDate && !validateMultipleDates(fullDate)) {
-                alert('FULL LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                alert('FULL LEAVE DATE માં તારીખ સાચા DD/MM/YYYY ફોર્મેટમાં લખો!');
                 return;
             }
             if (firstHalf && !validateMultipleDates(firstHalf)) {
-                alert('FIRST HALF LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                alert('FIRST HALF LEAVE DATE માં તારીખ સાચા DD/MM/YYYY ફોર્મેટમાં લખો!');
                 return;
             }
             if (secondHalf && !validateMultipleDates(secondHalf)) {
-                alert('SECOND HALF LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                alert('SECOND HALF LEAVE DATE માં તારીખ સાચા DD/MM/YYYY ફોર્મેટમાં લખો!');
                 return;
             }
 

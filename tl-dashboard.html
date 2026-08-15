@@ -64,6 +64,13 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
         .card h3 {
@@ -83,17 +90,6 @@
         .card.action-card {
             background: linear-gradient(135deg, #4f46e5, #3b82f6);
             color: white;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .card.action-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
         }
 
         .card.action-card h3 {
@@ -352,24 +348,24 @@
 
     <!-- Header Navbar -->
     <div class="navbar">
-        <h2 id="welcomeTitle">Welcome, Jainam Dave</h2>
+        <h2 id="welcomeTitle">Welcome, Anuj</h2>
         <div>
-            <button class="logout-btn" onclick="alert('Logged Out!')">Logout</button>
+            <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
     </div>
 
     <div class="container">
         <!-- Overview Stats Cards -->
         <div class="stats-grid">
-            <div class="card">
+            <div class="card" onclick="filterPendingOnly()" title="ક્લિક કરો ફક્ત પેન્ડિંગ જોવા માટે">
                 <h3>PENDING REQUESTS</h3>
                 <p id="pendingCount" style="color: #f59e0b;">0</p>
             </div>
-            <div class="card">
+            <div class="card" onclick="resetFilters()" title="ક્લિક કરો તમામ જોવા માટે">
                 <h3>APPROVED TODAY</h3>
                 <p id="approvedTodayCount" style="color: #10b981;">0</p>
             </div>
-            <div class="card">
+            <div class="card" onclick="resetFilters()" title="ક્લિક કરો તમામ જોવા માટે">
                 <h3>REJECTED TODAY</h3>
                 <p id="rejectedTodayCount" style="color: #ef4444;">0</p>
             </div>
@@ -485,7 +481,7 @@
                 <!-- Employee Name -->
                 <div class="form-group">
                     <label>EMPLOYEE NAME <span>*</span></label>
-                    <input type="text" id="employeeName" placeholder="Jainam Dave" required>
+                    <input type="text" id="employeeName" placeholder="Anuj Dave" required>
                     <div class="help-text">નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</div>
                 </div>
 
@@ -543,26 +539,29 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAFekL3dLq-v1NETC0PQ7zpnX7StutZs8",
             authDomain: "office-leave-app.firebaseapp.com",
-            databaseURL: "https://office-leave-app-default-rtdb.firebaseio.com", // Realtime Database URL
+            databaseURL: "https://office-leave-app-default-rtdb.firebaseio.com",
             projectId: "office-leave-app",
             storageBucket: "office-leave-app.appspot.com",
             messagingSenderId: "609769671596",
             appId: "1:609769671596:web:6a855afe57bf73b7240809"
         };
 
-        // Initialize Firebase Realtime Database
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Dynamic TL Login data from localStorage (fallback to Anuj if not set)
         const loggedInTL = {
-            name: "Jainam Dave",
-            department: "IT",
+            name: localStorage.getItem('tlName') || "Anuj",
+            department: localStorage.getItem('tlDept') || "IT",
             role: "TL"
         };
+
+        let filterPendingOnlyFlag = false;
 
         window.onload = function() {
             document.getElementById('welcomeTitle').innerText = `Welcome, ${loggedInTL.name} (${loggedInTL.department})`;
             document.getElementById('department').value = loggedInTL.department;
+            document.getElementById('employeeName').value = loggedInTL.name;
             document.getElementById('reportFillDate').valueAsDate = new Date();
             
             loadLeavesFromFirebase();
@@ -574,6 +573,25 @@
 
         window.closeLeaveModal = function() {
             document.getElementById('leaveModal').style.display = 'none';
+        }
+
+        window.logoutUser = function() {
+            localStorage.removeItem('tlName');
+            localStorage.removeItem('tlDept');
+            alert('Logged Out Successfully!');
+            window.location.href = 'login.html'; // તમારા લોગિન પેજનું નામ અહીં બદલી શકો છો
+        }
+
+        window.filterPendingOnly = function() {
+            filterPendingOnlyFlag = true;
+            filterTable();
+        }
+
+        window.resetFilters = function() {
+            filterPendingOnlyFlag = false;
+            document.getElementById('searchInput').value = '';
+            document.getElementById('monthSelect').value = 'ALL';
+            filterTable();
         }
 
         function validateMultipleDates(dateInputString) {
@@ -595,7 +613,7 @@
             const empName = document.getElementById('employeeName').value.trim();
             const nameParts = empName.split(/\s+/);
             if (nameParts.length < 2) {
-                alert('કૃપા કરીને નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખો! (e.g. Jainam Dave)');
+                alert('કૃપા કરીને નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખો! (e.g. Anuj Dave)');
                 document.getElementById('employeeName').focus();
                 return;
             }
@@ -655,12 +673,12 @@
             };
 
             try {
-                // Save to Firebase Realtime Database under 'leaves' path using push()
                 const leavesRef = ref(db, 'leaves');
                 await push(leavesRef, newLeaveData);
 
                 document.getElementById('leaveRequestForm').reset();
                 document.getElementById('department').value = loggedInTL.department;
+                document.getElementById('employeeName').value = loggedInTL.name;
                 document.getElementById('reportFillDate').valueAsDate = new Date();
                 closeLeaveModal();
 
@@ -778,12 +796,15 @@
                 const matchesDept = (rowDept === userDept);
                 const matchesName = (searchVal === '' || nameCell.includes(searchVal));
                 const matchesMonth = (selectedMonth === 'ALL' || rowMonth === selectedMonth);
+                
+                const isPending = row.querySelector('.btn-approve') !== null;
+                const matchesPending = (!filterPendingOnlyFlag || isPending);
 
-                if (matchesDept && matchesName && matchesMonth) {
+                if (matchesDept && matchesName && matchesMonth && matchesPending) {
                     row.style.display = '';
                     totalDaysCalculated += rowDays;
 
-                    if (row.querySelector('.btn-approve')) {
+                    if (isPending) {
                         pendingRequests++;
                     }
                     if (row.querySelector('.status-text.approved') && rowDate === todayStr) {
@@ -801,7 +822,10 @@
             document.getElementById('pendingCount').innerText = pendingRequests;
             document.getElementById('approvedTodayCount').innerText = approvedTodayCount;
             document.getElementById('rejectedTodayCount').innerText = rejectedTodayCount;
-            document.getElementById('tableHeaderTitle').innerText = `${userDept} Department Leave Requests`;
+            document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `${userDept} Department - Pending Requests` : `${userDept} Department Leave Requests`;
+            
+            // Reset flag after filter application so manual searches work normally next time
+            filterPendingOnlyFlag = false;
         }
     </script>
 </body>

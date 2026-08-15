@@ -348,7 +348,7 @@
 
     <!-- Header Navbar -->
     <div class="navbar">
-        <h2 id="welcomeTitle">Welcome, Anuj</h2>
+        <h2 id="welcomeTitle">Welcome, Loading...</h2>
         <div>
             <button class="logout-btn" onclick="logoutUser()">Logout</button>
         </div>
@@ -481,7 +481,7 @@
                 <!-- Employee Name -->
                 <div class="form-group">
                     <label>EMPLOYEE NAME <span>*</span></label>
-                    <input type="text" id="employeeName" placeholder="Anuj Dave" required>
+                    <input type="text" id="employeeName" placeholder="Name Surname" required>
                     <div class="help-text">નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</div>
                 </div>
 
@@ -549,10 +549,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Dynamic TL Login data from localStorage (fallback to Anuj if not set)
+        // Dynamically fetch logged-in user name and department from localStorage (Fallback to Anuj/IT if not found)
         const loggedInTL = {
-            name: localStorage.getItem('tlName') || "Anuj",
-            department: localStorage.getItem('tlDept') || "IT",
+            name: localStorage.getItem('tlName') || localStorage.getItem('loggedInUser') || "Anuj",
+            department: localStorage.getItem('tlDept') || localStorage.getItem('userDept') || "IT",
             role: "TL"
         };
 
@@ -578,8 +578,10 @@
         window.logoutUser = function() {
             localStorage.removeItem('tlName');
             localStorage.removeItem('tlDept');
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('userDept');
             alert('Logged Out Successfully!');
-            window.location.href = 'login.html'; // તમારા લોગિન પેજનું નામ અહીં બદલી શકો છો
+            window.location.href = 'login.html'; // તમારા લૉગિન પેજની ફાઇલનું નામ અહી છે
         }
 
         window.filterPendingOnly = function() {
@@ -613,7 +615,7 @@
             const empName = document.getElementById('employeeName').value.trim();
             const nameParts = empName.split(/\s+/);
             if (nameParts.length < 2) {
-                alert('કૃપા કરીને નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખો! (e.g. Anuj Dave)');
+                alert('કૃપા કરીને નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખો!');
                 document.getElementById('employeeName').focus();
                 return;
             }
@@ -824,7 +826,6 @@
             document.getElementById('rejectedTodayCount').innerText = rejectedTodayCount;
             document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `${userDept} Department - Pending Requests` : `${userDept} Department Leave Requests`;
             
-            // Reset flag after filter application so manual searches work normally next time
             filterPendingOnlyFlag = false;
         }
     </script>

@@ -549,10 +549,63 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Dynamically fetch logged-in user name and department from localStorage (Fallback to Anuj/IT if not found)
+        // Robust function to extract user name and department correctly from localStorage (handles raw JSON strings or direct strings)
+        function getLoggedInUserInfo() {
+            let name = "Anuj";
+            let dept = "IT";
+
+            // Check potential keys used during login
+            const rawKeys = ['tlName', 'loggedInUser', 'user', 'currentUser'];
+            for (let k of rawKeys) {
+                let val = localStorage.getItem(k);
+                if (val) {
+                    try {
+                        let parsed = JSON.parse(val);
+                        if (parsed && typeof parsed === 'object') {
+                            if (parsed.name) name = parsed.name;
+                            if (parsed.departments && Array.isArray(parsed.departments) && parsed.departments.length > 0) {
+                                dept = parsed.departments[0];
+                            } else if (parsed.department) {
+                                dept = parsed.department;
+                            }
+                            break;
+                        }
+                    } catch (e) {
+                        // If it's a plain string
+                        name = val;
+                        break;
+                    }
+                }
+            }
+
+            // Check specific department keys if department is still default
+            const deptKeys = ['tlDept', 'userDept', 'department'];
+            for (let dk of deptKeys) {
+                let dVal = localStorage.getItem(dk);
+                if (dVal) {
+                    try {
+                        let parsedD = JSON.parse(dVal);
+                        if (Array.isArray(parsedD) && parsedD.length > 0) {
+                            dept = parsedD[0];
+                            break;
+                        } else if (typeof parsedD === 'string') {
+                            dept = parsedD;
+                            break;
+                        }
+                    } catch (e) {
+                        dept = dVal;
+                        break;
+                    }
+                }
+            }
+
+            return { name, dept };
+        }
+
+        const userInfo = getLoggedInUserInfo();
         const loggedInTL = {
-            name: localStorage.getItem('tlName') || localStorage.getItem('loggedInUser') || "Anuj",
-            department: localStorage.getItem('tlDept') || localStorage.getItem('userDept') || "IT",
+            name: userInfo.name,
+            department: userInfo.dept,
             role: "TL"
         };
 
@@ -576,12 +629,9 @@
         }
 
         window.logoutUser = function() {
-            localStorage.removeItem('tlName');
-            localStorage.removeItem('tlDept');
-            localStorage.removeItem('loggedInUser');
-            localStorage.removeItem('userDept');
+            localStorage.clear();
             alert('Logged Out Successfully!');
-            window.location.href = 'login.html'; // તમારા લૉગિન પેજની ફાઇલનું નામ અહી છે
+            window.location.href = 'login.html';
         }
 
         window.filterPendingOnly = function() {

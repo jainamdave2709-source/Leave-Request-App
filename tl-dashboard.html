@@ -384,6 +384,14 @@
                 <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="કર્મચારીનું નામ લખો...">
             </div>
 
+            <!-- Department Dropdown Container (Visible only if multiple departments exist) -->
+            <div class="filter-group" id="deptDropdownContainer" style="display: none;">
+                <label for="deptSelect">🏢 ડિપાર્ટમેન્ટ:</label>
+                <select id="deptSelect" onchange="filterTable()">
+                    <!-- Options will be loaded dynamically -->
+                </select>
+            </div>
+
             <div class="filter-group">
                 <label for="monthSelect">📅 મહિનો:</label>
                 <select id="monthSelect" onchange="filterTable()">
@@ -549,12 +557,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Robust function to extract user name and department correctly from localStorage (handles raw JSON strings or direct strings)
+        // Robust function to extract user name and departments correctly from localStorage
         function getLoggedInUserInfo() {
             let name = "Anuj";
-            let dept = "IT";
+            let depts = ["IT"];
 
-            // Check potential keys used during login
             const rawKeys = ['tlName', 'loggedInUser', 'user', 'currentUser'];
             for (let k of rawKeys) {
                 let val = localStorage.getItem(k);
@@ -564,59 +571,75 @@
                         if (parsed && typeof parsed === 'object') {
                             if (parsed.name) name = parsed.name;
                             if (parsed.departments && Array.isArray(parsed.departments) && parsed.departments.length > 0) {
-                                dept = parsed.departments[0];
+                                depts = parsed.departments;
                             } else if (parsed.department) {
-                                dept = parsed.department;
+                                depts = [parsed.department];
                             }
                             break;
                         }
                     } catch (e) {
-                        // If it's a plain string
                         name = val;
                         break;
                     }
                 }
             }
 
-            // Check specific department keys if department is still default
-            const deptKeys = ['tlDept', 'userDept', 'department'];
+            const deptKeys = ['tlDept', 'userDept', 'department', 'departments'];
             for (let dk of deptKeys) {
                 let dVal = localStorage.getItem(dk);
                 if (dVal) {
                     try {
                         let parsedD = JSON.parse(dVal);
                         if (Array.isArray(parsedD) && parsedD.length > 0) {
-                            dept = parsedD[0];
+                            depts = parsedD;
                             break;
                         } else if (typeof parsedD === 'string') {
-                            dept = parsedD;
+                            depts = [dVal];
                             break;
                         }
                     } catch (e) {
-                        dept = dVal;
+                        depts = [dVal];
                         break;
                     }
                 }
             }
 
-            return { name, dept };
+            return { name, depts };
         }
 
         const userInfo = getLoggedInUserInfo();
         const loggedInTL = {
             name: userInfo.name,
-            department: userInfo.dept,
+            departments: userInfo.depts,
             role: "TL"
         };
 
         let filterPendingOnlyFlag = false;
 
         window.onload = function() {
-            document.getElementById('welcomeTitle').innerText = `Welcome, ${loggedInTL.name} (${loggedInTL.department})`;
-            document.getElementById('department').value = loggedInTL.department;
+            const deptDisplayStr = loggedInTL.departments.join(', ');
+            document.getElementById('welcomeTitle').innerText = `Welcome, ${loggedInTL.name} (${deptDisplayStr})`;
+            document.getElementById('department').value = loggedInTL.departments[0];
             document.getElementById('employeeName').value = loggedInTL.name;
             document.getElementById('reportFillDate').valueAsDate = new Date();
             
+            // Setup Department Dropdown if multiple departments exist
+            const deptDropdownContainer = document.getElementById('deptDropdownContainer');
+            const deptSelect = document.getElementById('deptSelect');
+            
+            if (loggedInTL.departments.length > 1) {
+                deptDropdownContainer.style.display = 'flex';
+                deptSelect.innerHTML = '';
+                loggedInTL.departments.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.innerText = d;
+                    deptSelect.appendChild(opt);
+                });
+            } else {
+                deptDropdownContainer.style.display = 'none';
+            }
+
             loadLeavesFromFirebase();
         };
 
@@ -643,6 +666,9 @@
             filterPendingOnlyFlag = false;
             document.getElementById('searchInput').value = '';
             document.getElementById('monthSelect').value = 'ALL';
+            if(loggedInTL.departments.length > 1) {
+                document.getElementById('deptSelect').selectedIndex = 0;
+            }
             filterTable();
         }
 
@@ -729,7 +755,7 @@
                 await push(leavesRef, newLeaveData);
 
                 document.getElementById('leaveRequestForm').reset();
-                document.getElementById('department').value = loggedInTL.department;
+                document.getElementById('department').value = loggedInTL.departments[0];
                 document.getElementById('employeeName').value = loggedInTL.name;
                 document.getElementById('reportFillDate').valueAsDate = new Date();
                 closeLeaveModal();
@@ -823,7 +849,17 @@
 
         // Filter Functionality
         window.filterTable = function() {
-            const userDept = loggedInTL.department;
+            const allowedDepts = loggedInTL.departments;
+            
+            // Determine active department filter if multiple exist
+            let activeDept = allowedDepts[0];
+            if (allowedDepts.length > 1) {
+                const deptSelectElem = document.getElementById('deptSelect');
+                if (deptSelectElem && deptSelectElem.value) {
+                    activeDept = deptSelectElem.value;
+                }
+            }
+
             const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
             const selectedMonth = document.getElementById('monthSelect').value;
             const rows = document.querySelectorAll('#requestTable tr');
@@ -845,17 +881,26 @@
                 const rowMonth = rowDate ? rowDate.split('-')[1] : '';
                 const rowDays = parseFloat(row.getAttribute('data-days')) || 0;
 
-                const matchesDept = (rowDept === userDept);
+                // Check if row department matches TL's authorized list
+                const isAllowedDept = allowedDepts.includes(rowDept);
+                const matchesActiveDept = (rowDept === activeDept);
+
                 const matchesName = (searchVal === '' || nameCell.includes(searchVal));
                 const matchesMonth = (selectedMonth === 'ALL' || rowMonth === selectedMonth);
                 
                 const isPending = row.querySelector('.btn-approve') !== null;
                 const matchesPending = (!filterPendingOnlyFlag || isPending);
 
-                if (matchesDept && matchesName && matchesMonth && matchesPending) {
+                // Row is displayed only if it matches the selected dropdown department and other filters
+                if (isAllowedDept && matchesActiveDept && matchesName && matchesMonth && matchesPending) {
                     row.style.display = '';
                     totalDaysCalculated += rowDays;
+                } else {
+                    row.style.display = 'none';
+                }
 
+                // Global stats computation across all authorized departments for this TL
+                if (isAllowedDept) {
                     if (isPending) {
                         pendingRequests++;
                     }
@@ -865,8 +910,6 @@
                     if (row.querySelector('.status-text.rejected') && rowDate === todayStr) {
                         rejectedTodayCount++;
                     }
-                } else {
-                    row.style.display = 'none';
                 }
             });
 
@@ -874,7 +917,7 @@
             document.getElementById('pendingCount').innerText = pendingRequests;
             document.getElementById('approvedTodayCount').innerText = approvedTodayCount;
             document.getElementById('rejectedTodayCount').innerText = rejectedTodayCount;
-            document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `${userDept} Department - Pending Requests` : `${userDept} Department Leave Requests`;
+            document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `${activeDept} Department - Pending Requests` : `${activeDept} Department Leave Requests`;
             
             filterPendingOnlyFlag = false;
         }

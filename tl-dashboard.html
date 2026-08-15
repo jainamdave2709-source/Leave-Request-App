@@ -412,14 +412,14 @@
             </div>
 
             <div class="total-leave-badge">
-                Department Total Leaves: <span id="filteredTotalLeaves">0</span> Days
+                Total Leaves: <span id="filteredTotalLeaves">0</span> Days
             </div>
         </div>
 
         <!-- Leave Requests Table Box -->
         <div class="section-box">
             <div class="header-flex">
-                <h3 id="tableHeaderTitle">Team Leave Requests</h3>
+                <h3 id="tableHeaderTitle">Leave Requests</h3>
             </div>
 
             <div class="table-responsive">
@@ -580,6 +580,9 @@
             "NILESH GADHAVI": ["VIKAS PATEL"],
             "MAULIK KORINGA": ["VIKAS PATEL"]
         };
+
+        // Get list of all known TL names for robust detection
+        const allTLNames = Object.keys(headTlMapping);
 
         // Robust function to extract user name and departments correctly from localStorage
         function getLoggedInUserInfo() {
@@ -757,7 +760,8 @@
             if (secondHalf) leaveDetailsArr.push(`2nd Half: ${secondHalf}`);
             const leaveDetailsStr = leaveDetailsArr.join(' | ');
 
-            const isTLRequest = (empName.toLowerCase() === loggedInTL.name.toLowerCase());
+            // Check if this person submitting is any of the listed TLs from the image mapping
+            const isTLRequest = allTLNames.includes(empName.toUpperCase());
             const initialStatus = isTLRequest ? "Pending (Head TL)" : "Pending";
 
             const newLeaveData = {
@@ -981,9 +985,9 @@
             document.getElementById('pendingCount').innerText = pendingRequests;
             document.getElementById('approvedTodayCount').innerText = approvedTodayCount;
             document.getElementById('rejectedTodayCount').innerText = rejectedTodayCount;
-            document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `Pending Leave Requests` : `Team & Head TL Leave Requests`;
+            document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `Pending Leave Requests` : `Leave Requests Dashboard`;
             
-            filterPendingOnlyFlag = false;
+            filterPendingOnlyLabel = false;
         }
     </script>
 </body>

@@ -557,6 +557,30 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Mapping based on your provided Head TL / TL hierarchy image
+        const headTlMapping = {
+            "MAHESH RAKHIYANIYA": ["VIKAS PATEL"],
+            "MEHUL CHAUHAN": ["MAHESH RAKHIYANIYA", "VIKAS PATEL"],
+            "PARTH GADHAVI": ["VIKAS PATEL"],
+            "LAKHAN BHATIYA": ["VIKAS PATEL"],
+            "PIYUSH KOTVADIYA": ["LAKHAN BHATIYA", "VIKAS PATEL"],
+            "KANJI KUCHHADIYA": ["VIKAS PATEL"],
+            "AJAY KHUNTI": ["KANJI KUCHHADIYA", "VIKAS PATEL"],
+            "PARAS BHUVA": ["MAHESH RAKHIYANIYA", "MEHUL CHAUHAN"],
+            "KHUSHBU SOLANKI": ["MAHESH RAKHIYANIYA"],
+            "KOMAL RAVAL": ["KHUSHBU SOLANKI"],
+            "YOGESH PRAJAPATI": ["MAHESH RAKHIYANIYA", "MEHUL CHAUHAN"],
+            "JIGNESH SADARIYA": ["YOGESH PRAJAPATI"],
+            "NIKUNJ RATHOD": ["MAHESH RAKHIYANIYA", "MEHUL CHAUHAN"],
+            "KUNDAN PATEL": ["VIKAS PATEL"],
+            "SANJAY CHAUDHARY": ["VIKAS PATEL"],
+            "PARTH PANCHAL": ["VIKAS PATEL"],
+            "SIDDHARTH MAROO": ["VIKAS PATEL"],
+            "MANGALA RAVAL": ["MAHESH RAKHIYANIYA", "MEHUL CHAUHAN"],
+            "NILESH GADHAVI": ["VIKAS PATEL"],
+            "MAULIK KORINGA": ["VIKAS PATEL"]
+        };
+
         // Robust function to extract user name and departments correctly from localStorage
         function getLoggedInUserInfo() {
             let name = "Anuj";
@@ -734,7 +758,7 @@
             const leaveDetailsStr = leaveDetailsArr.join(' | ');
 
             const isTLRequest = (empName.toLowerCase() === loggedInTL.name.toLowerCase());
-            const initialStatus = isTLRequest ? "Pending (Management)" : "Pending";
+            const initialStatus = isTLRequest ? "Pending (Head TL)" : "Pending";
 
             const newLeaveData = {
                 company: company,
@@ -763,7 +787,7 @@
                 loadLeavesFromFirebase();
 
                 if (isTLRequest) {
-                    alert('તમારો લીવ રિપોર્ટ Management ને મંજૂરી માટે મોકલી દેવામાં આવ્યો છે!');
+                    alert('તમારો લીવ રિપોર્ટ Head TL ને મંજૂરી માટે મોકલી દેવામાં આવ્યો છે!');
                 } else {
                     alert('લીવ રિક્વેસ્ટ સફળતાપૂર્વક સબમિટ થઈ ગઈ છે!');
                 }
@@ -794,7 +818,7 @@
                         } else if (data.status === "Rejected") {
                             actionContent = `<span class="status-text rejected">✖ Rejected</span>`;
                         } else if (data.isTL) {
-                            actionContent = `<span class="status-text pending-mgmt">⏳ Pending (Management)</span>`;
+                            actionContent = `<span class="status-text pending-mgmt">⏳ Pending (Head TL)</span>`;
                         } else {
                             actionContent = `
                                 <button class="btn-action btn-approve" onclick="updateLeaveStatus('${docId}', 'Approved')">Approve</button>
@@ -807,7 +831,7 @@
                             : `<b>${data.employeeName}</b>`;
 
                         const rowHtml = `
-                            <tr id="row-${docId}" data-dept="${data.department}" data-date="${data.fillDateVal}" data-days="${data.totalDays}">
+                            <tr id="row-${docId}" data-dept="${data.department}" data-name="${data.employeeName}" data-is-tl="${data.isTL ? 'true' : 'false'}" data-date="${data.fillDateVal}" data-days="${data.totalDays}">
                                 <td><span class="badge req-date">${data.formattedFillDate}</span></td>
                                 <td><span class="badge company">${data.company}</span></td>
                                 <td><span class="badge dept">${data.department}</span></td>
@@ -850,6 +874,7 @@
         // Filter Functionality
         window.filterTable = function() {
             const allowedDepts = loggedInTL.departments;
+            const currentTLName = loggedInTL.name.trim().toUpperCase();
             
             // Determine active department filter if multiple exist
             let activeDept = allowedDepts[0];
@@ -873,6 +898,9 @@
 
             rows.forEach(row => {
                 const rowDept = row.getAttribute('data-dept');
+                const rowEmpName = (row.getAttribute('data-name') || "").trim().toUpperCase();
+                const isRowTLRequest = row.getAttribute('data-is-tl') === 'true';
+
                 const nameCellNode = row.querySelector('.emp-name');
                 if (!nameCellNode) return;
                 
@@ -881,9 +909,28 @@
                 const rowMonth = rowDate ? rowDate.split('-')[1] : '';
                 const rowDays = parseFloat(row.getAttribute('data-days')) || 0;
 
-                // Check if row department matches TL's authorized list
-                const isAllowedDept = allowedDepts.includes(rowDept);
-                const matchesActiveDept = (rowDept === activeDept);
+                let shouldShow = false;
+
+                if (isRowTLRequest) {
+                    // Check if current logged-in TL is assigned as Head TL for this submitting TL
+                    let headTls = [];
+                    for (let key in headTlMapping) {
+                        if (key.toUpperCase() === rowEmpName) {
+                            headTls = headTlMapping[key].map(h => h.toUpperCase());
+                            break;
+                        }
+                    }
+                    if (headTls.includes(currentTLName)) {
+                        shouldShow = true;
+                    }
+                } else {
+                    // Standard employee request checking
+                    const isAllowedDept = allowedDepts.includes(rowDept);
+                    const matchesActiveDept = (rowDept === activeDept);
+                    if (isAllowedDept && matchesActiveDept) {
+                        shouldShow = true;
+                    }
+                }
 
                 const matchesName = (searchVal === '' || nameCell.includes(searchVal));
                 const matchesMonth = (selectedMonth === 'ALL' || rowMonth === selectedMonth);
@@ -891,16 +938,33 @@
                 const isPending = row.querySelector('.btn-approve') !== null;
                 const matchesPending = (!filterPendingOnlyFlag || isPending);
 
-                // Row is displayed only if it matches the selected dropdown department and other filters
-                if (isAllowedDept && matchesActiveDept && matchesName && matchesMonth && matchesPending) {
+                if (shouldShow && matchesName && matchesMonth && matchesPending) {
                     row.style.display = '';
                     totalDaysCalculated += rowDays;
                 } else {
                     row.style.display = 'none';
                 }
 
-                // Global stats computation across all authorized departments for this TL
-                if (isAllowedDept) {
+                // Global stats computation
+                let isRelevantForStats = false;
+                if (isRowTLRequest) {
+                    let headTls = [];
+                    for (let key in headTlMapping) {
+                        if (key.toUpperCase() === rowEmpName) {
+                            headTls = headTlMapping[key].map(h => h.toUpperCase());
+                            break;
+                        }
+                    }
+                    if (headTls.includes(currentTLName)) {
+                        isRelevantForStats = true;
+                    }
+                } else {
+                    if (allowedDepts.includes(rowDept)) {
+                        isRelevantForStats = true;
+                    }
+                }
+
+                if (isRelevantForStats) {
                     if (isPending) {
                         pendingRequests++;
                     }
@@ -917,7 +981,7 @@
             document.getElementById('pendingCount').innerText = pendingRequests;
             document.getElementById('approvedTodayCount').innerText = approvedTodayCount;
             document.getElementById('rejectedTodayCount').innerText = rejectedTodayCount;
-            document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `${activeDept} Department - Pending Requests` : `${activeDept} Department Leave Requests`;
+            document.getElementById('tableHeaderTitle').innerText = filterPendingOnlyFlag ? `Pending Leave Requests` : `Team & Head TL Leave Requests`;
             
             filterPendingOnlyFlag = false;
         }

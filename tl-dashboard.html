@@ -86,23 +86,90 @@
             color: #1f2937;
         }
 
-        /* Action Card for Modal */
-        .card.action-card {
-            background: linear-gradient(135deg, #4f46e5, #3b82f6);
-            color: white;
+        /* Main Layout Grid for Form & Table */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 25px;
+            align-items: start;
         }
 
-        .card.action-card h3 {
-            color: #e0e7ff;
+        @media(max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .card.action-card .btn-text {
+        /* Inline Form Box */
+        .form-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-box h3 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
             font-size: 18px;
-            font-weight: bold;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 6px 14px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .form-group label span {
+            color: red;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
-            margin-top: 5px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: #4f46e5;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 3px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: #059669;
         }
 
         /* Search & Filter Bar */
@@ -111,7 +178,7 @@
             padding: 15px 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: flex;
             gap: 15px;
             align-items: center;
@@ -239,109 +306,6 @@
         .status-text.approved { color: #10b981; }
         .status-text.rejected { color: #ef4444; }
         .status-text.pending-mgmt { color: #d97706; font-style: italic; }
-
-        /* Modal Overlay Styling */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-box {
-            background: white;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            position: relative;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
-        }
-
-        .modal-header h3 {
-            color: #374151;
-            font-size: 18px;
-        }
-
-        .close-modal {
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #6b7280;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #4b5563;
-        }
-
-        .form-group label span {
-            color: red;
-        }
-
-        .form-group input, 
-        .form-group select, 
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            outline: none;
-            font-size: 14px;
-        }
-
-        .form-group input:focus, 
-        .form-group select:focus, 
-        .form-group textarea:focus {
-            border-color: #4f46e5;
-        }
-
-        .help-text {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 3px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            background-color: #10b981;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            background-color: #059669;
-        }
     </style>
 </head>
 <body>
@@ -369,173 +333,170 @@
                 <h3>REJECTED TODAY</h3>
                 <p id="rejectedTodayCount" style="color: #ef4444;">0</p>
             </div>
+        </div>
+
+        <!-- Main Layout: Form on Left, Table & Filters on Right -->
+        <div class="main-layout">
             
-            <!-- APPLY FOR LEAVE BUTTON CARD -->
-            <div class="card action-card" onclick="openLeaveModal()">
-                <h3>APPLY FOR LEAVE</h3>
-                <div class="btn-text">📝 Leave Request Form</div>
-            </div>
-        </div>
-
-        <!-- Search & Filter Controls -->
-        <div class="filter-card">
-            <div class="filter-group">
-                <label for="searchInput">🔍 નામથી સર્ચ કરો:</label>
-                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="કર્મચારીનું નામ લખો...">
-            </div>
-
-            <!-- Department Dropdown Container (Visible only if multiple departments exist) -->
-            <div class="filter-group" id="deptDropdownContainer" style="display: none;">
-                <label for="deptSelect">🏢 ડિપાર્ટમેન્ટ:</label>
-                <select id="deptSelect" onchange="filterTable()">
-                    <!-- Options will be loaded dynamically -->
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="monthSelect">📅 મહિનો:</label>
-                <select id="monthSelect" onchange="filterTable()">
-                    <option value="ALL">તમામ મહિનાઓ (All)</option>
-                    <option value="01">જાન્યુઆરી (Jan)</option>
-                    <option value="02">ફેબ્રુઆરી (Feb)</option>
-                    <option value="03">માર્ચ (Mar)</option>
-                    <option value="04">એપ્રિલ (Apr)</option>
-                    <option value="05">મે (May)</option>
-                    <option value="06">જૂન (Jun)</option>
-                    <option value="07">જુલાઈ (Jul)</option>
-                    <option value="08" selected>ઓગસ્ટ (Aug)</option>
-                    <option value="09">સપ્ટેમ્બર (Sep)</option>
-                    <option value="10">ઓક્ટોબર (Oct)</option>
-                    <option value="11">નવેમ્બર (Nov)</option>
-                    <option value="12">ડિસેમ્બર (Dec)</option>
-                </select>
-            </div>
-
-            <div class="total-leave-badge">
-                Total Leaves: <span id="filteredTotalLeaves">0</span> Days
-            </div>
-        </div>
-
-        <!-- Leave Requests Table Box -->
-        <div class="section-box">
-            <div class="header-flex">
-                <h3 id="tableHeaderTitle">Leave Requests</h3>
-            </div>
-
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Request Date</th>
-                            <th>Company</th>
-                            <th>Dept</th>
-                            <th>Employee Name</th>
-                            <th>Reason</th>
-                            <th>Leave Details</th>
-                            <th>Total Days</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="requestTable">
-                        <!-- Data will be loaded dynamically from Firebase Realtime Database -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL FORM -->
-    <div class="modal-overlay" id="leaveModal">
-        <div class="modal-box">
-            <div class="modal-header">
+            <!-- LEAVE REQUEST FORM (Inline) -->
+            <div class="form-box">
                 <h3>LEAVE REQUEST FORM</h3>
-                <span class="close-modal" onclick="closeLeaveModal()">&times;</span>
-            </div>
-            
-            <form id="leaveRequestForm">
                 
-                <!-- Company Name -->
-                <div class="form-group">
-                    <label>COMPANY NAME <span>*</span></label>
-                    <select id="companyName" required>
-                        <option value="" disabled selected>-- કંપની પસંદ કરો --</option>
-                        <option value="WEBSANKUL">WEBSANKUL</option>
-                        <option value="HOUSIVITY">HOUSIVITY</option>
-                    </select>
+                <form id="leaveRequestForm">
+                    
+                    <!-- Company Name -->
+                    <div class="form-group">
+                        <label>COMPANY NAME <span>*</span></label>
+                        <select id="companyName" required>
+                            <option value="" disabled selected>-- કંપની પસંદ કરો --</option>
+                            <option value="WEBSANKUL">WEBSANKUL</option>
+                            <option value="HOUSIVITY">HOUSIVITY</option>
+                        </select>
+                    </div>
+
+                    <!-- Department -->
+                    <div class="form-group">
+                        <label>DEPARTMENT <span>*</span></label>
+                        <select id="department" required>
+                            <option value="" disabled selected>-- ડિપાર્ટમેન્ટ પસંદ કરો --</option>
+                            <option value="FACULTY">FACULTY</option>
+                            <option value="TYPING">TYPING</option>
+                            <option value="CONTENT">CONTENT</option>
+                            <option value="GRAPHIC">GRAPHIC</option>
+                            <option value="VIDEO EDITING">VIDEO EDITING</option>
+                            <option value="VIDEO RECORDING">VIDEO RECORDING</option>
+                            <option value="OFFLINE">OFFLINE</option>
+                            <option value="CALLING">CALLING</option>
+                            <option value="MARKETING">MARKETING</option>
+                            <option value="SALES">SALES</option>
+                            <option value="MANAGEMENT">MANAGEMENT</option>
+                            <option value="ACCOUNT">ACCOUNT</option>
+                            <option value="IT">IT</option>
+                            <option value="BOOK">BOOK</option>
+                        </select>
+                    </div>
+
+                    <!-- Employee Name -->
+                    <div class="form-group">
+                        <label>EMPLOYEE NAME <span>*</span></label>
+                        <input type="text" id="employeeName" placeholder="Name Surname" required>
+                        <div class="help-text">નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</div>
+                    </div>
+
+                    <!-- Leave Reason -->
+                    <div class="form-group">
+                        <label>LEAVE REASON <span>*</span></label>
+                        <textarea id="leaveReason" rows="2" placeholder="રજાનું કારણ લખો..." required></textarea>
+                    </div>
+
+                    <!-- Leave Report Fill Date -->
+                    <div class="form-group">
+                        <label>LEAVE REPORT FILL DATE <span>*</span></label>
+                        <input type="date" id="reportFillDate" onkeydown="return false;" style="cursor: pointer;" required>
+                        <div class="help-text">ફક્ત કેલેન્ડર પરથી જ તારીખ પસંદ કરો.</div>
+                    </div>
+
+                    <!-- Full Leave Date -->
+                    <div class="form-group">
+                        <label>FULL LEAVE DATE</label>
+                        <input type="text" id="fullLeaveDate" placeholder="01/08/2026, 02/08/2026">
+                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસની રજા હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
+                    </div>
+
+                    <!-- First Half Leave Date -->
+                    <div class="form-group">
+                        <label>FIRST HALF LEAVE DATE</label>
+                        <input type="text" id="firstHalfDate" placeholder="">
+                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
+                    </div>
+
+                    <!-- Second Half Leave Date -->
+                    <div class="form-group">
+                        <label>SECOND HALF LEAVE DATE</label>
+                        <input type="text" id="secondHalfDate" placeholder="">
+                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
+                    </div>
+
+                    <!-- Total Days Of Leaves -->
+                    <div class="form-group">
+                        <label>TOTAL DAYS OF LEAVES <span>*</span></label>
+                        <input type="number" step="0.5" min="0.5" id="totalDays" placeholder="0.5, 1, 1.5, 2" required>
+                        <div class="help-text">ફક્ત નંબર જ લખી શકાશે.</div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="submit-btn">Submit Request</button>
+                </form>
+            </div>
+
+            <!-- Right Side: Filter & Table Section -->
+            <div>
+                <!-- Search & Filter Controls -->
+                <div class="filter-card">
+                    <div class="filter-group">
+                        <label for="searchInput">🔍 નામથી સર્ચ કરો:</label>
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="કર્મચારીનું નામ લખો...">
+                    </div>
+
+                    <!-- Department Dropdown Container -->
+                    <div class="filter-group" id="deptDropdownContainer" style="display: none;">
+                        <label for="deptSelect">🏢 ડિપાર્ટમેન્ટ:</label>
+                        <select id="deptSelect" onchange="filterTable()">
+                            <!-- Options will be loaded dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="monthSelect">📅 મહિનો:</label>
+                        <select id="monthSelect" onchange="filterTable()">
+                            <option value="ALL">તમામ મહિનાઓ (All)</option>
+                            <option value="01">જાન્યુઆરી (Jan)</option>
+                            <option value="02">ફેબ્રુઆરી (Feb)</option>
+                            <option value="03">માર્ચ (Mar)</option>
+                            <option value="04">એપ્રિલ (Apr)</option>
+                            <option value="05">મે (May)</option>
+                            <option value="06">જૂન (Jun)</option>
+                            <option value="07">જુલાઈ (Jul)</option>
+                            <option value="08" selected>ઓગસ્ટ (Aug)</option>
+                            <option value="09">સપ્ટેમ્બર (Sep)</option>
+                            <option value="10">ઓક્ટોબર (Oct)</option>
+                            <option value="11">નવેમ્બર (Nov)</option>
+                            <option value="12">ડિસેમ્બર (Dec)</option>
+                        </select>
+                    </div>
+
+                    <div class="total-leave-badge">
+                        Total Leaves: <span id="filteredTotalLeaves">0</span> Days
+                    </div>
                 </div>
 
-                <!-- Department -->
-                <div class="form-group">
-                    <label>DEPARTMENT <span>*</span></label>
-                    <select id="department" required>
-                        <option value="" disabled selected>-- ડિપાર્ટમેન્ટ પસંદ કરો --</option>
-                        <option value="FACULTY">FACULTY</option>
-                        <option value="TYPING">TYPING</option>
-                        <option value="CONTENT">CONTENT</option>
-                        <option value="GRAPHIC">GRAPHIC</option>
-                        <option value="VIDEO EDITING">VIDEO EDITING</option>
-                        <option value="VIDEO RECORDING">VIDEO RECORDING</option>
-                        <option value="OFFLINE">OFFLINE</option>
-                        <option value="CALLING">CALLING</option>
-                        <option value="MARKETING">MARKETING</option>
-                        <option value="SALES">SALES</option>
-                        <option value="MANAGEMENT">MANAGEMENT</option>
-                        <option value="ACCOUNT">ACCOUNT</option>
-                        <option value="IT">IT</option>
-                        <option value="BOOK">BOOK</option>
-                    </select>
-                </div>
+                <!-- Leave Requests Table Box -->
+                <div class="section-box">
+                    <div class="header-flex">
+                        <h3 id="tableHeaderTitle">Leave Requests</h3>
+                    </div>
 
-                <!-- Employee Name -->
-                <div class="form-group">
-                    <label>EMPLOYEE NAME <span>*</span></label>
-                    <input type="text" id="employeeName" placeholder="Name Surname" required>
-                    <div class="help-text">નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Request Date</th>
+                                    <th>Company</th>
+                                    <th>Dept</th>
+                                    <th>Employee Name</th>
+                                    <th>Reason</th>
+                                    <th>Leave Details</th>
+                                    <th>Total Days</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requestTable">
+                                <!-- Data will be loaded dynamically from Firebase Realtime Database -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Leave Reason -->
-                <div class="form-group">
-                    <label>LEAVE REASON <span>*</span></label>
-                    <textarea id="leaveReason" rows="2" placeholder="રજાનું કારણ લખો..." required></textarea>
-                </div>
-
-                <!-- Leave Report Fill Date -->
-                <div class="form-group">
-                    <label>LEAVE REPORT FILL DATE <span>*</span></label>
-                    <input type="date" id="reportFillDate" onkeydown="return false;" style="cursor: pointer;" required>
-                    <div class="help-text">ફક્ત કેલેન્ડર પરથી જ તારીખ પસંદ કરો.</div>
-                </div>
-
-                <!-- Full Leave Date -->
-                <div class="form-group">
-                    <label>FULL LEAVE DATE</label>
-                    <input type="text" id="fullLeaveDate" placeholder="01/08/2026, 02/08/2026">
-                    <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસની રજા હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
-                </div>
-
-                <!-- First Half Leave Date -->
-                <div class="form-group">
-                    <label>FIRST HALF LEAVE DATE</label>
-                    <input type="text" id="firstHalfDate" placeholder="">
-                    <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
-                </div>
-
-                <!-- Second Half Leave Date -->
-                <div class="form-group">
-                    <label>SECOND HALF LEAVE DATE</label>
-                    <input type="text" id="secondHalfDate" placeholder="">
-                    <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</div>
-                </div>
-
-                <!-- Total Days Of Leaves -->
-                <div class="form-group">
-                    <label>TOTAL DAYS OF LEAVES <span>*</span></label>
-                    <input type="number" step="0.5" min="0.5" id="totalDays" placeholder="0.5, 1, 1.5, 2" required>
-                    <div class="help-text">ફક્ત નંબર જ લખી શકાશે.</div>
-                </div>
-
-                <button type="submit" id="submitBtn" class="submit-btn">Submit Request</button>
-            </form>
         </div>
     </div>
 
@@ -666,14 +627,6 @@
             loadLeavesFromFirebase();
         };
 
-        window.openLeaveModal = function() {
-            document.getElementById('leaveModal').style.display = 'flex';
-        }
-
-        window.closeLeaveModal = function() {
-            document.getElementById('leaveModal').style.display = 'none';
-        }
-
         window.logoutUser = function() {
             localStorage.clear();
             alert('Logged Out Successfully!');
@@ -781,7 +734,6 @@
                 document.getElementById('department').value = loggedInTL.departments[0];
                 document.getElementById('employeeName').value = loggedInTL.name;
                 document.getElementById('reportFillDate').valueAsDate = new Date();
-                closeLeaveModal();
 
                 loadLeavesFromFirebase();
 

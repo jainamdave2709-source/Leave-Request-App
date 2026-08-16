@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TL Dashboard - Leave Management</title>
+    <title>TL Dashboard - Leave Management[cite: 1]</title>
     <style>
         * {
             box-sizing: border-box;
@@ -544,7 +544,8 @@
         const allTLNames = Object.keys(headTlMapping);
 
         function getLoggedInUserInfo() {
-            let name = "Anuj";
+            // જો લોકલ સ્ટોરેજ ખાલી હોય તો ટેસ્ટિંગ માટે 'Anuj' અથવા તમારી જરૂરિયાત મુજબ નામ સેટ કરી શકાય
+            let name = localStorage.getItem('tlName') || localStorage.getItem('loggedInUser') || "Anuj";
             let depts = ["IT"];
 
             const rawKeys = ['tlName', 'loggedInUser', 'user', 'currentUser'];
@@ -762,13 +763,30 @@
                         const docId = childSnapshot.key;
                         const data = childSnapshot.val();
 
+                        // જો ડેટાબેઝમાં ડિપાર્ટમેન્ટ મેચ થતો હોય અથવા તે હેડ TL રિક્વેસ્ટ હોય
+                        let showRow = false;
                         if (loggedInTL.departments.includes(data.department)) {
+                            showRow = true;
+                        } else if (data.isTL) {
+                            let headTls = [];
+                            for (let key in headTlMapping) {
+                                if (key.toUpperCase() === (data.employeeName || "").trim().toUpperCase()) {
+                                    headTls = headTlMapping[key].map(h => h.toUpperCase());
+                                    break;
+                                }
+                            }
+                            if (headTls.includes(loggedInTL.name.trim().toUpperCase())) {
+                                showRow = true;
+                            }
+                        }
+
+                        if (showRow) {
                             let actionContent = "";
                             if (data.status === "Approved" || data.status === "Approved-TL") {
                                 actionContent = `<span class="status-text approved">✔ Approved</span>`;
                             } else if (data.status === "Rejected") {
                                 actionContent = `<span class="status-text rejected">✖ Rejected</span>`;
-                            } else if (data.isTL) {
+                            } else if (data.isTL && data.status === "Pending (Head TL)") {
                                 actionContent = `<span class="status-text pending-mgmt">⏳ Pending (Head TL)</span>`;
                             } else {
                                 actionContent = `
@@ -816,7 +834,7 @@
                         status: "Approved-TL",
                         approvedByTL: loggedInTL.name
                     });
-                    alert('લીવ રિક્વેસ્ટ Approved-TL કરવામાં આવી છે!');
+                    alert('લીવ રિક્વેસ્ટ Approved કરવામાં આવી છે!');
                 } else {
                     await update(leaveRef, {
                         status: newStatus
@@ -923,10 +941,10 @@
                     if (isPending) {
                         pendingRequests++;
                     }
-                    if ((row.querySelector('.status-text.approved')) && rowDate === todayStr) {
+                    if (row.querySelector('.status-text.approved') && rowDate === todayStr) {
                         approvedTodayCount++;
                     }
-                    if ((row.querySelector('.status-text.rejected')) && rowDate === todayStr) {
+                    if (row.querySelector('.status-text.rejected') && rowDate === todayStr) {
                         rejectedTodayCount++;
                     }
                 }

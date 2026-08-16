@@ -761,7 +761,66 @@
                     snapshot.forEach((childSnapshot) => {
                         const docId = childSnapshot.key;
                         const data = childSnapshot.val();
+window.loadLeavesFromFirebase = async function() {
+    const tableBody = document.getElementById('requestTable');
+    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">લોડ થઈ રહ્યું છે...</td></tr>`;
 
+    try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, 'leaves'));
+        tableBody.innerHTML = "";
+
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const docId = childSnapshot.key;
+                const data = childSnapshot.val();
+
+                // ⬇️ આ લાઇન અહીં પેસ્ટ કરો ⬇️
+                if (data.department === loggedInTL.departments[0]) {
+
+                    let actionContent = "";
+                    if (data.status === "Approved") {
+                        actionContent = `<span class="status-text approved">✔ Approved</span>`;
+                    } else if (data.status === "Rejected") {
+                        actionContent = `<span class="status-text rejected">✖ Rejected</span>`;
+                    } else if (data.isTL) {
+                        actionContent = `<span class="status-text pending-mgmt">⏳ Pending (Head TL)</span>`;
+                    } else {
+                        actionContent = `
+                            <button class="btn-action btn-approve" onclick="updateLeaveStatus('${docId}', 'Approved-TL')">Approve</button>
+                            <button class="btn-action btn-reject" onclick="updateLeaveStatus('${docId}', 'Rejected')">Reject</button>
+                        `;
+                    }
+
+                    const nameBadge = data.isTL 
+                        ? `<b>${data.employeeName}</b> <span class="badge tl-badge">TL</span>` 
+                        : `<b>${data.employeeName}</b>`;
+
+                    const rowHtml = `
+                        <tr id="row-${docId}" data-dept="${data.department}" data-name="${data.employeeName}" data-is-tl="${data.isTL ? 'true' : 'false'}" data-date="${data.fillDateVal}" data-days="${data.totalDays}">
+                            <td><span class="badge req-date">${data.formattedFillDate}</span></td>
+                            <td><span class="badge company">${data.company}</span></td>
+                            <td><span class="badge dept">${data.department}</span></td>
+                            <td class="emp-name">${nameBadge}</td>
+                            <td>${data.reason}</td>
+                            <td>${data.leaveDetails}</td>
+                            <td>${data.totalDays}</td>
+                            <td id="action-${docId}">${actionContent}</td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', rowHtml);
+                } // 👈 કંડિશનનો કૌંસ અહીં પૂરો થાય
+            });
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">કોઈ ડેટા ઉપલબ્ધ નથી.</td></tr>`;
+        }
+
+        filterTable();
+    } catch (error) {
+        console.error("Error loading data: ", error);
+        tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">ડેટા લાવવામાં ભૂલ થઈ છે.</td></tr>`;
+    }
+}
                         let actionContent = "";
                         if (data.status === "Approved") {
                             actionContent = `<span class="status-text approved">✔ Approved</span>`;
@@ -806,19 +865,29 @@
         }
 
         window.updateLeaveStatus = async function(docId, newStatus) {
-            try {
-                const leaveRef = ref(db, `leaves/${docId}`);
-                await update(leaveRef, {
-                    status: newStatus
-                });
-
-                loadLeavesFromFirebase();
-                alert(`લીવ રિક્વેસ્ટ ${newStatus} કરવામાં આવી છે!`);
-            } catch (error) {
-                console.error("Error updating status: ", error);
-                alert("સ્ટેટસ અપડેટ કરવામાં ભૂલ થઈ છે!");
-            }
+    try {
+        const leaveRef = ref(db, `leaves/${docId}`);
+        
+        // જો સ્ટેટસ Approved હોય તો સ્ક્રીનશૉટ મુજબ અપડેટ કરો
+        if (newStatus === 'Approved') {
+            await update(leaveRef, {
+                status: "Approved-TL",
+                approvedByTL: loggedInTL.name
+            });
+            alert('લીવ રિક્વેસ્ટ Approved-TL કરવામાં આવી છે!');
+        } else {
+            await update(leaveRef, {
+                status: newStatus
+            });
+            alert(`લીવ રિક્વેસ્ટ ${newStatus} કરવામાં આવી છે!`);
         }
+
+        loadLeavesFromFirebase();
+    } catch (error) {
+        console.error("Error updating status: ", error);
+        alert("સ્ટેટસ અપડેટ કરવામાં ભૂલ થઈ છે!");
+    }
+}
 
         window.filterTable = function() {
             const allowedDepts = loggedInTL.departments;

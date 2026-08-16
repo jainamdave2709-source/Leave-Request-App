@@ -342,12 +342,12 @@
 
         <!-- Main Content Grid -->
         <div class="main-grid">
-
+            
             <!-- Leave Request Form -->
             <div class="section-box">
                 <h3 id="formTitle">LEAVE REQUEST FORM</h3>
                 <form id="leaveRequestForm">
-
+                    
                     <!-- Company Name -->
                     <div class="form-group">
                         <label>COMPANY NAME <span>*</span></label>
@@ -384,7 +384,7 @@
                     <div class="form-group">
                         <label>EMPLOYEE NAME <span>*</span></label>
                         <input type="text" id="employeeName" placeholder="Jainam Dave" required>
-                        <div class="help-text">નામ અને અટક (Surname) વચ્ચે માત્ર એક જ સ્પેસ મૂકીને નામ લખવું ફરજિયાત છે.</div>
+                        <div class="help-text">નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</div>
                     </div>
 
                     <!-- Leave Reason -->
@@ -403,29 +403,26 @@
                     <!-- Full Leave Date -->
                     <div class="form-group">
                         <label>FULL LEAVE DATE</label>
-                        <input type="text" id="fullLeaveDate" placeholder="01/08/2026 અથવા 01/08/2026, 02/08/2026">
-                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું (એકથી વધુ તારીખ માટે વચ્ચે કોમા (,) વાપરવું).</div>
+                        <input type="text" id="fullLeaveDate" placeholder="01/08/2026, 02/08/2026">
+                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.</div>
                     </div>
 
                     <!-- First Half Leave Date -->
                     <div class="form-group">
                         <label>FIRST HALF LEAVE DATE</label>
-                        <input type="text" id="firstHalfDate" placeholder="01/08/2026 અથવા 01/08/2026, 02/08/2026">
-                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.</div>
+                        <input type="text" id="firstHalfDate" placeholder="01/08/2026, 02/08/2026">
                     </div>
 
                     <!-- Second Half Leave Date -->
                     <div class="form-group">
                         <label>SECOND HALF LEAVE DATE</label>
-                        <input type="text" id="secondHalfDate" placeholder="01/08/2026 અથવા 01/08/2026, 02/08/2026">
-                        <div class="help-text">ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.</div>
+                        <input type="text" id="secondHalfDate" placeholder="01/08/2026, 02/08/2026">
                     </div>
 
                     <!-- Total Days Of Leaves -->
                     <div class="form-group">
                         <label>TOTAL DAYS OF LEAVES <span>*</span></label>
                         <input type="number" step="0.5" min="0.5" id="totalDays" placeholder="0.5, 1, 1.5, 2" required>
-                        <div class="help-text">ફક્ત આંકડા જ લખવા (દા.ત. 1 અથવા 1.5).</div>
                     </div>
 
                     <button type="submit" id="submitBtn" class="submit-btn">Submit Request</button>
@@ -440,8 +437,6 @@
                         <thead>
                             <tr>
                                 <th>Report Fill Date</th>
-                                <th>Company Name</th>
-                                <th>Department</th>
                                 <th>Days</th>
                                 <th>Leave Date</th>
                                 <th>Reason</th>
@@ -452,7 +447,7 @@
                         </thead>
                         <tbody id="historyTable">
                             <tr>
-                                <td colspan="9" style="text-align: center; color: #6b7280;">ડેટા લોડ થઈ રહ્યો છે...</td>
+                                <td colspan="7" style="text-align: center; color: #6b7280;">ડેટા લોડ થઈ રહ્યો છે...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -490,7 +485,7 @@
 
         const currentUser = JSON.parse(userStr);
 
-        // Set User details in UI (Employee name field is now fully editable)
+        // Set User details in UI
         document.getElementById('headerEmpName').innerText = `Welcome, ${currentUser.name}`;
         document.getElementById('employeeName').value = currentUser.name;
         if(currentUser.department) {
@@ -512,7 +507,7 @@
         window.filterTable = function() {
             const selectedMonth = document.getElementById('monthSelect').value;
             const rows = document.querySelectorAll('#historyTable tr');
-
+            
             let totalMonthLeaves = 0;
             let totalYearApprovedLeaves = 0;
 
@@ -555,7 +550,7 @@
                 const snapshot = await get(dbRef);
 
                 if (!snapshot.exists()) {
-                    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
                     return;
                 }
 
@@ -577,11 +572,9 @@
                     newRow.setAttribute('data-date', data.fillDateRaw || '');
                     newRow.setAttribute('data-days', data.totalDays || 0);
                     newRow.setAttribute('data-status', statusClass);
-
+                    
                     newRow.innerHTML = `
                         <td>${data.reportFillDate || ''}</td>
-                        <td>${data.companyName || ''}</td>
-                        <td>${data.department || ''}</td>
                         <td>${data.totalDays || ''}</td>
                         <td>${data.leaveDates || ''}</td>
                         <td>${data.reason || ''}</td>
@@ -589,19 +582,19 @@
                         <td>${data.tlName || '-'}</td>
                         <td><button class="edit-btn" onclick="window.editDatabaseRow('${leaveId}', '${statusClass}', this)" ${isApproved ? 'disabled' : ''}>Edit</button></td>
                     `;
-
+                    
                     tbody.appendChild(newRow);
                 });
 
                 if (!hasData) {
-                    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #6b7280;">તમે હજુ સુધી કોઈ લીવ રિક્વેસ્ટ મોકલી નથી.</td></tr>`;
                     return;
                 }
 
                 filterTable();
             } catch (error) {
                 console.error("Error loading leaves: ", error);
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #ef4444;">ડેટા લોડ કરવામાં ભૂલ આવી છે.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444;">ડેટા લોડ કરવામાં ભૂલ આવી છે.</td></tr>`;
             }
         }
 
@@ -621,11 +614,9 @@
                 document.getElementById('reportFillDate').value = `${fillDateParts[2]}-${fillDateParts[1]}-${fillDateParts[0]}`;
             }
 
-            document.getElementById('companyName').value = cells[1].innerText;
-            document.getElementById('department').value = cells[2].innerText;
-            document.getElementById('totalDays').value = cells[3].innerText;
-            document.getElementById('fullLeaveDate').value = cells[4].innerText;
-            document.getElementById('leaveReason').value = cells[5].innerText;
+            document.getElementById('totalDays').value = cells[1].innerText;
+            document.getElementById('fullLeaveDate').value = cells[2].innerText;
+            document.getElementById('leaveReason').value = cells[3].innerText;
 
             document.getElementById('formTitle').innerText = "EDIT LEAVE REQUEST";
             document.getElementById('submitBtn').innerText = "Update Request";
@@ -656,28 +647,12 @@
             const reason = document.getElementById('leaveReason').value.trim();
             const fillDateVal = document.getElementById('reportFillDate').value;
 
-            // 1. Employee Name Validation: Name & Surname with mandatory single space
-            const nameParts = empName.split(/\s+/);
-            if (nameParts.length !== 2) {
-                alert('EMPLOYEE NAME માં નામ અને અટક (Surname) વચ્ચે માત્ર એક જ સ્પેસ રાખીને બંને લખવું ફરજિયાત છે!');
-                return;
-            }
-
             const fullDate = document.getElementById('fullLeaveDate').value.trim();
             const firstHalf = document.getElementById('firstHalfDate').value.trim();
             const secondHalf = document.getElementById('secondHalfDate').value.trim();
 
-            // 2. Date Formats Validation (dd/mm/yyyy separated by comma)
             if (fullDate && !validateMultipleDates(fullDate)) {
-                alert('FULL LEAVE DATE માં તારીખ ફરજિયાત DD/MM/YYYY ફોર્મેટમાં જ લખો!');
-                return;
-            }
-            if (firstHalf && !validateMultipleDates(firstHalf)) {
-                alert('FIRST HALF LEAVE DATE માં તારીખ ફરજિયાત DD/MM/YYYY ફોર્મેટમાં જ લખો!');
-                return;
-            }
-            if (secondHalf && !validateMultipleDates(secondHalf)) {
-                alert('SECOND HALF LEAVE DATE માં તારીખ ફરજિયાત DD/MM/YYYY ફોર્મેટમાં જ લખો!');
+                alert('FULL LEAVE DATE માં તારીખ DD/MM/YYYY ફોર્મેટમાં જ લખો!');
                 return;
             }
 
@@ -686,14 +661,7 @@
                 return;
             }
 
-            // 3. Total Days Validation (Only numbers allowed)
-            const totalDaysVal = document.getElementById('totalDays').value.trim();
-            if (isNaN(totalDaysVal) || totalDaysVal === "") {
-                alert('TOTAL DAYS OF LEAVES માં માત્ર આંકડા જ લખવા!');
-                return;
-            }
-            const totalDays = parseFloat(totalDaysVal);
-
+            const totalDays = document.getElementById('totalDays').value;
             const dateParts = fillDateVal.split('-');
             const formattedFillDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
             let requestedLeaveDates = fullDate || firstHalf || secondHalf;
@@ -705,7 +673,6 @@
                     await update(leaveRef, {
                         companyName,
                         department,
-                        employeeName: empName,
                         reason,
                         reportFillDate: formattedFillDate,
                         fillDateRaw: fillDateVal,
@@ -730,14 +697,14 @@
                         leaveDates: requestedLeaveDates,
                         totalDays: totalDays,
                         status: "Pending",
-                        tlName: "-",
+                        tlName: "Pending-TL",
                         createdAt: new Date().toISOString()
                     });
 
                     alert('તમારી લીવ રિક્વેસ્ટ સફળતાપૂર્વક સબમિટ થઈ ગઈ છે!');
                 }
 
-                // Reset form fields (keeping name)
+                // Reset form fields
                 document.getElementById('leaveReason').value = '';
                 document.getElementById('fullLeaveDate').value = '';
                 document.getElementById('firstHalfDate').value = '';

@@ -592,9 +592,7 @@
                 localStorage.setItem("loggedInUser", JSON.stringify(userData));
                 alert(`✅ લોગિન સફળ!`);
                 
-                if (userData.role === "Employee") window.location.href = "employee-dashboard.html";
-                else if (userData.role === "TL") window.location.href = "tl-dashboard.html";
-                else if (userData.role === "Management") window.location.href = "management-dashboard.html";
+                window.location.href = "dashboard.html";
             } catch (error) {
                 alert("❌ ભૂલ: " + error.message);
             } finally {

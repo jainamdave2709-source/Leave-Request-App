@@ -123,13 +123,11 @@
             font-size: 13px;
         }
 
-        /* અહીં મેં ખાસ પેરન્ટ ડિવને રિલેટિવ બનાવ્યું છે જેથી આઇકન અંદર જ ફિટ રહે */
         .input-icon-container {
             position: relative;
             width: 100%;
         }
 
-        /* ડાબી બાજુનું આઇકન - એકદમ બોક્સની અંદર વચ્ચે */
         .input-icon-container > i:not(.toggle-password) {
             position: absolute;
             left: 14px;
@@ -140,7 +138,6 @@
             pointer-events: none;
         }
 
-        /* જમણી બાજુનું પાસવર્ડ હાઇડ/શો આઇકન */
         .toggle-password {
             position: absolute;
             right: 14px;
@@ -159,7 +156,7 @@
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 12px 14px 12px 42px; /* ડાબી બાજુ આઇકન માટે જગ્યા */
+            padding: 12px 14px 12px 42px;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #334155;
             border-radius: 12px;
@@ -169,7 +166,6 @@
             transition: all 0.3s ease;
         }
 
-        /* પાસવર્ડ ફીલ્ડમાં જમણે અને ડાબે બંને બાજુ જગ્યા */
         .form-group input[type="password"] {
             padding-right: 42px;
         }
@@ -283,19 +279,6 @@
         </div>
         
         <form id="loginForm">
-            <div class="form-group">
-                <label for="role">તમારો રોલ પસંદ કરો *</label>
-                <div class="input-icon-container">
-                    <select id="role" required>
-                        <option value="" disabled selected>-- રોલ સિલેક્ટ કરો --</option>
-                        <option value="Employee">Employee</option>
-                        <option value="TL">Team Leader (TL)</option>
-                        <option value="Management">Management</option>
-                    </select>
-                    <i class="fa-solid fa-user-gear"></i>
-                </div>
-            </div>
-
             <div class="form-group">
                 <label for="email">ઈમેઈલ (Email) *</label>
                 <div class="input-icon-container">

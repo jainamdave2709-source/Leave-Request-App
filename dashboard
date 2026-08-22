@@ -377,10 +377,12 @@
 
         .stat-card.taken { background: #eef2ff; border: 1px solid #c7d2fe; }
         .stat-card.balance { background: #ecfdf5; border: 1px solid #a7f3d0; }
+        .stat-card.approved-counter { background: #f0fdf4; border: 1px solid #bbf7d0; }
 
         .stat-card-title { font-size: 16px; font-weight: 700; }
         .stat-card.taken .stat-card-title { color: #3730a3; }
         .stat-card.balance .stat-card-title { color: #065f46; }
+        .stat-card.approved-counter .stat-card-title { color: #166534; }
 
         .stat-badge-box { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; }
         .stat-circle {
@@ -388,9 +390,11 @@
         }
         .stat-card.taken .stat-circle { background: #4f46e5; }
         .stat-card.balance .stat-circle { background: #059669; }
+        .stat-card.approved-counter .stat-circle { background: #16a34a; }
 
         .stat-card.taken .stat-badge-box span:last-child { color: #3730a3; }
         .stat-card.balance .stat-badge-box span:last-child { color: #065f46; }
+        .stat-card.approved-counter .stat-badge-box span:last-child { color: #166534; }
 
         .clickable-card {
             cursor: pointer;
@@ -430,7 +434,7 @@
         }
 
         .month-filter-box label { font-size: 12px; color: #94a3b8; font-weight: 600; }
-        .month-filter-box select {
+        .month-filter-box select, .month-filter-box input {
             background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; outline: none;
         }
 
@@ -734,7 +738,52 @@
             <h3><i class="fa-solid fa-user-check" style="color: #10b981; margin-right: 8px;"></i>Team Leave Approvals</h3>
             <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Review and approve/reject leave requests from your department members.</p>
             
+            <!-- TL Counter & Search/Filter Section -->
+            <div class="stats-row" style="margin-bottom: 20px;">
+                <div class="stat-card approved-counter">
+                    <div class="stat-card-title">Total Approved Leaves (This Month):</div>
+                    <div class="stat-badge-box">
+                        <div class="stat-circle" id="tlApprovedCountBadge">0</div>
+                        <span>Days</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="history-section">
+                <div class="history-header">
+                    <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-list-check" style="color: #38bdf8;"></i> Leave Requests List
+                    </h4>
+                    
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <!-- Search by Name -->
+                        <div class="month-filter-box">
+                            <label for="tlSearchName"><i class="fa-solid fa-search"></i> Search:</label>
+                            <input type="text" id="tlSearchName" placeholder="Employee Name..." style="width: 150px;">
+                        </div>
+
+                        <!-- Month Filter -->
+                        <div class="month-filter-box">
+                            <label for="tlMonthFilter">Month:</label>
+                            <select id="tlMonthFilter">
+                                <option value="all">All Months</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="leave-table">
                         <thead>
@@ -1121,6 +1170,8 @@
 
         function loadTlApprovals() {
             const tbody = document.getElementById('tlApprovalTableBody');
+            const selectedMonth = document.getElementById('tlMonthFilter').value;
+            const searchQuery = document.getElementById('tlSearchName').value.trim().toLowerCase();
             const allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
 
             tbody.innerHTML = '';
@@ -1130,12 +1181,52 @@
                 departmentLeaves = allLeaves.filter(l => l.departmentName.toUpperCase() === userDept.toUpperCase());
             }
 
-            if (departmentLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="no-data">No leave requests found for your department.</td></tr>`;
+            // Month Filter logic
+            let filteredLeaves = departmentLeaves;
+            if (selectedMonth !== 'all') {
+                filteredLeaves = departmentLeaves.filter(leave => {
+                    if (leave.reportFillDate) {
+                        const parts = leave.reportFillDate.split('/');
+                        if (parts.length === 3) {
+                            return parts[1] === selectedMonth;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            // Name Search logic
+            if (searchQuery !== '') {
+                filteredLeaves = filteredLeaves.filter(leave => {
+                    return leave.employeeFullName && leave.employeeFullName.toLowerCase().includes(searchQuery);
+                });
+            }
+
+            // Calculate total approved leaves count for the filtered/month selection
+            let totalApprovedDays = 0;
+            departmentLeaves.forEach(leave => {
+                if (leave.status === 'Approved') {
+                    // Check if matches month filter if applied
+                    let matchesMonth = true;
+                    if (selectedMonth !== 'all' && leave.reportFillDate) {
+                        const parts = leave.reportFillDate.split('/');
+                        if (parts.length === 3 && parts[1] !== selectedMonth) {
+                            matchesMonth = false;
+                        }
+                    }
+                    if (matchesMonth) {
+                        totalApprovedDays += parseFloat(leave.totalLeaveDays) || 0;
+                    }
+                }
+            });
+            document.getElementById('tlApprovedCountBadge').innerText = totalApprovedDays;
+
+            if (filteredLeaves.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="no-data">No leave requests found matching your criteria.</td></tr>`;
                 return;
             }
 
-            departmentLeaves.forEach((leave) => {
+            filteredLeaves.forEach((leave) => {
                 let badgeClass = 'status-pending';
                 if (leave.status === 'Approved') badgeClass = 'status-approved';
                 else if (leave.status === 'Rejected') badgeClass = 'status-rejected';
@@ -1181,10 +1272,12 @@
         };
 
         document.getElementById('monthFilter').addEventListener('change', loadLeaveHistory);
+        document.getElementById('tlMonthFilter').addEventListener('change', loadTlApprovals);
+        document.getElementById('tlSearchName').addEventListener('input', loadTlApprovals);
 
         function isValidDateString(str) {
             if (!str || str.trim() === "") return true;
-            const dates = str.split(',').map(d => d.drim ? d.trim() : d.trim());
+            const dates = str.split(',').map(d => d.trim());
             const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/\d{4}$/;
             for (let d of dates) {
                 if (!dateRegex.test(d)) return false;

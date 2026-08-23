@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Leave App - Modern Login</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-glow-1 {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.5;
+            top: 10%;
+            left: 15%;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .bg-glow-2 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.5;
+            bottom: 10%;
+            right: 15%;
+            animation: float 6s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-30px) scale(1.08); }
+        }
+
+        .login-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 45px 35px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-logo-container {
+            width: 85px;
+            height: 85px;
+            background: #ffffff;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .brand-logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .login-header h2 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .input-icon-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-icon-container > i:not(.toggle-password) {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 15px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: #f8fafc;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #f8fafc;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="password"] {
+            padding-right: 42px;
+        }
+
+        .form-group select option {
+            background-color: #1e293b;
+            color: #f8fafc;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus {
+            border-color: #818cf8;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .link-btn {
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 35px 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-card h3 { color: #fff; text-align: center; font-size: 20px; margin-bottom: 10px; }
+        .modal-card p { color: #94a3b8; font-size: 13px; text-align: center; margin-bottom: 20px; }
+        .close-btn { position: absolute; top: 18px; right: 22px; font-size: 20px; cursor: pointer; color: #94a3b8; }
+        .close-btn:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <div class="login-card">
+        <div class="login-header">
+            <div class="brand-logo-container">
+                <img src="JD.jpg" alt="JD Logo">
+            </div>
+            <h2>Office Leave Portal</h2>
+            <p>તમારું એકાઉન્ટ લોગિન કરો</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">ઈમેઈલ (Email) *</label>
+                <div class="input-icon-container">
+                    <input type="email" id="email" placeholder="example@company.com" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">પાસવર્ડ *</label>
+                <div class="input-icon-container">
+                    <input type="password" id="password" placeholder="••••••••" required>
+                    <i class="fa-solid fa-lock"></i>
+                    <i class="fa-solid fa-eye toggle-password" data-target="password"></i>
+                </div>
+            </div>
+
+            <button type="submit" id="loginBtn" class="login-btn">
+                <span id="loginBtnText">Login</span>
+                <i class="fa-solid fa-arrow-right" id="loginBtnIcon"></i>
+            </button>
+
+            <div class="action-links">
+                <a class="link-btn" id="openRegBtn"><i class="fa-solid fa-user-plus"></i> New Register</a>
+                <a class="link-btn" id="openForgotBtn"><i class="fa-solid fa-key"></i> Reset Password?</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Registration Modal -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal-card">
+            <span class="close-btn" id="closeRegBtn"><i class="fa-solid fa-xmark"></i></span>
+            <h3><i class="fa-solid fa-user-plus" style="color: #818cf8; margin-right: 8px;"></i>New Registration</h3>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>પૂરું નામ (Full Name) *</label>
+                    <div class="input-icon-container">
+                        <input type="text" id="regName" placeholder="તમારું પૂરું નામ" required>
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ઈમેઈલ (Email) *</label>
+                    <div class="input-icon-container">
+                        <input type="email" id="regEmail" placeholder="example@company.com" required>
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>રોલ (Role) *</label>
+                    <div class="input-icon-container">
+                        <select id="regRole" required>
+                            <option value="" disabled selected>-- રોલ પસંદ કરો --</option>
+                            <option value="Employee">Employee</option>
+                        </select>
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ડિપાર્ટમેન્ટ (કોઈપણ એક સિલેક્ટ કરો) *</label>
+                    <div class="input-icon-container">
+                        <select id="regDept" required>
+                            <option value="" disabled selected>-- ડિપાર્ટમેન્ટ પસંદ કરો --</option>
+                            <option value="FACULTY">FACULTY</option>
+                            <option value="TYPING">TYPING</option>
+                            <option value="CONTENT">CONTENT</option>
+                            <option value="GRAPHIC">GRAPHIC</option>
+                            <option value="VIDEO EDITING">VIDEO EDITING</option>
+                            <option value="VIDEO RECORDING">VIDEO RECORDING</option>
+                            <option value="OFFLINE">OFFLINE</option>
+                            <option value="CALLING">CALLING</option>
+                            <option value="MARKETING">MARKETING</option>
+                            <option value="SALES">SALES</option>
+                            <option value="MANAGEMENT">MANAGEMENT</option>
+                            <option value="ACCOUNT">ACCOUNT</option>
+                            <option value="IT">IT</option>
+                            <option value="BOOK">BOOK</option>
+                        </select>
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>નવો પાસવર્ડ *</label>
+                    <div class="input-icon-container">
+                        <input type="password" id="regPassword" placeholder="••••••••" required>
+                        <i class="fa-solid fa-lock"></i>
+                        <i class="fa-solid fa-eye toggle-password" data-target="regPassword"></i>
+                    </div>
+                </div>
+
+                <button type="submit" id="regBtn" class="login-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <span id="regBtnText">Submit & Register</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal-overlay" id="forgotModal">
+        <div class="modal-card">
+            <span class="close-btn" id="closeForgotBtn"><i class="fa-solid fa-xmark"></i></span>
+            <h3><i class="fa-solid fa-key" style="color: #38bdf8; margin-right: 8px;"></i>Reset Password</h3>
+            <p>તમારા નોંધાયેલા ઈમેઈલ પર પાસવર્ડ રીસેટ કરવાની લિંક મોકલવામાં આવશે.</p>
+            <form id="forgotForm">
+                <div class="form-group">
+                    <label>તમારો ઈમેઈલ (Email) *</label>
+                    <div class="input-icon-container">
+                        <input type="email" id="forgotEmail" placeholder="example@company.com" required>
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                </div>
+                <button type="submit" id="forgotBtn" class="login-btn" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
+                    <span id="forgotBtnText">Send Reset Link</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfEKSL3dLQ-v1NEtC0PQ7zpNx7STutZs8",
+            authDomain: "office-leave-app.firebaseapp.com",
+            databaseURL: "https://office-leave-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "office-leave-app",
+            storageBucket: "office-leave-app.appspot.com",
+            messagingSenderId: "609769671596",
+            appId: "1:609769671596:web:6a855afe57bf73b7240809"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app); // 👈 Firebase Auth Initialize કર્યું
+
+        document.getElementById('openRegBtn').addEventListener('click', () => {
+            document.getElementById('registerModal').style.display = 'flex';
+        });
+
+        document.getElementById('closeRegBtn').addEventListener('click', () => {
+            document.getElementById('registerModal').style.display = 'none';
+        });
+
+        document.getElementById('openForgotBtn').addEventListener('click', () => {
+            document.getElementById('forgotModal').style.display = 'flex';
+        });
+        document.getElementById('closeForgotBtn').addEventListener('click', () => {
+            document.getElementById('forgotModal').style.display = 'none';
+        });
+
+        // 🔥 Password Show/Hide Toggle Logic
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            });
+        });
+
+        const getCleanKey = (email) => email.trim().toLowerCase().replace(/[.#$\[\]]/g, "_");
+
+        // 🔥 Registration logic (Authentication + Realtime Database)
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const role = document.getElementById('regRole').value;
+            const department = document.getElementById('regDept').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (role !== "Employee") {
+                alert("⚠️ માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે!");
+                return;
+            }
+
+            const regBtn = document.getElementById('regBtn');
+            const regBtnText = document.getElementById('regBtnText');
+            regBtn.disabled = true;
+            regBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> પ્રોસેસ થઈ રહી છે...';
+
+            try {
+                // ૧. Firebase Authentication માં યુઝર બનાવો
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const uid = userCredential.user.uid;
+
+                // ૨. Realtime Database માં પણ યુઝરની વધારાની માહિતી સેવ કરો
+                const userKey = getCleanKey(email);
+                await set(ref(db, 'users/' + userKey), {
+                    uid: uid,
+                    name, 
+                    email, 
+                    role, 
+                    department, 
+                    createdAt: new Date().toISOString()
+                });
+                
+                alert(`🎉 રજીસ્ટ્રેશન સફળ રહ્યું! હવે તમે લોગિન કરી શકો છો.`);
+                document.getElementById('registerModal').style.display = 'none';
+                document.getElementById('registerForm').reset();
+            } catch (error) {
+                alert("❌ ભૂલ: " + error.message);
+            } finally {
+                regBtn.disabled = false;
+                regBtnText.innerText = 'Submit & Register';
+            }
+        });
+
+        // 🔥 Reset Password Logic (Firebase Auth Email Link)
+        document.getElementById('forgotForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+
+            const forgotBtn = document.getElementById('forgotBtn');
+            const forgotBtnText = document.getElementById('forgotBtnText');
+            forgotBtn.disabled = true;
+            forgotBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> લિંક મોકલાઈ રહી છે...';
+
+            try {
+                // Firebase Auth દ્વારા પાસવર્ડ રીસેટ ઈમેઈલ લિંક મોકલો
+                await sendPasswordResetEmail(auth, email);
+
+                alert("✅ પાસવર્ડ રીસેટ કરવાની લિંક તમારા ઈમેઈલ પર મોકલી દેવામાં આવી છે! કૃપા કરીને તમારું ઇમેઇલ ચેક કરો.");
+                document.getElementById('forgotModal').style.display = 'none';
+                document.getElementById('forgotForm').reset();
+            } catch (error) {
+                alert("❌ ભૂલ: " + error.message);
+            } finally {
+                forgotBtn.disabled = false;
+                forgotBtnText.innerText = 'Send Reset Link';
+            }
+        });
+
+        // 🔥 Login Logic (Firebase Auth Sign In)
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginBtnIcon = document.getElementById('loginBtnIcon');
+            
+            loginBtn.disabled = true;
+            loginBtnText.innerText = "લૉગિન થઈ રહ્યું છે...";
+            loginBtnIcon.className = "fa-solid fa-spinner fa-spin";
+
+            try {
+                // ૧. Firebase Auth થી લોગિન કરો
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                
+                // ૨. ડેટાબેઝમાંથી યુઝરનો પૂરો ડેટા લોકલ સ્ટોરેજ માટે મેળવો
+                const userKey = getCleanKey(email);
+                const userSnap = await get(child(ref(db), `users/${userKey}`));
+                
+                if (userSnap.exists()) {
+                    localStorage.setItem("loggedInUser", JSON.stringify(userSnap.val()));
+                } else {
+                    // જો ડેટાબેઝમાં ના હોય તો બેઝિક ડેટા સેવ કરી દો
+                    localStorage.setItem("loggedInUser", JSON.stringify({ email: email }));
+                }
+
+                alert(`✅ લોગિન સફળ!`);
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                alert("❌ લોગિન નિષ્ફળ: " + error.message);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtnText.innerText = "Login";
+                loginBtnIcon.className = "fa-solid fa-arrow-right";
+            }
+        });
+    </script>
+</body>
+</html>

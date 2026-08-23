@@ -464,6 +464,10 @@
         .action-btn:hover { opacity: 0.85; }
         .btn-approve { background: #10b981; }
         .btn-reject { background: #ef4444; }
+        .btn-delete { background: #f59e0b; }
+        .new-request-row { background: rgba(245, 158, 11, 0.10); box-shadow: inset 3px 0 0 #f59e0b; }
+        .review-checkbox { width: 16px; height: 16px; accent-color: #10b981; cursor: pointer; }
+        .review-label { display: inline-flex; align-items: center; justify-content: center; }
 
         .no-data { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; }
 
@@ -581,16 +585,23 @@
                 
                 <div class="stats-row">
                     <div class="stat-card taken">
-                        <div class="stat-card-title">Taken Leaves:</div>
+                        <div class="stat-card-title">Pending Leave:</div>
                         <div class="stat-badge-box">
-                            <div class="stat-circle" id="takenLeavesCount">0</div>
+                            <div class="stat-circle" id="pendingLeavesCount">0</div>
                             <span>Days</span>
                         </div>
                     </div>
                     <div class="stat-card balance">
-                        <div class="stat-card-title">Pending Balance:</div>
+                        <div class="stat-card-title">Approved Leave:</div>
                         <div class="stat-badge-box">
-                            <div class="stat-circle" id="pendingBalanceCount">12</div>
+                            <div class="stat-circle" id="approvedLeavesCount">0</div>
+                            <span>Days</span>
+                        </div>
+                    </div>
+                    <div class="stat-card approved-counter">
+                        <div class="stat-card-title">Rejected Leave:</div>
+                        <div class="stat-badge-box">
+                            <div class="stat-circle" id="rejectedLeavesCount">0</div>
                             <span>Days</span>
                         </div>
                     </div>
@@ -633,11 +644,14 @@
                         <table class="leave-table">
                             <thead>
                                 <tr>
+                                    <th>Report Date</th>
                                     <th>Company</th>
                                     <th>Department</th>
-                                    <th>Reason</th>
-                                    <th>Report Date</th>
+                                    <th>Employee Name</th>
                                     <th>Full Leave</th>
+                                    <th>First Half</th>
+                                    <th>Second Half</th>
+                                    <th>Reason</th>
                                     <th>Days</th>
                                     <th>Status & Action By</th>
                                 </tr>
@@ -781,6 +795,28 @@
                                 <option value="12">December</option>
                             </select>
                         </div>
+
+                        <!-- Department Filter -->
+                        <div class="month-filter-box">
+                            <label for="tlDeptFilter">Department:</label>
+                            <select id="tlDeptFilter">
+                                <option value="all">All Departments</option>
+                                <option value="FACULTY">FACULTY</option>
+                                <option value="TYPING">TYPING</option>
+                                <option value="CONTENT">CONTENT</option>
+                                <option value="GRAPHIC">GRAPHIC</option>
+                                <option value="VIDEO EDITING">VIDEO EDITING</option>
+                                <option value="VIDEO RECORDING">VIDEO RECORDING</option>
+                                <option value="OFFLINE">OFFLINE</option>
+                                <option value="CALLING">CALLING</option>
+                                <option value="MARKETING">MARKETING</option>
+                                <option value="SALES">SALES</option>
+                                <option value="MANAGEMENT">MANAGEMENT</option>
+                                <option value="ACCOUNT">ACCOUNT</option>
+                                <option value="IT">IT</option>
+                                <option value="BOOK">BOOK</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -788,10 +824,15 @@
                     <table class="leave-table">
                         <thead>
                             <tr>
-                                <th>Employee Name</th>
-                                <th>Department</th>
-                                <th>Reason</th>
+                                <th>Action Taken</th>
                                 <th>Report Date</th>
+                                <th>Company</th>
+                                <th>Department</th>
+                                <th>Employee Name</th>
+                                <th>Full Leave</th>
+                                <th>First Half</th>
+                                <th>Second Half</th>
+                                <th>Reason</th>
                                 <th>Days</th>
                                 <th>Status & Action By</th>
                                 <th>Actions</th>
@@ -806,12 +847,70 @@
         <!-- Management Panel -->
         <div id="managementPanel" class="panel-section hidden">
             <h3><i class="fa-solid fa-shield-halved" style="color: #f59e0b; margin-right: 8px;"></i>Management Control Panel</h3>
-            <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 0 0;">Overall data and reports for all office staff and team leaders.</p>
+            <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Overall data and reports for all office staff and team leaders.</p>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-list-check" style="color: #f59e0b;"></i> All Leave Requests
+                    </h4>
+
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div class="month-filter-box">
+                            <label for="managementSearchName"><i class="fa-solid fa-search"></i> Search:</label>
+                            <input type="text" id="managementSearchName" placeholder="Employee Name..." style="width: 150px;">
+                        </div>
+
+                        <div class="month-filter-box">
+                            <label for="managementMonthFilter">Month:</label>
+                            <select id="managementMonthFilter">
+                                <option value="all">All Months</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="leave-table">
+                        <thead>
+                            <tr>
+                                <th>Action Taken</th>
+                                <th>Report Date</th>
+                                <th>Company</th>
+                                <th>Department</th>
+                                <th>Employee Name</th>
+                                <th>Full Leave</th>
+                                <th>First Half</th>
+                                <th>Second Half</th>
+                                <th>Reason</th>
+                                <th>Days</th>
+                                <th>Status & Action By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="managementTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Flatpickr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
         flatpickr("#reportFillDate", {
             dateFormat: "d/m/Y",
@@ -825,6 +924,23 @@
         let userIdentifier = "";
         let currentUserName = "";
 
+        function normalizeRole(roleValue) {
+            return String(roleValue || '').trim().toLowerCase().replace(/\s+/g, '');
+        }
+
+        function isRole(expectedRole) {
+            return normalizeRole(userRole) === normalizeRole(expectedRole);
+        }
+
+        function getUserDepartments() {
+            if (!userData) return [];
+            if (Array.isArray(userData.departments)) return userData.departments.filter(Boolean);
+            if (userData.departments && typeof userData.departments === 'object') return Object.values(userData.departments).filter(Boolean);
+            if (typeof userData.departments === 'string' && userData.departments.trim()) return [userData.departments.trim()];
+            if (typeof userData.department === 'string' && userData.department.trim()) return [userData.department.trim()];
+            return [];
+        }
+
         if (!userData) {
             window.location.href = "login.html";
         } else {
@@ -832,17 +948,9 @@
             userIdentifier = userData.email || userData.name;
             currentUserName = userData.name;
             
-            if (userData.departments) {
-                if (Array.isArray(userData.departments)) {
-                    userDept = userData.departments[0] || "N/A";
-                } else if (typeof userData.departments === 'object') {
-                    const values = Object.values(userData.departments);
-                    userDept = values[0] || "N/A";
-                } else {
-                    userDept = userData.departments;
-                }
-            } else if (userData.department) {
-                userDept = userData.department;
+            const userDepartments = getUserDepartments();
+            if (userDepartments.length > 0) {
+                userDept = userDepartments[0];
             }
 
             document.getElementById('welcomeName').innerText = `Welcome, ${userData.name}!`;
@@ -871,15 +979,15 @@
             const menuMgmt = document.getElementById('menuManagement');
             const lockMgmt = document.getElementById('lockManagement');
 
-            if (userRole === "Employee") {
+            if (isRole("Employee")) {
                 menuEmp.classList.remove('locked'); lockEmp.classList.add('hidden');
                 menuTL.classList.add('locked'); lockTL.classList.remove('hidden');
                 menuMgmt.classList.add('locked'); lockMgmt.classList.remove('hidden');
-            } else if (userRole === "TL") {
+            } else if (isRole("TL") || isRole("TeamLeader") || isRole("Team Leader")) {
                 menuEmp.classList.remove('locked'); lockEmp.classList.add('hidden');
                 menuTL.classList.remove('locked'); lockTL.classList.add('hidden');
                 menuMgmt.classList.add('locked'); lockMgmt.classList.remove('hidden');
-            } else if (userRole === "Management") {
+            } else if (isRole("Management") || isRole("MANAGEMENT")) {
                 menuEmp.classList.remove('locked'); lockEmp.classList.add('hidden');
                 menuTL.classList.remove('locked'); lockTL.classList.add('hidden');
                 menuMgmt.classList.remove('locked'); lockMgmt.classList.add('hidden');
@@ -954,16 +1062,37 @@
             localStorage.setItem(`notifications_${targetUserIdentifier}`, JSON.stringify(userNotifs));
         }
 
+        function getDepartmentNotificationKeys() {
+            const deptKeys = [];
+            const departments = getUserDepartments();
+
+            departments.forEach(dept => {
+                if (dept && dept.trim()) {
+                    deptKeys.push(`dept_notifications_${dept.trim()}`);
+                }
+            });
+
+            if (deptKeys.length === 0 && userDept && userDept !== 'N/A') {
+                deptKeys.push(`dept_notifications_${userDept}`);
+            }
+
+            return Array.from(new Set(deptKeys));
+        }
+
         function loadNotifications() {
             const listContainer = document.getElementById('notificationListContainer');
             const badgeCount = document.getElementById('notificationBadgeCount');
-            
-            if (userRole === 'TL') {
-                let deptNotifsKey = `dept_notifications_${userDept}`;
-                let deptNotifs = JSON.parse(localStorage.getItem(deptNotifsKey)) || [];
+
+            if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
+                let deptNotifs = [];
+                getDepartmentNotificationKeys().forEach(key => {
+                    const notifications = JSON.parse(localStorage.getItem(key)) || [];
+                    deptNotifs = deptNotifs.concat(notifications);
+                });
+
                 let personalNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
                 let combined = [...deptNotifs, ...personalNotifs];
-                
+
                 listContainer.innerHTML = '';
 
                 let unreadCount = combined.filter(n => !n.read).length;
@@ -1019,11 +1148,12 @@
         }
 
         document.getElementById('markAllReadBtn').addEventListener('click', () => {
-            if (userRole === 'TL') {
-                let deptNotifsKey = `dept_notifications_${userDept}`;
-                let deptNotifs = JSON.parse(localStorage.getItem(deptNotifsKey)) || [];
-                deptNotifs = deptNotifs.map(n => ({ ...n, read: true }));
-                localStorage.setItem(deptNotifsKey, JSON.stringify(deptNotifs));
+            if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
+                getDepartmentNotificationKeys().forEach(deptKey => {
+                    let deptNotifs = JSON.parse(localStorage.getItem(deptKey)) || [];
+                    deptNotifs = deptNotifs.map(n => ({ ...n, read: true }));
+                    localStorage.setItem(deptKey, JSON.stringify(deptNotifs));
+                });
 
                 let personalNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
                 personalNotifs = personalNotifs.map(n => ({ ...n, read: true }));
@@ -1039,11 +1169,11 @@
         function switchTab(tabName) {
             if (tabName !== 'dashboard') {
                 let hasAccess = false;
-                if (userRole === "Employee") {
+                if (isRole("Employee")) {
                     if (tabName === 'employee') hasAccess = true;
-                } else if (userRole === "TL") {
+                } else if (isRole("TL") || isRole("TeamLeader") || isRole("Team Leader")) {
                     if (tabName === 'employee' || tabName === 'tl') hasAccess = true;
-                } else if (userRole === "Management") {
+                } else if (isRole("Management") || isRole("MANAGEMENT")) {
                     if (tabName === 'employee' || tabName === 'tl' || tabName === 'management') hasAccess = true;
                 }
 
@@ -1083,6 +1213,7 @@
             } else if (tabName === 'management') {
                 activeLink = document.getElementById('menuManagement');
                 document.getElementById('managementPanel').classList.remove('hidden');
+                loadManagementRequests();
             }
 
             if (activeLink) {
@@ -1092,9 +1223,66 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfEKSL3dLQ-v1NEtC0PQ7zpNx7STutZs8",
+            authDomain: "office-leave-app.firebaseapp.com",
+            databaseURL: "https://office-leave-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "office-leave-app",
+            storageBucket: "office-leave-app.appspot.com",
+            messagingSenderId: "609769671596",
+            appId: "1:609769671596:web:6a855afe57bf73b7240809"
+        };
+
+        const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+        const db = firebase.database(firebaseApp);
+        const FIREBASE_LEAVES_KEY = 'officeLeaveRequests';
+
+        function getStoredLeaves() {
+            try {
+                return JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function persistStoredLeaves(allLeaves) {
+            localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(allLeaves));
+            try {
+                if (db && db.ref) {
+                    db.ref(FIREBASE_LEAVES_KEY).set(allLeaves).catch(() => {});
+                }
+            } catch (e) {
+                console.warn('Firebase save failed:', e);
+            }
+        }
+
+        async function syncGlobalLeavesFromFirebase() {
+            try {
+                if (!db || !db.ref) return getStoredLeaves();
+                const snapshot = await db.ref(FIREBASE_LEAVES_KEY).once('value');
+                const firebaseLeaves = snapshot.val();
+
+                if (Array.isArray(firebaseLeaves) && firebaseLeaves.length > 0) {
+                    localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(firebaseLeaves));
+                    return firebaseLeaves;
+                }
+
+                const localLeaves = getStoredLeaves();
+                if (localLeaves.length > 0) {
+                    await db.ref(FIREBASE_LEAVES_KEY).set(localLeaves);
+                }
+                return localLeaves;
+            } catch (e) {
+                console.warn('Firebase load failed, using localStorage:', e);
+                return getStoredLeaves();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await syncGlobalLeavesFromFirebase();
             switchTab('dashboard');
             loadNotifications();
+            populateTlDepartmentFilter();
         });
 
         document.getElementById('navDashboard').addEventListener('click', (e) => { e.preventDefault(); switchTab('dashboard'); });
@@ -1102,7 +1290,87 @@
         document.getElementById('menuTL').addEventListener('click', (e) => { e.preventDefault(); switchTab('tl'); });
         document.getElementById('menuManagement').addEventListener('click', (e) => { e.preventDefault(); switchTab('management'); });
 
+        const DEPARTMENTS = ["FACULTY","TYPING","CONTENT","GRAPHIC","VIDEO EDITING","VIDEO RECORDING","OFFLINE","CALLING","MARKETING","SALES","MANAGEMENT","ACCOUNT","IT","BOOK"];
         const GLOBAL_LEAVES_KEY = "globalOfficeLeaveRequests";
+
+        function populateTlDepartmentFilter() {
+            const sel = document.getElementById('tlDeptFilter');
+            if (!sel) return;
+
+            // Helper to normalize user departments into an array of strings
+            function getUserDepartments() {
+                if (!userData) return [];
+                if (userData.departments) {
+                    if (Array.isArray(userData.departments)) return userData.departments.slice();
+                    if (typeof userData.departments === 'object') return Object.values(userData.departments);
+                    return [userData.departments];
+                }
+                if (userData.department) return [userData.department];
+                return [];
+            }
+
+            // Clear existing options
+            sel.innerHTML = '';
+
+            if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
+                const userDeps = getUserDepartments().map(d => (d || '').toString().trim()).filter(Boolean);
+                // If TL has no explicit departments, fall back to user's single dept variable if present
+                if (userDeps.length === 0 && userDept) userDeps.push(userDept);
+
+                // If TL has only one department, show only that and disable the selector so they can't change it.
+                if (userDeps.length === 1) {
+                    const only = userDeps[0];
+                    const opt = document.createElement('option');
+                    opt.value = only;
+                    opt.text = only;
+                    sel.appendChild(opt);
+                    sel.value = only;
+                    sel.disabled = true;
+                } else if (userDeps.length > 1) {
+                    // If multiple departments, show only those departments (no 'All' option)
+                    userDeps.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d;
+                        opt.text = d;
+                        sel.appendChild(opt);
+                    });
+                    sel.disabled = false;
+                    // Try to preserve previously selected if still present
+                    const prev = sel.getAttribute('data-prev') || '';
+                    if (prev && Array.from(sel.options).some(o => o.value === prev)) sel.value = prev;
+                } else {
+                    // fallback to showing all departments if nothing known (shouldn't normally happen)
+                    const optAll = document.createElement('option');
+                    optAll.value = 'all';
+                    optAll.text = 'All Departments';
+                    sel.appendChild(optAll);
+                    DEPARTMENTS.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d;
+                        opt.text = d;
+                        sel.appendChild(opt);
+                    });
+                    sel.disabled = false;
+                    sel.value = 'all';
+                }
+            } else {
+                // For Management or others show all departments and an 'All Departments' option
+                const optAll = document.createElement('option');
+                optAll.value = 'all';
+                optAll.text = 'All Departments';
+                sel.appendChild(optAll);
+                DEPARTMENTS.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.text = d;
+                    sel.appendChild(opt);
+                });
+                sel.disabled = false;
+                // preserve existing selection if possible
+                const current = sel.getAttribute('data-prev') || 'all';
+                sel.value = current;
+            }
+        }
 
         function loadLeaveHistory() {
             const tbody = document.getElementById('leaveHistoryTableBody');
@@ -1126,21 +1394,22 @@
                 });
             }
 
-            let totalTakenDays = 0;
+            let pendingDays = 0;
+            let approvedDays = 0;
+            let rejectedDays = 0;
             filteredLeaves.forEach(leave => {
-                if (leave.status === 'Approved') {
-                    totalTakenDays += parseFloat(leave.totalLeaveDays) || 0;
-                }
+                const days = parseFloat(leave.totalLeaveDays) || 0;
+                if (leave.status === 'Pending') pendingDays += days;
+                else if (leave.status === 'Approved') approvedDays += days;
+                else if (leave.status === 'Rejected') rejectedDays += days;
             });
 
-            document.getElementById('takenLeavesCount').innerText = totalTakenDays;
-            
-            const totalAllowedQuota = 12; 
-            let pendingBalance = totalAllowedQuota - totalTakenDays;
-            document.getElementById('pendingBalanceCount').innerText = pendingBalance >= 0 ? pendingBalance : 0;
+            document.getElementById('pendingLeavesCount').innerText = pendingDays;
+            document.getElementById('approvedLeavesCount').innerText = approvedDays;
+            document.getElementById('rejectedLeavesCount').innerText = rejectedDays;
 
             if (filteredLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="no-data">No leave history found for this period.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="no-data">No leave history found for this period.</td></tr>`;
                 return;
             }
 
@@ -1153,12 +1422,15 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${leave.companyName}</td>
-                    <td>${leave.departmentName}</td>
-                    <td>${leave.leaveReason}</td>
-                    <td>${leave.reportFillDate}</td>
+                    <td>${leave.reportFillDate || '-'}</td>
+                    <td>${leave.companyName || '-'}</td>
+                    <td>${leave.departmentName || '-'}</td>
+                    <td>${leave.employeeFullName || '-'}</td>
                     <td>${leave.fullLeaveDate || '-'}</td>
-                    <td>${leave.totalLeaveDays}</td>
+                    <td>${leave.firstHalfDate || '-'}</td>
+                    <td>${leave.secondHalfDate || '-'}</td>
+                    <td>${leave.leaveReason || '-'}</td>
+                    <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
                         <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
                         ${actionByName}
@@ -1172,16 +1444,20 @@
             const tbody = document.getElementById('tlApprovalTableBody');
             const selectedMonth = document.getElementById('tlMonthFilter').value;
             const searchQuery = document.getElementById('tlSearchName').value.trim().toLowerCase();
-            const allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
+            const allLeaves = getStoredLeaves();
 
             tbody.innerHTML = '';
 
+            const selectedDeptFilter = (document.getElementById('tlDeptFilter') && document.getElementById('tlDeptFilter').value) ? document.getElementById('tlDeptFilter').value : 'all';
             let departmentLeaves = allLeaves;
-            if (userRole !== 'Management') {
-                departmentLeaves = allLeaves.filter(l => l.departmentName.toUpperCase() === userDept.toUpperCase());
+            if (selectedDeptFilter && selectedDeptFilter !== 'all') {
+                departmentLeaves = allLeaves.filter(l => l.departmentName && l.departmentName.toUpperCase() === selectedDeptFilter.toUpperCase());
+            } else if (!(isRole('Management') || isRole('MANAGEMENT'))) {
+                const deptList = getUserDepartments();
+                const normalizedUserDept = deptList.length > 0 ? deptList.map(d => d.toUpperCase()) : [String(userDept || '').toUpperCase()];
+                departmentLeaves = allLeaves.filter(l => l.departmentName && normalizedUserDept.includes(String(l.departmentName).toUpperCase()));
             }
 
-            // Month Filter logic
             let filteredLeaves = departmentLeaves;
             if (selectedMonth !== 'all') {
                 filteredLeaves = departmentLeaves.filter(leave => {
@@ -1195,18 +1471,15 @@
                 });
             }
 
-            // Name Search logic
             if (searchQuery !== '') {
                 filteredLeaves = filteredLeaves.filter(leave => {
                     return leave.employeeFullName && leave.employeeFullName.toLowerCase().includes(searchQuery);
                 });
             }
 
-            // Calculate total approved leaves count for the filtered/month selection
             let totalApprovedDays = 0;
             departmentLeaves.forEach(leave => {
                 if (leave.status === 'Approved') {
-                    // Check if matches month filter if applied
                     let matchesMonth = true;
                     if (selectedMonth !== 'all' && leave.reportFillDate) {
                         const parts = leave.reportFillDate.split('/');
@@ -1222,7 +1495,7 @@
             document.getElementById('tlApprovedCountBadge').innerText = totalApprovedDays;
 
             if (filteredLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="no-data">No leave requests found matching your criteria.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="no-data">No leave requests found matching your criteria.</td></tr>`;
                 return;
             }
 
@@ -1235,11 +1508,20 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${leave.employeeFullName}</strong></td>
-                    <td>${leave.departmentName}</td>
-                    <td>${leave.leaveReason}</td>
-                    <td>${leave.reportFillDate}</td>
-                    <td>${leave.totalLeaveDays}</td>
+                    <td>
+                        <label class="review-label" title="Mark as action taken">
+                            <input type="checkbox" class="review-checkbox" ${leave.reviewed ? 'checked' : ''} onchange="toggleLeaveReviewed(${leave.id}, this.checked)">
+                        </label>
+                    </td>
+                    <td>${leave.reportFillDate || '-'}</td>
+                    <td>${leave.companyName || '-'}</td>
+                    <td>${leave.departmentName || '-'}</td>
+                    <td><strong>${leave.employeeFullName || '-'}</strong></td>
+                    <td>${leave.fullLeaveDate || '-'}</td>
+                    <td>${leave.firstHalfDate || '-'}</td>
+                    <td>${leave.secondHalfDate || '-'}</td>
+                    <td>${leave.leaveReason || '-'}</td>
+                    <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
                         <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
                         ${actionByName}
@@ -1248,32 +1530,165 @@
                         <div class="action-btn-group">
                             <button class="action-btn btn-approve" onclick="updateLeaveStatus(${leave.id}, 'Approved')"><i class="fa-solid fa-check"></i></button>
                             <button class="action-btn btn-reject" onclick="updateLeaveStatus(${leave.id}, 'Rejected')"><i class="fa-solid fa-xmark"></i></button>
+                            <button class="action-btn btn-delete" onclick="deleteLeaveRequest(${leave.id})" title="Delete Request"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 `;
+                if (!leave.reviewed) {
+                    tr.classList.add('new-request-row');
+                }
                 tbody.appendChild(tr);
             });
         }
 
+        function loadManagementRequests() {
+            const tbody = document.getElementById('managementTableBody');
+            const selectedMonth = document.getElementById('managementMonthFilter').value;
+            const searchQuery = document.getElementById('managementSearchName').value.trim().toLowerCase();
+            const allLeaves = getStoredLeaves();
+
+            tbody.innerHTML = '';
+
+            let filteredLeaves = allLeaves;
+            if (selectedMonth !== 'all') {
+                filteredLeaves = allLeaves.filter(leave => {
+                    if (leave.reportFillDate) {
+                        const parts = leave.reportFillDate.split('/');
+                        if (parts.length === 3) {
+                            return parts[1] === selectedMonth;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            if (searchQuery !== '') {
+                filteredLeaves = filteredLeaves.filter(leave => {
+                    return leave.employeeFullName && leave.employeeFullName.toLowerCase().includes(searchQuery);
+                });
+            }
+
+            if (filteredLeaves.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="no-data">No requests found matching your criteria.</td></tr>`;
+                return;
+            }
+
+            filteredLeaves.forEach((leave) => {
+                let badgeClass = 'status-pending';
+                if (leave.status === 'Approved') badgeClass = 'status-approved';
+                else if (leave.status === 'Rejected') badgeClass = 'status-rejected';
+
+                let actionByName = leave.actionBy ? `<span class="action-by-text">By: ${leave.actionBy}</span>` : '';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <label class="review-label" title="Mark as action taken">
+                            <input type="checkbox" class="review-checkbox" ${leave.reviewed ? 'checked' : ''} onchange="toggleLeaveReviewed(${leave.id}, this.checked)">
+                        </label>
+                    </td>
+                    <td>${leave.reportFillDate || '-'}</td>
+                    <td>${leave.companyName || '-'}</td>
+                    <td>${leave.departmentName || '-'}</td>
+                    <td><strong>${leave.employeeFullName || '-'}</strong></td>
+                    <td>${leave.fullLeaveDate || '-'}</td>
+                    <td>${leave.firstHalfDate || '-'}</td>
+                    <td>${leave.secondHalfDate || '-'}</td>
+                    <td>${leave.leaveReason || '-'}</td>
+                    <td>${leave.totalLeaveDays || '0'}</td>
+                    <td>
+                        <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
+                        ${actionByName}
+                    </td>
+                    <td>
+                        <div class="action-btn-group">
+                            <button class="action-btn btn-approve" onclick="updateLeaveStatus(${leave.id}, 'Approved')"><i class="fa-solid fa-check"></i></button>
+                            <button class="action-btn btn-reject" onclick="updateLeaveStatus(${leave.id}, 'Rejected')"><i class="fa-solid fa-xmark"></i></button>
+                            <button class="action-btn btn-delete" onclick="deleteLeaveRequest(${leave.id})" title="Delete Request"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                if (!leave.reviewed) {
+                    tr.classList.add('new-request-row');
+                }
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.toggleLeaveReviewed = function(leaveId, isReviewed) {
+            let allLeaves = getStoredLeaves();
+            const leaveIndex = allLeaves.findIndex(l => l.id === leaveId);
+            if (leaveIndex !== -1) {
+                allLeaves[leaveIndex].reviewed = !!isReviewed;
+                allLeaves[leaveIndex].reviewedBy = currentUserName;
+                allLeaves[leaveIndex].reviewedAt = new Date().toISOString();
+                persistStoredLeaves(allLeaves);
+
+                if (isReviewed) {
+                    const targetEmpIdentifier = allLeaves[leaveIndex].employeeEmail;
+                    addNotification(targetEmpIdentifier, `Your leave request has been reviewed and marked as handled by ${currentUserName}.`);
+                }
+
+                loadTlApprovals();
+                loadManagementRequests();
+                loadLeaveHistory();
+            }
+        };
+
         window.updateLeaveStatus = function(leaveId, newStatus) {
-            let allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
+            let allLeaves = getStoredLeaves();
             const leaveIndex = allLeaves.findIndex(l => l.id === leaveId);
             if (leaveIndex !== -1) {
                 allLeaves[leaveIndex].status = newStatus;
                 allLeaves[leaveIndex].actionBy = currentUserName; 
-                localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(allLeaves));
-                
+                allLeaves[leaveIndex].reviewed = true;
+                allLeaves[leaveIndex].reviewedBy = currentUserName;
+                allLeaves[leaveIndex].reviewedAt = new Date().toISOString();
+                persistStoredLeaves(allLeaves);
+                   
                 const targetEmpIdentifier = allLeaves[leaveIndex].employeeEmail;
                 addNotification(targetEmpIdentifier, `Your leave request for ${allLeaves[leaveIndex].totalLeaveDays} day(s) has been ${newStatus} by ${currentUserName}.`);
 
                 loadTlApprovals();
+                loadManagementRequests();
+                loadLeaveHistory();
                 alert(`✅ Leave request successfully marked as ${newStatus}!`);
             }
+        };
+
+        window.deleteLeaveRequest = function(leaveId) {
+            const confirmDelete = confirm('Are you sure you want to delete this leave request?');
+            if (!confirmDelete) return;
+
+            let allLeaves = getStoredLeaves();
+            const leaveToDelete = allLeaves.find(l => l.id === leaveId);
+
+            if (!leaveToDelete) {
+                alert('❌ Leave request not found.');
+                return;
+            }
+
+            allLeaves = allLeaves.filter(l => l.id !== leaveId);
+            persistStoredLeaves(allLeaves);
+
+            const targetEmpIdentifier = leaveToDelete.employeeEmail;
+            if (targetEmpIdentifier) {
+                addNotification(targetEmpIdentifier, `Your leave request for ${leaveToDelete.totalLeaveDays} day(s) has been deleted by ${currentUserName}.`);
+            }
+
+            loadTlApprovals();
+            loadLeaveHistory();
+            alert('✅ Leave request deleted successfully!');
         };
 
         document.getElementById('monthFilter').addEventListener('change', loadLeaveHistory);
         document.getElementById('tlMonthFilter').addEventListener('change', loadTlApprovals);
         document.getElementById('tlSearchName').addEventListener('input', loadTlApprovals);
+        document.getElementById('managementMonthFilter').addEventListener('change', loadManagementRequests);
+        document.getElementById('managementSearchName').addEventListener('input', loadManagementRequests);
+        if (document.getElementById('tlDeptFilter')) {
+            document.getElementById('tlDeptFilter').addEventListener('change', loadTlApprovals);
+        }
 
         function isValidDateString(str) {
             if (!str || str.trim() === "") return true;
@@ -1322,9 +1737,12 @@
                 timestamp: new Date().toISOString()
             };
 
-            let allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
+            let allLeaves = getStoredLeaves();
+            newLeave.reviewed = false;
+            newLeave.reviewedBy = '';
+            newLeave.reviewedAt = '';
             allLeaves.unshift(newLeave);
-            localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(allLeaves));
+            persistStoredLeaves(allLeaves);
 
             addNotification(userIdentifier, `Your leave application was successfully submitted to ${selectedDept} department TL.`);
 

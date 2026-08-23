@@ -396,6 +396,11 @@
         .stat-card.balance .stat-badge-box span:last-child { color: #065f46; }
         .stat-card.approved-counter .stat-badge-box span:last-child { color: #166534; }
 
+        /* clickable stat boxes */
+        .clickable-stat { cursor: pointer; transition: transform 0.12s ease, box-shadow 0.12s ease; }
+        .clickable-stat:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.12); }
+        .stat-selected { outline: 3px solid rgba(99,102,241,0.18); box-shadow: 0 8px 30px rgba(99,102,241,0.12); }
+
         .clickable-card {
             cursor: pointer;
             transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -754,10 +759,26 @@
             
             <!-- TL Counter & Search/Filter Section -->
             <div class="stats-row" style="margin-bottom: 20px;">
-                <div class="stat-card approved-counter">
-                    <div class="stat-card-title">Total Approved Leaves (This Month):</div>
+                <div class="stat-card taken clickable-stat" onclick="setTlStatusFilter('Pending')">
+                    <div class="stat-card-title">Pending Leave:</div>
+                    <div class="stat-badge-box">
+                        <div class="stat-circle" id="tlPendingCountBadge">0</div>
+                        <span>Days</span>
+                    </div>
+                </div>
+
+                <div class="stat-card balance clickable-stat" onclick="setTlStatusFilter('Approved')">
+                    <div class="stat-card-title">Approved Leave:</div>
                     <div class="stat-badge-box">
                         <div class="stat-circle" id="tlApprovedCountBadge">0</div>
+                        <span>Days</span>
+                    </div>
+                </div>
+
+                <div class="stat-card approved-counter clickable-stat" onclick="setTlStatusFilter('Rejected')">
+                    <div class="stat-card-title">Rejected Leave:</div>
+                    <div class="stat-badge-box">
+                        <div class="stat-circle" id="tlRejectedCountBadge">0</div>
                         <span>Days</span>
                     </div>
                 </div>
@@ -848,6 +869,33 @@
         <div id="managementPanel" class="panel-section hidden">
             <h3><i class="fa-solid fa-shield-halved" style="color: #f59e0b; margin-right: 8px;"></i>Management Control Panel</h3>
             <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Overall data and reports for all office staff and team leaders.</p>
+
+            <!-- Management Counters -->
+            <div class="stats-row" style="margin-bottom: 16px;">
+                <div class="stat-card taken clickable-stat" onclick="setManagementStatusFilter('Pending')">
+                    <div class="stat-card-title">Pending Leave:</div>
+                    <div class="stat-badge-box">
+                        <div class="stat-circle" id="mgmtPendingCountBadge">0</div>
+                        <span>Days</span>
+                    </div>
+                </div>
+
+                <div class="stat-card balance clickable-stat" onclick="setManagementStatusFilter('Approved')">
+                    <div class="stat-card-title">Approved Leave:</div>
+                    <div class="stat-badge-box">
+                        <div class="stat-circle" id="mgmtApprovedCountBadge">0</div>
+                        <span>Days</span>
+                    </div>
+                </div>
+
+                <div class="stat-card approved-counter clickable-stat" onclick="setManagementStatusFilter('Rejected')">
+                    <div class="stat-card-title">Rejected Leave:</div>
+                    <div class="stat-badge-box">
+                        <div class="stat-circle" id="mgmtRejectedCountBadge">0</div>
+                        <span>Days</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="history-section">
                 <div class="history-header">
@@ -1293,6 +1341,33 @@
         const DEPARTMENTS = ["FACULTY","TYPING","CONTENT","GRAPHIC","VIDEO EDITING","VIDEO RECORDING","OFFLINE","CALLING","MARKETING","SALES","MANAGEMENT","ACCOUNT","IT","BOOK"];
         const GLOBAL_LEAVES_KEY = "globalOfficeLeaveRequests";
 
+        // Status filters for TL & Management quick-filter clickable stat boxes
+        let tlStatusFilter = 'all';
+        let managementStatusFilter = 'all';
+
+        function setTlStatusFilter(status) {
+            tlStatusFilter = status === tlStatusFilter ? 'all' : status; // toggle if same clicked
+            // visually indicate selection (optional simple highlight)
+            document.querySelectorAll('.clickable-stat').forEach(el => el.classList.remove('stat-selected'));
+            if (tlStatusFilter !== 'all') {
+                const idMap = { 'Pending': 'tlPendingCountBadge', 'Approved': 'tlApprovedCountBadge', 'Rejected': 'tlRejectedCountBadge' };
+                const el = document.getElementById(idMap[tlStatusFilter]);
+                if (el && el.parentElement && el.parentElement.parentElement) el.parentElement.parentElement.classList.add('stat-selected');
+            }
+            loadTlApprovals();
+        }
+
+        function setManagementStatusFilter(status) {
+            managementStatusFilter = status === managementStatusFilter ? 'all' : status;
+            document.querySelectorAll('.clickable-stat').forEach(el => el.classList.remove('stat-selected'));
+            if (managementStatusFilter !== 'all') {
+                const idMap = { 'Pending': 'mgmtPendingCountBadge', 'Approved': 'mgmtApprovedCountBadge', 'Rejected': 'mgmtRejectedCountBadge' };
+                const el = document.getElementById(idMap[managementStatusFilter]);
+                if (el && el.parentElement && el.parentElement.parentElement) el.parentElement.parentElement.classList.add('stat-selected');
+            }
+            loadManagementRequests();
+        }
+
         function populateTlDepartmentFilter() {
             const sel = document.getElementById('tlDeptFilter');
             if (!sel) return;
@@ -1477,22 +1552,32 @@
                 });
             }
 
-            let totalApprovedDays = 0;
+            // Apply TL status quick-filter if set
+            if (typeof tlStatusFilter !== 'undefined' && tlStatusFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(l => (l.status || 'Pending') === tlStatusFilter);
+            }
+
+            // Compute Pending / Approved / Rejected totals (days) for TL view (respecting department + month filters)
+            let pendingDays = 0;
+            let approvedDays = 0;
+            let rejectedDays = 0;
             departmentLeaves.forEach(leave => {
-                if (leave.status === 'Approved') {
-                    let matchesMonth = true;
-                    if (selectedMonth !== 'all' && leave.reportFillDate) {
-                        const parts = leave.reportFillDate.split('/');
-                        if (parts.length === 3 && parts[1] !== selectedMonth) {
-                            matchesMonth = false;
-                        }
-                    }
-                    if (matchesMonth) {
-                        totalApprovedDays += parseFloat(leave.totalLeaveDays) || 0;
-                    }
+                let matchesMonth = true;
+                if (selectedMonth !== 'all' && leave.reportFillDate) {
+                    const parts = leave.reportFillDate.split('/');
+                    if (parts.length === 3 && parts[1] !== selectedMonth) matchesMonth = false;
                 }
+                if (!matchesMonth) return;
+                const days = parseFloat(leave.totalLeaveDays) || 0;
+                if ((leave.status || 'Pending') === 'Pending') pendingDays += days;
+                else if (leave.status === 'Approved') approvedDays += days;
+                else if (leave.status === 'Rejected') rejectedDays += days;
             });
-            document.getElementById('tlApprovedCountBadge').innerText = totalApprovedDays;
+
+            // Update TL stat badges
+            const tlPendEl = document.getElementById('tlPendingCountBadge'); if (tlPendEl) tlPendEl.innerText = pendingDays;
+            const tlAppEl = document.getElementById('tlApprovedCountBadge'); if (tlAppEl) tlAppEl.innerText = approvedDays;
+            const tlRejEl = document.getElementById('tlRejectedCountBadge'); if (tlRejEl) tlRejEl.innerText = rejectedDays;
 
             if (filteredLeaves.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="12" class="no-data">No leave requests found matching your criteria.</td></tr>`;
@@ -1567,6 +1652,25 @@
                     return leave.employeeFullName && leave.employeeFullName.toLowerCase().includes(searchQuery);
                 });
             }
+
+            // Apply Management status quick-filter if set
+            if (typeof managementStatusFilter !== 'undefined' && managementStatusFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(l => (l.status || 'Pending') === managementStatusFilter);
+            }
+
+            // Compute Pending/Approved/Rejected totals for management view
+            let mgPendingDays = 0;
+            let mgApprovedDays = 0;
+            let mgRejectedDays = 0;
+            filteredLeaves.forEach(leave => {
+                const days = parseFloat(leave.totalLeaveDays) || 0;
+                if ((leave.status || 'Pending') === 'Pending') mgPendingDays += days;
+                else if (leave.status === 'Approved') mgApprovedDays += days;
+                else if (leave.status === 'Rejected') mgRejectedDays += days;
+            });
+            const mgPendEl = document.getElementById('mgmtPendingCountBadge'); if (mgPendEl) mgPendEl.innerText = mgPendingDays;
+            const mgAppEl = document.getElementById('mgmtApprovedCountBadge'); if (mgAppEl) mgAppEl.innerText = mgApprovedDays;
+            const mgRejEl = document.getElementById('mgmtRejectedCountBadge'); if (mgRejEl) mgRejEl.innerText = mgRejectedDays;
 
             if (filteredLeaves.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="12" class="no-data">No requests found matching your criteria.</td></tr>`;

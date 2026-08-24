@@ -471,8 +471,243 @@
         .btn-reject { background: #ef4444; }
         .btn-delete { background: #f59e0b; }
         .new-request-row { background: rgba(245, 158, 11, 0.10); box-shadow: inset 3px 0 0 #f59e0b; }
-        .review-checkbox { width: 16px; height: 16px; accent-color: #10b981; cursor: pointer; }
+        .review-checkbox {
+            width: 18px; height: 18px; accent-color: #10b981; cursor: pointer; display: block; margin: 0 auto;
+            -webkit-appearance: checkbox; appearance: checkbox;
+        }
         .review-label { display: inline-flex; align-items: center; justify-content: center; }
+
+        .export-actions {
+            display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-left: 8px;
+        }
+        .export-btn {
+            border: none; background: transparent; color: rgba(255,255,255,0.9); font-size: 28px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer; padding: 0; line-height: 1;
+        }
+        .export-btn .dot {
+            width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.7); display: inline-block;
+            box-sizing: border-box; background: transparent;
+        }
+        .export-btn.pdf-btn .dot { background: #3b82f6; border-color: #3b82f6; }
+        .export-btn.excel-btn .dot { background: transparent; }
+        .export-btn:hover { opacity: 0.9; }
+
+        .management-submenu {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 10px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.45);
+            overflow: hidden;
+        }
+
+        .management-submenu.hidden {
+            display: none;
+        }
+
+        .report-dropdown-item {
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .report-dropdown-item:hover {
+            background: rgba(99, 102, 241, 0.12);
+        }
+
+        .daily-report-view {
+            background: rgba(245, 247, 250, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.18);
+            min-height: 520px;
+        }
+
+        .daily-report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 28px 18px;
+            background: rgba(255, 255, 255, 0.18);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .daily-report-header h2 {
+            font-size: 26px;
+            color: #1f2937;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .daily-report-body {
+            padding: 18px 22px 22px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1fr;
+            gap: 18px;
+            min-height: 420px;
+        }
+
+        .daily-report-panel {
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 14px 12px;
+            min-height: 240px;
+        }
+
+        .daily-report-panel h4 {
+            color: #475569;
+            font-size: 15px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .daily-report-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            color: #475569;
+        }
+
+        .daily-report-input input {
+            border: none;
+            background: transparent;
+            color: #334155;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+
+        .daily-report-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .report-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .report-period-field {
+            display: block;
+        }
+
+        .report-period-field select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #334155;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .report-option input {
+            accent-color: #4f46e5;
+            width: 15px;
+            height: 15px;
+        }
+
+        .daily-report-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            background: rgba(255,255,255,0.16);
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 240px;
+        }
+
+        .daily-report-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #475569;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .daily-report-selection-mode {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        }
+
+        .daily-report-box-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .daily-report-box-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #475569;
+            font-size: 13px;
+            padding: 4px 0;
+        }
+
+        .daily-report-box-list input {
+            accent-color: #4f46e5;
+            width: 15px;
+            height: 15px;
+        }
+
+        .daily-report-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 24px 24px;
+            background: rgba(255,255,255,0.08);
+            border-top: 1px solid rgba(148,163,184,0.35);
+        }
+
+        .report-export-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .report-export-option input {
+            accent-color: #4f46e5;
+        }
+
+        .daily-report-selected-summary {
+            font-size: 14px;
+            color: #334155;
+            font-weight: 600;
+        }
 
         .no-data { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; }
 
@@ -512,7 +747,17 @@
                 <li><a id="navDashboard"><i class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a id="menuEmployee"><i class="fa-solid fa-file-pen"></i> Employee Panel <i id="lockEmployee" class="fa-solid fa-lock lock-icon hidden"></i></a></li>
                 <li><a id="menuTL"><i class="fa-solid fa-users-gear"></i> Team Leader <i id="lockTL" class="fa-solid fa-lock lock-icon hidden"></i></a></li>
-                <li><a id="menuManagement"><i class="fa-solid fa-chart-pie"></i> Management <i id="lockManagement" class="fa-solid fa-lock lock-icon hidden"></i></a></li>
+                <li>
+                    <a id="menuManagement" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-solid fa-chart-pie"></i> Management</span>
+                        <i id="lockManagement" class="fa-solid fa-lock lock-icon hidden"></i>
+                    </a>
+                    <div id="managementReportMenu" class="management-submenu hidden">
+                        <button type="button" class="report-dropdown-item" data-report-type="Daily Report">Daily Report</button>
+                        <button type="button" class="report-dropdown-item" data-report-type="Monthly Report">Monthly Report</button>
+                        <button type="button" class="report-dropdown-item" data-report-type="Periodic Report">Periodic Report</button>
+                    </div>
+                </li>
             </ul>
         </div>
 
@@ -870,86 +1115,195 @@
             <h3><i class="fa-solid fa-shield-halved" style="color: #f59e0b; margin-right: 8px;"></i>Management Control Panel</h3>
             <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Overall data and reports for all office staff and team leaders.</p>
 
-            <!-- Management Counters -->
-            <div class="stats-row" style="margin-bottom: 16px;">
-                <div class="stat-card taken clickable-stat" onclick="setManagementStatusFilter('Pending')">
-                    <div class="stat-card-title">Pending Leave:</div>
-                    <div class="stat-badge-box">
-                        <div class="stat-circle" id="mgmtPendingCountBadge">0</div>
-                        <span>Days</span>
+            <div id="managementMainView">
+                <!-- Management Counters -->
+                <div class="stats-row" style="margin-bottom: 16px;">
+                    <div class="stat-card balance" style="cursor: default;">
+                        <div class="stat-card-title">Approved Leave:</div>
+                        <div class="stat-badge-box">
+                            <div class="stat-circle" id="mgmtApprovedCountBadge">0</div>
+                            <span>Days</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="stat-card balance clickable-stat" onclick="setManagementStatusFilter('Approved')">
-                    <div class="stat-card-title">Approved Leave:</div>
-                    <div class="stat-badge-box">
-                        <div class="stat-circle" id="mgmtApprovedCountBadge">0</div>
-                        <span>Days</span>
-                    </div>
-                </div>
+                <div class="history-section">
+                    <div class="history-header">
+                        <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-list-check" style="color: #f59e0b;"></i> All Leave Requests
+                        </h4>
 
-                <div class="stat-card approved-counter clickable-stat" onclick="setManagementStatusFilter('Rejected')">
-                    <div class="stat-card-title">Rejected Leave:</div>
-                    <div class="stat-badge-box">
-                        <div class="stat-circle" id="mgmtRejectedCountBadge">0</div>
-                        <span>Days</span>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+                            <div class="month-filter-box">
+                                <label for="managementReportDateFilter">Report Date:</label>
+                                <input type="date" id="managementReportDateFilter" style="width: 170px;">
+                            </div>
+
+                            <div class="month-filter-box">
+                                <label for="managementCompanyFilter">Company:</label>
+                                <select id="managementCompanyFilter" style="width: 150px;">
+                                    <option value="all">All Companies</option>
+                                </select>
+                            </div>
+
+                            <div class="month-filter-box">
+                                <label for="managementDepartmentFilter">Department:</label>
+                                <select id="managementDepartmentFilter" style="width: 150px;">
+                                    <option value="all">All Departments</option>
+                                </select>
+                            </div>
+
+                            <div class="month-filter-box">
+                                <label for="managementActionByFilter">Action By:</label>
+                                <select id="managementActionByFilter" style="width: 150px;">
+                                    <option value="all">All</option>
+                                </select>
+                            </div>
+
+                            <div class="month-filter-box">
+                                <label for="managementSearchName"><i class="fa-solid fa-search"></i> Search:</label>
+                                <input type="text" id="managementSearchName" placeholder="Employee Name..." style="width: 150px;">
+                            </div>
+
+                            <div class="month-filter-box">
+                                <label for="managementMonthFilter">Month:</label>
+                                <select id="managementMonthFilter">
+                                    <option value="all">All Months</option>
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+
+                            <div class="export-actions">
+                                <button type="button" class="export-btn pdf-btn" onclick="exportManagementToPdf()"><span class="dot"></span><span>PDF</span></button>
+                                <button type="button" class="export-btn excel-btn" onclick="exportManagementToExcel()"><span class="dot"></span><span>Excel</span></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="leave-table">
+                            <thead>
+                                <tr>
+                                    <th>Report Date</th>
+                                    <th>Company</th>
+                                    <th>Department</th>
+                                    <th>Employee Name</th>
+                                    <th>Full Leave</th>
+                                    <th>First Half</th>
+                                    <th>Second Half</th>
+                                    <th>Reason</th>
+                                    <th>Days</th>
+                                    <th>Status & Action By</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="managementTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <div class="history-section">
-                <div class="history-header">
-                    <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-list-check" style="color: #f59e0b;"></i> All Leave Requests
-                    </h4>
-
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <div class="month-filter-box">
-                            <label for="managementSearchName"><i class="fa-solid fa-search"></i> Search:</label>
-                            <input type="text" id="managementSearchName" placeholder="Employee Name..." style="width: 150px;">
+            <div id="dailyReportView" class="daily-report-view hidden">
+                <div class="daily-report-header">
+                    <h2 id="dailyReportTitle">Daily Report</h2>
+                </div>
+                <div class="daily-report-body">
+                    <div class="daily-report-panel">
+                        <div id="dailyReportDateField" class="report-period-field">
+                            <h4>Select Date</h4>
+                            <div class="daily-report-input">
+                                <input type="date" id="dailyReportDatePicker" aria-label="Punch date">
+                                <i class="fa-regular fa-calendar"></i>
+                            </div>
                         </div>
 
-                        <div class="month-filter-box">
-                            <label for="managementMonthFilter">Month:</label>
-                            <select id="managementMonthFilter">
-                                <option value="all">All Months</option>
-                                <option value="01">January</option>
-                                <option value="02">February</option>
-                                <option value="03">March</option>
-                                <option value="04">April</option>
-                                <option value="05">May</option>
-                                <option value="06">June</option>
-                                <option value="07">July</option>
-                                <option value="08">August</option>
-                                <option value="09">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
+                        <div id="monthlyReportField" class="report-period-field hidden">
+                            <h4>Select Month</h4>
+                            <div class="daily-report-input">
+                                <select id="dailyReportMonthPicker" aria-label="Select month">
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="yearReportField" class="report-period-field hidden" style="margin-top: 12px;">
+                            <h4>Select Year</h4>
+                            <div class="daily-report-input">
+                                <select id="dailyReportYearPicker" aria-label="Select year"></select>
+                            </div>
+                        </div>
+
+                        <div id="periodicReportDateRangeField" class="report-period-field hidden" style="margin-top: 12px;">
+                            <h4>Select Date Range</h4>
+                            <div class="daily-report-input" style="display: flex; gap: 10px; align-items: center;">
+                                <input type="date" id="periodicStartDatePicker" aria-label="Start date">
+                                <span style="color: #475569; font-weight: 600;">To</span>
+                                <input type="date" id="periodicEndDatePicker" aria-label="End date">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="table-responsive">
-                    <table class="leave-table">
-                        <thead>
-                            <tr>
-                                <th>Action Taken</th>
-                                <th>Report Date</th>
-                                <th>Company</th>
-                                <th>Department</th>
-                                <th>Employee Name</th>
-                                <th>Full Leave</th>
-                                <th>First Half</th>
-                                <th>Second Half</th>
-                                <th>Reason</th>
-                                <th>Days</th>
-                                <th>Status & Action By</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="managementTableBody"></tbody>
-                    </table>
+                    <div class="daily-report-box">
+                        <div class="daily-report-box-header">
+                            <span>Company</span>
+                        </div>
+                        <div class="daily-report-selection-mode">
+                            <label class="report-option"><input type="radio" name="companySelectionMode" value="all" checked> All Company</label>
+                            <label class="report-option"><input type="radio" name="companySelectionMode" value="few"> Few Company</label>
+                        </div>
+                        <ul id="dailyReportCompanyList" class="daily-report-box-list"></ul>
+                    </div>
+
+                    <div class="daily-report-box">
+                        <div class="daily-report-box-header">
+                            <span>Department</span>
+                        </div>
+                        <div class="daily-report-selection-mode">
+                            <label class="report-option"><input type="radio" name="departmentSelectionMode" value="all" checked> All Department</label>
+                            <label class="report-option"><input type="radio" name="departmentSelectionMode" value="few"> Few Department</label>
+                        </div>
+                        <ul id="dailyReportDepartmentList" class="daily-report-box-list"></ul>
+                    </div>
+
+                    <div class="daily-report-box">
+                        <div class="daily-report-box-header">
+                            <span>Employee</span>
+                        </div>
+                        <div class="daily-report-selection-mode">
+                            <label class="report-option"><input type="radio" name="employeeSelectionMode" value="all" checked> All Employee</label>
+                            <label class="report-option"><input type="radio" name="employeeSelectionMode" value="few"> Few Employee</label>
+                        </div>
+                        <ul id="dailyReportEmployeeList" class="daily-report-box-list"></ul>
+                    </div>
+                </div>
+                <div class="daily-report-footer">
+                    <div class="report-export-option-group">
+                        <label class="report-export-option"><input type="radio" name="exportType" value="pdf" checked> PDF</label>
+                        <label class="report-export-option"><input type="radio" name="exportType" value="excel"> Excel</label>
+                    </div>
+                    <div class="daily-report-selected-summary">Selected Employee:- <span id="dailyReportSelectedEmployeeCount">0</span></div>
                 </div>
             </div>
         </div>
@@ -957,6 +1311,8 @@
 
     <!-- Flatpickr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
@@ -1036,8 +1392,8 @@
                 menuTL.classList.remove('locked'); lockTL.classList.add('hidden');
                 menuMgmt.classList.add('locked'); lockMgmt.classList.remove('hidden');
             } else if (isRole("Management") || isRole("MANAGEMENT")) {
-                menuEmp.classList.remove('locked'); lockEmp.classList.add('hidden');
-                menuTL.classList.remove('locked'); lockTL.classList.add('hidden');
+                menuEmp.classList.add('locked'); lockEmp.classList.remove('hidden');
+                menuTL.classList.add('locked'); lockTL.classList.remove('hidden');
                 menuMgmt.classList.remove('locked'); lockMgmt.classList.add('hidden');
             }
         }
@@ -1214,6 +1570,235 @@
             loadNotifications();
         });
 
+        function updateDailyReportSelectionSummary() {
+            const employeeList = document.getElementById('dailyReportEmployeeList');
+            const countEl = document.getElementById('dailyReportSelectedEmployeeCount');
+            if (!employeeList || !countEl) return;
+
+            const checked = Array.from(employeeList.querySelectorAll('input[type="checkbox"]'))
+                .filter((input) => input.checked && !input.disabled)
+                .length;
+
+            const allMode = document.querySelector('input[name="employeeSelectionMode"][value="all"]:checked');
+            const totalEmployees = Array.from(employeeList.querySelectorAll('input[type="checkbox"]')).length;
+            countEl.textContent = String(allMode ? totalEmployees : checked);
+        }
+
+        function applyDailyReportMode(listId, modeName, isAllMode) {
+            const listEl = document.getElementById(listId);
+            if (!listEl) return;
+
+            const checkboxes = Array.from(listEl.querySelectorAll('input[type="checkbox"]'));
+            checkboxes.forEach((checkbox) => {
+                checkbox.disabled = isAllMode;
+                if (isAllMode) checkbox.checked = true;
+            });
+
+            if (!isAllMode) {
+                const checkedCount = checkboxes.filter((checkbox) => checkbox.checked).length;
+                if (checkedCount === 0 && checkboxes.length > 0) {
+                    checkboxes[0].checked = true;
+                }
+            }
+
+            updateDailyReportSelectionSummary();
+        }
+
+        function getSelectedCheckboxValues(listId) {
+            const listEl = document.getElementById(listId);
+            if (!listEl) return [];
+            return Array.from(listEl.querySelectorAll('input[type="checkbox"]'))
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => checkbox.dataset.value || checkbox.closest('label').textContent.trim());
+        }
+
+        function normalizeDateValue(value) {
+            if (!value) return '';
+            const trimmed = String(value).trim();
+            if (!trimmed) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) {
+                const [day, month, year] = trimmed.split('/');
+                return `${year}-${month}-${day}`;
+            }
+            return trimmed;
+        }
+
+        function exportSelectedDailyReport(format = 'PDF') {
+            const leaves = getStoredLeaves();
+            const datePicker = document.getElementById('dailyReportDatePicker');
+            const dateValue = normalizeDateValue(datePicker ? datePicker.value : '');
+            const selectedCompanies = getSelectedCheckboxValues('dailyReportCompanyList');
+            const selectedDepartments = getSelectedCheckboxValues('dailyReportDepartmentList');
+            const selectedEmployees = getSelectedCheckboxValues('dailyReportEmployeeList');
+
+            const filtered = leaves.filter((leave) => {
+                if (dateValue) {
+                    const leaveDate = normalizeDateValue(leave.reportFillDate || '');
+                    const visitDate = normalizeDateValue(leave.fullLeaveDate || '');
+                    if (leaveDate && leaveDate !== dateValue && visitDate && visitDate !== dateValue) {
+                        return false;
+                    }
+                }
+
+                if (selectedCompanies.length && !(leave.companyName && selectedCompanies.includes(leave.companyName))) return false;
+                if (selectedDepartments.length && !(leave.departmentName && selectedDepartments.includes(leave.departmentName))) return false;
+                if (selectedEmployees.length && !(leave.employeeFullName && selectedEmployees.includes(leave.employeeFullName))) return false;
+
+                return true;
+            });
+
+            if (!filtered.length) {
+                alert('No records match the current selected company, department, employee, and date filters.');
+                return;
+            }
+
+            if (format === 'Excel') {
+                const rows = filtered.map((leave) => ({
+                    'Report Date': leave.reportFillDate || '',
+                    'Company': leave.companyName || '',
+                    'Department': leave.departmentName || '',
+                    'Employee Name': leave.employeeFullName || '',
+                    'Full Leave': leave.fullLeaveDate || '',
+                    'First Half': leave.firstHalfDate || '',
+                    'Second Half': leave.secondHalfDate || '',
+                    'Reason': leave.leaveReason || '',
+                    'Days': leave.totalLeaveDays || '',
+                    'Status': leave.status || '',
+                    'Action By': leave.actionBy || ''
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(rows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Daily Report');
+                XLSX.writeFile(wb, 'daily-report.xlsx');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.setFontSize(12);
+            doc.text('Daily Report', 14, 16);
+            doc.setFontSize(9);
+            let y = 28;
+            filtered.slice(0, 35).forEach((leave) => {
+                const line = `${leave.reportFillDate || '-'} | ${leave.companyName || '-'} | ${leave.departmentName || '-'} | ${leave.employeeFullName || '-'} | ${leave.totalLeaveDays || '0'} days`;
+                if (y > 190) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.text(line, 14, y);
+                y += 6;
+            });
+            doc.save('daily-report.pdf');
+        }
+
+        function populateDailyReportLists() {
+            const leaves = getStoredLeaves();
+            const companyList = document.getElementById('dailyReportCompanyList');
+            const departmentList = document.getElementById('dailyReportDepartmentList');
+            const employeeList = document.getElementById('dailyReportEmployeeList');
+            const datePicker = document.getElementById('dailyReportDatePicker');
+            const monthPicker = document.getElementById('dailyReportMonthPicker');
+            const yearPicker = document.getElementById('dailyReportYearPicker');
+
+            if (datePicker) {
+                if (!datePicker.value) {
+                    const today = new Date();
+                    const offset = today.getTimezoneOffset();
+                    const localDate = new Date(today.getTime() - offset * 60000);
+                    datePicker.value = localDate.toISOString().slice(0, 10);
+                }
+            }
+
+            if (monthPicker) {
+                const today = new Date();
+                monthPicker.value = String(today.getMonth() + 1).padStart(2, '0');
+            }
+
+            if (yearPicker) {
+                const currentYear = new Date().getFullYear();
+                const years = [];
+                for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+                    years.push(year);
+                }
+                yearPicker.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join('');
+                yearPicker.value = String(currentYear);
+            }
+
+            const periodicStartPicker = document.getElementById('periodicStartDatePicker');
+            const periodicEndPicker = document.getElementById('periodicEndDatePicker');
+            if (periodicStartPicker && periodicEndPicker) {
+                const today = new Date();
+                const offset = today.getTimezoneOffset();
+                const localToday = new Date(today.getTime() - offset * 60000);
+                const start = new Date(localToday);
+                start.setDate(start.getDate() - 7);
+                periodicStartPicker.value = start.toISOString().slice(0, 10);
+                periodicEndPicker.value = localToday.toISOString().slice(0, 10);
+            }
+
+            function buildList(listEl, values, labelKey) {
+                listEl.innerHTML = '';
+                if (!values.length) {
+                    listEl.innerHTML = '<li>No data available</li>';
+                    return;
+                }
+
+                values.forEach((value) => {
+                    const item = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = true;
+                    checkbox.dataset.value = value;
+                    checkbox.addEventListener('change', updateDailyReportSelectionSummary);
+
+                    const label = document.createElement('label');
+                    label.className = 'report-option';
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(` ${value}`));
+                    item.appendChild(label);
+                    listEl.appendChild(item);
+                });
+            }
+
+            if (companyList) {
+                const companies = Array.from(new Set(leaves.map(leave => leave.companyName).filter(Boolean))).sort();
+                buildList(companyList, companies, 'company');
+            }
+
+            if (departmentList) {
+                const departments = Array.from(new Set(leaves.map(leave => leave.departmentName).filter(Boolean))).sort();
+                buildList(departmentList, departments, 'department');
+            }
+
+            if (employeeList) {
+                const employees = Array.from(new Set(leaves.map(leave => leave.employeeFullName).filter(Boolean))).sort();
+                buildList(employeeList, employees, 'employee');
+            }
+
+            document.querySelectorAll('input[name="companySelectionMode"]').forEach((radio) => {
+                radio.addEventListener('change', () => applyDailyReportMode('dailyReportCompanyList', 'company', radio.value === 'all'));
+            });
+            document.querySelectorAll('input[name="departmentSelectionMode"]').forEach((radio) => {
+                radio.addEventListener('change', () => applyDailyReportMode('dailyReportDepartmentList', 'department', radio.value === 'all'));
+            });
+            document.querySelectorAll('input[name="employeeSelectionMode"]').forEach((radio) => {
+                radio.addEventListener('change', () => applyDailyReportMode('dailyReportEmployeeList', 'employee', radio.value === 'all'));
+            });
+
+            applyDailyReportMode('dailyReportCompanyList', 'company', true);
+            applyDailyReportMode('dailyReportDepartmentList', 'department', true);
+            applyDailyReportMode('dailyReportEmployeeList', 'employee', true);
+            updateDailyReportSelectionSummary();
+
+            document.querySelectorAll('input[name="exportType"]').forEach((radio) => {
+                radio.addEventListener('change', () => {
+                    if (radio.checked) exportSelectedDailyReport(radio.value === 'excel' ? 'Excel' : 'PDF');
+                });
+            });
+        }
+
         function switchTab(tabName) {
             if (tabName !== 'dashboard') {
                 let hasAccess = false;
@@ -1222,7 +1807,7 @@
                 } else if (isRole("TL") || isRole("TeamLeader") || isRole("Team Leader")) {
                     if (tabName === 'employee' || tabName === 'tl') hasAccess = true;
                 } else if (isRole("Management") || isRole("MANAGEMENT")) {
-                    if (tabName === 'employee' || tabName === 'tl' || tabName === 'management') hasAccess = true;
+                    if (tabName === 'management') hasAccess = true;
                 }
 
                 if (!hasAccess) {
@@ -1261,6 +1846,8 @@
             } else if (tabName === 'management') {
                 activeLink = document.getElementById('menuManagement');
                 document.getElementById('managementPanel').classList.remove('hidden');
+                setManagementReportView(currentManagementReportType === 'Management' ? 'Management' : currentManagementReportType);
+                populateDailyReportLists();
                 loadManagementRequests();
             }
 
@@ -1328,6 +1915,8 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             await syncGlobalLeavesFromFirebase();
+            populateManagementFilterOptions();
+            populateDailyReportLists();
             switchTab('dashboard');
             loadNotifications();
             populateTlDepartmentFilter();
@@ -1336,14 +1925,59 @@
         document.getElementById('navDashboard').addEventListener('click', (e) => { e.preventDefault(); switchTab('dashboard'); });
         document.getElementById('menuEmployee').addEventListener('click', (e) => { e.preventDefault(); switchTab('employee'); });
         document.getElementById('menuTL').addEventListener('click', (e) => { e.preventDefault(); switchTab('tl'); });
-        document.getElementById('menuManagement').addEventListener('click', (e) => { e.preventDefault(); switchTab('management'); });
+        let currentManagementReportType = 'Management';
+
+        function setManagementReportView(reportType) {
+            currentManagementReportType = reportType || 'Management';
+            const managementMainView = document.getElementById('managementMainView');
+            const dailyReportView = document.getElementById('dailyReportView');
+            const reportTitle = document.getElementById('dailyReportTitle');
+            const reportTypes = ['Daily Report', 'Monthly Report', 'Periodic Report'];
+            const isReportView = reportTypes.includes(currentManagementReportType);
+
+            if (managementMainView) {
+                managementMainView.classList.toggle('hidden', isReportView);
+            }
+
+            if (dailyReportView) {
+                dailyReportView.classList.toggle('hidden', !isReportView);
+            }
+
+            if (reportTitle) {
+                reportTitle.textContent = isReportView ? currentManagementReportType : 'Daily Report';
+            }
+
+            const dateField = document.getElementById('dailyReportDateField');
+            const monthField = document.getElementById('monthlyReportField');
+            const yearField = document.getElementById('yearReportField');
+            const periodicRangeField = document.getElementById('periodicReportDateRangeField');
+
+            if (dateField && monthField && yearField && periodicRangeField) {
+                const showDate = currentManagementReportType === 'Daily Report';
+                const showMonthYear = currentManagementReportType === 'Monthly Report';
+                const showPeriodicRange = currentManagementReportType === 'Periodic Report';
+
+                dateField.classList.toggle('hidden', !showDate);
+                monthField.classList.toggle('hidden', !showMonthYear);
+                yearField.classList.toggle('hidden', !showMonthYear);
+                periodicRangeField.classList.toggle('hidden', !showPeriodicRange);
+            }
+        }
+
+        document.getElementById('menuManagement').addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('management');
+            const menu = document.getElementById('managementReportMenu');
+            if (menu) menu.classList.toggle('hidden');
+            populateDailyReportLists();
+        });
 
         const DEPARTMENTS = ["FACULTY","TYPING","CONTENT","GRAPHIC","VIDEO EDITING","VIDEO RECORDING","OFFLINE","CALLING","MARKETING","SALES","MANAGEMENT","ACCOUNT","IT","BOOK"];
         const GLOBAL_LEAVES_KEY = "globalOfficeLeaveRequests";
 
         // Status filters for TL & Management quick-filter clickable stat boxes
         let tlStatusFilter = 'all';
-        let managementStatusFilter = 'all';
+        let managementStatusFilter = 'Approved';
 
         function setTlStatusFilter(status) {
             tlStatusFilter = status === tlStatusFilter ? 'all' : status; // toggle if same clicked
@@ -1358,13 +1992,7 @@
         }
 
         function setManagementStatusFilter(status) {
-            managementStatusFilter = status === managementStatusFilter ? 'all' : status;
-            document.querySelectorAll('.clickable-stat').forEach(el => el.classList.remove('stat-selected'));
-            if (managementStatusFilter !== 'all') {
-                const idMap = { 'Pending': 'mgmtPendingCountBadge', 'Approved': 'mgmtApprovedCountBadge', 'Rejected': 'mgmtRejectedCountBadge' };
-                const el = document.getElementById(idMap[managementStatusFilter]);
-                if (el && el.parentElement && el.parentElement.parentElement) el.parentElement.parentElement.classList.add('stat-selected');
-            }
+            managementStatusFilter = 'Approved';
             loadManagementRequests();
         }
 
@@ -1515,6 +2143,33 @@
             });
         }
 
+        function getTlReviewedState(leave) {
+            if (!leave) return false;
+            if (typeof leave.tlReviewed !== 'undefined') return !!leave.tlReviewed;
+            return !!leave.reviewed;
+        }
+
+        function getManagementReviewedState(leave) {
+            if (!leave) return false;
+            return !!leave.managementReviewed;
+        }
+
+        function setReviewedState(leave, panel, isReviewed) {
+            if (!leave) return;
+
+            if (panel === 'management') {
+                leave.managementReviewed = !!isReviewed;
+                leave.managementReviewedBy = isReviewed ? currentUserName : '';
+                leave.managementReviewedAt = isReviewed ? new Date().toISOString() : '';
+                return;
+            }
+
+            leave.tlReviewed = !!isReviewed;
+            leave.reviewed = !!isReviewed;
+            leave.reviewedBy = isReviewed ? currentUserName : '';
+            leave.reviewedAt = isReviewed ? new Date().toISOString() : '';
+        }
+
         function loadTlApprovals() {
             const tbody = document.getElementById('tlApprovalTableBody');
             const selectedMonth = document.getElementById('tlMonthFilter').value;
@@ -1595,7 +2250,7 @@
                 tr.innerHTML = `
                     <td>
                         <label class="review-label" title="Mark as action taken">
-                            <input type="checkbox" class="review-checkbox" ${leave.reviewed ? 'checked' : ''} onchange="toggleLeaveReviewed(${leave.id}, this.checked)">
+                            <input type="checkbox" class="review-checkbox" data-leave-id="${leave.id}" data-panel="tl" ${getTlReviewedState(leave) ? 'checked' : ''} onchange="toggleLeaveReviewed(this, ${leave.id}, 'tl')">
                         </label>
                     </td>
                     <td>${leave.reportFillDate || '-'}</td>
@@ -1619,19 +2274,52 @@
                         </div>
                     </td>
                 `;
-                if (!leave.reviewed) {
+                if (!getTlReviewedState(leave)) {
                     tr.classList.add('new-request-row');
                 }
                 tbody.appendChild(tr);
             });
         }
 
+        function populateManagementFilterOptions() {
+            const allLeaves = getStoredLeaves();
+            const companyFilter = document.getElementById('managementCompanyFilter');
+            const departmentFilter = document.getElementById('managementDepartmentFilter');
+            const actionByFilter = document.getElementById('managementActionByFilter');
+
+            if (companyFilter) {
+                const companies = Array.from(new Set(allLeaves.map(leave => leave.companyName).filter(Boolean))).sort();
+                const currentValue = companyFilter.value;
+                companyFilter.innerHTML = '<option value="all">All Companies</option>' + companies.map(company => `<option value="${company}">${company}</option>`).join('');
+                if (companies.includes(currentValue)) companyFilter.value = currentValue;
+            }
+
+            if (departmentFilter) {
+                const departments = Array.from(new Set(allLeaves.map(leave => leave.departmentName).filter(Boolean))).sort();
+                const currentValue = departmentFilter.value;
+                departmentFilter.innerHTML = '<option value="all">All Departments</option>' + departments.map(department => `<option value="${department}">${department}</option>`).join('');
+                if (departments.includes(currentValue)) departmentFilter.value = currentValue;
+            }
+
+            if (actionByFilter) {
+                const actionByNames = Array.from(new Set(allLeaves.map(leave => leave.actionBy).filter(Boolean))).sort();
+                const currentValue = actionByFilter.value;
+                actionByFilter.innerHTML = '<option value="all">All</option>' + actionByNames.map(name => `<option value="${name}">${name}</option>`).join('');
+                if (actionByNames.includes(currentValue)) actionByFilter.value = currentValue;
+            }
+        }
+
         function loadManagementRequests() {
             const tbody = document.getElementById('managementTableBody');
             const selectedMonth = document.getElementById('managementMonthFilter').value;
             const searchQuery = document.getElementById('managementSearchName').value.trim().toLowerCase();
+            const reportDateFilter = document.getElementById('managementReportDateFilter').value;
+            const companyFilter = document.getElementById('managementCompanyFilter').value;
+            const departmentFilter = document.getElementById('managementDepartmentFilter').value;
+            const actionByFilter = document.getElementById('managementActionByFilter').value;
             const allLeaves = getStoredLeaves();
 
+            populateManagementFilterOptions();
             tbody.innerHTML = '';
 
             let filteredLeaves = allLeaves;
@@ -1647,33 +2335,45 @@
                 });
             }
 
+            if (reportDateFilter) {
+                filteredLeaves = filteredLeaves.filter(leave => {
+                    if (!leave.reportFillDate) return false;
+                    const [day, month, year] = leave.reportFillDate.split('/');
+                    const formatted = `${year}-${month}-${day}`;
+                    return formatted === reportDateFilter;
+                });
+            }
+
+            if (companyFilter && companyFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.companyName || '') === companyFilter);
+            }
+
+            if (departmentFilter && departmentFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.departmentName || '') === departmentFilter);
+            }
+
+            if (actionByFilter && actionByFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.actionBy || '') === actionByFilter);
+            }
+
             if (searchQuery !== '') {
                 filteredLeaves = filteredLeaves.filter(leave => {
                     return leave.employeeFullName && leave.employeeFullName.toLowerCase().includes(searchQuery);
                 });
             }
 
-            // Apply Management status quick-filter if set
-            if (typeof managementStatusFilter !== 'undefined' && managementStatusFilter !== 'all') {
-                filteredLeaves = filteredLeaves.filter(l => (l.status || 'Pending') === managementStatusFilter);
-            }
+            // Management panel is approved-only by requirement
+            filteredLeaves = filteredLeaves.filter(l => (l.status || 'Pending') === 'Approved');
 
-            // Compute Pending/Approved/Rejected totals for management view
-            let mgPendingDays = 0;
+            // Compute approved total days only
             let mgApprovedDays = 0;
-            let mgRejectedDays = 0;
             filteredLeaves.forEach(leave => {
-                const days = parseFloat(leave.totalLeaveDays) || 0;
-                if ((leave.status || 'Pending') === 'Pending') mgPendingDays += days;
-                else if (leave.status === 'Approved') mgApprovedDays += days;
-                else if (leave.status === 'Rejected') mgRejectedDays += days;
+                mgApprovedDays += parseFloat(leave.totalLeaveDays) || 0;
             });
-            const mgPendEl = document.getElementById('mgmtPendingCountBadge'); if (mgPendEl) mgPendEl.innerText = mgPendingDays;
             const mgAppEl = document.getElementById('mgmtApprovedCountBadge'); if (mgAppEl) mgAppEl.innerText = mgApprovedDays;
-            const mgRejEl = document.getElementById('mgmtRejectedCountBadge'); if (mgRejEl) mgRejEl.innerText = mgRejectedDays;
 
             if (filteredLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="no-data">No requests found matching your criteria.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="no-data">No approved leave requests found.</td></tr>`;
                 return;
             }
 
@@ -1686,11 +2386,6 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>
-                        <label class="review-label" title="Mark as action taken">
-                            <input type="checkbox" class="review-checkbox" ${leave.reviewed ? 'checked' : ''} onchange="toggleLeaveReviewed(${leave.id}, this.checked)">
-                        </label>
-                    </td>
                     <td>${leave.reportFillDate || '-'}</td>
                     <td>${leave.companyName || '-'}</td>
                     <td>${leave.departmentName || '-'}</td>
@@ -1705,27 +2400,24 @@
                         ${actionByName}
                     </td>
                     <td>
-                        <div class="action-btn-group">
-                            <button class="action-btn btn-approve" onclick="updateLeaveStatus(${leave.id}, 'Approved')"><i class="fa-solid fa-check"></i></button>
-                            <button class="action-btn btn-reject" onclick="updateLeaveStatus(${leave.id}, 'Rejected')"><i class="fa-solid fa-xmark"></i></button>
-                            <button class="action-btn btn-delete" onclick="deleteLeaveRequest(${leave.id})" title="Delete Request"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+                        <input type="checkbox" class="review-checkbox" data-leave-id="${leave.id}" data-panel="management" ${getManagementReviewedState(leave) ? 'checked' : ''} onchange="toggleLeaveReviewed(this, ${leave.id}, 'management')">
                     </td>
                 `;
-                if (!leave.reviewed) {
+                if (!getManagementReviewedState(leave)) {
                     tr.classList.add('new-request-row');
                 }
                 tbody.appendChild(tr);
             });
         }
 
-        window.toggleLeaveReviewed = function(leaveId, isReviewed) {
+        window.toggleLeaveReviewed = function(checkbox, leaveId, panel = 'tl') {
+            if (!checkbox) return;
+            const selectedPanel = checkbox.dataset && checkbox.dataset.panel ? checkbox.dataset.panel : panel;
+            const isReviewed = !!checkbox.checked;
             let allLeaves = getStoredLeaves();
             const leaveIndex = allLeaves.findIndex(l => l.id === leaveId);
             if (leaveIndex !== -1) {
-                allLeaves[leaveIndex].reviewed = !!isReviewed;
-                allLeaves[leaveIndex].reviewedBy = currentUserName;
-                allLeaves[leaveIndex].reviewedAt = new Date().toISOString();
+                setReviewedState(allLeaves[leaveIndex], selectedPanel, isReviewed);
                 persistStoredLeaves(allLeaves);
 
                 if (isReviewed) {
@@ -1733,6 +2425,7 @@
                     addNotification(targetEmpIdentifier, `Your leave request has been reviewed and marked as handled by ${currentUserName}.`);
                 }
 
+                checkbox.checked = isReviewed;
                 loadTlApprovals();
                 loadManagementRequests();
                 loadLeaveHistory();
@@ -1745,6 +2438,7 @@
             if (leaveIndex !== -1) {
                 allLeaves[leaveIndex].status = newStatus;
                 allLeaves[leaveIndex].actionBy = currentUserName; 
+                allLeaves[leaveIndex].tlReviewed = true;
                 allLeaves[leaveIndex].reviewed = true;
                 allLeaves[leaveIndex].reviewedBy = currentUserName;
                 allLeaves[leaveIndex].reviewedAt = new Date().toISOString();
@@ -1790,6 +2484,256 @@
         document.getElementById('tlSearchName').addEventListener('input', loadTlApprovals);
         document.getElementById('managementMonthFilter').addEventListener('change', loadManagementRequests);
         document.getElementById('managementSearchName').addEventListener('input', loadManagementRequests);
+        document.getElementById('managementReportDateFilter').addEventListener('change', loadManagementRequests);
+        document.getElementById('managementCompanyFilter').addEventListener('change', loadManagementRequests);
+        document.getElementById('managementDepartmentFilter').addEventListener('change', loadManagementRequests);
+        document.getElementById('managementActionByFilter').addEventListener('change', loadManagementRequests);
+
+        const managementReportMenu = document.getElementById('managementReportMenu');
+        const managementNavLink = document.getElementById('menuManagement');
+        if (managementReportMenu) {
+            document.querySelectorAll('.report-dropdown-item').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const type = button.dataset.reportType || 'Report';
+                    managementReportMenu.classList.add('hidden');
+                    if (['Daily Report', 'Monthly Report', 'Periodic Report'].includes(type)) {
+                        setManagementReportView(type);
+                    } else {
+                        setManagementReportView('Management');
+                        alert(`${type} selected. Export is based on the current filtered management data.`);
+                    }
+                });
+            });
+        }
+
+        if (managementReportMenu && managementNavLink) {
+            document.addEventListener('click', (event) => {
+                if (!managementReportMenu.contains(event.target) && !managementNavLink.contains(event.target)) {
+                    managementReportMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        function getFilteredManagementLeaves() {
+            const selectedMonth = document.getElementById('managementMonthFilter').value;
+            const searchQuery = document.getElementById('managementSearchName').value.trim().toLowerCase();
+            const reportDateFilter = document.getElementById('managementReportDateFilter').value;
+            const companyFilter = document.getElementById('managementCompanyFilter').value;
+            const departmentFilter = document.getElementById('managementDepartmentFilter').value;
+            const actionByFilter = document.getElementById('managementActionByFilter').value;
+            const allLeaves = getStoredLeaves();
+
+            let filteredLeaves = allLeaves;
+            if (selectedMonth !== 'all') {
+                filteredLeaves = allLeaves.filter(leave => {
+                    if (leave.reportFillDate) {
+                        const parts = leave.reportFillDate.split('/');
+                        if (parts.length === 3) {
+                            return parts[1] === selectedMonth;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            if (reportDateFilter) {
+                filteredLeaves = filteredLeaves.filter(leave => {
+                    if (!leave.reportFillDate) return false;
+                    const [day, month, year] = leave.reportFillDate.split('/');
+                    const formatted = `${year}-${month}-${day}`;
+                    return formatted === reportDateFilter;
+                });
+            }
+
+            if (companyFilter && companyFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.companyName || '') === companyFilter);
+            }
+
+            if (departmentFilter && departmentFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.departmentName || '') === departmentFilter);
+            }
+
+            if (actionByFilter && actionByFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.actionBy || '') === actionByFilter);
+            }
+
+            if (searchQuery !== '') {
+                filteredLeaves = filteredLeaves.filter(leave => {
+                    return leave.employeeFullName && leave.employeeFullName.toLowerCase().includes(searchQuery);
+                });
+            }
+
+            return filteredLeaves.filter(l => (l.status || 'Pending') === 'Approved');
+        }
+
+        function exportManagementToPdf() {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('PDF export library is not loaded.');
+                return;
+            }
+
+            const leaves = getFilteredManagementLeaves();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const fontSize = 8;
+            const headerHeight = 12;
+            const rowPadding = 2;
+            const columns = [
+                { title: 'Report Date', width: 24 },
+                { title: 'Company', width: 26 },
+                { title: 'Department', width: 28 },
+                { title: 'Employee Name', width: 30 },
+                { title: 'Full Leave', width: 25 },
+                { title: 'First Half', width: 22 },
+                { title: 'Second Half', width: 22 },
+                { title: 'Reason', width: 36 },
+                { title: 'Days', width: 14 },
+                { title: 'Status', width: 20 },
+                { title: 'Action By', width: 24 },
+                { title: 'Reviewed', width: 18 }
+            ];
+
+            let x = 10;
+            let y = 18;
+            const maxWidth = pageWidth - 20;
+
+            const totalColumnWidth = columns.reduce((sum, col) => sum + col.width, 0);
+            const scale = totalColumnWidth > maxWidth ? maxWidth / totalColumnWidth : 1;
+
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.text('All Leave Requests', 10, 12);
+
+            if (leaves.length === 0) {
+                doc.setFontSize(10);
+                doc.text('No approved leave requests found for the selected filters.', 10, 30);
+                doc.save('approved_leave_report.pdf');
+                return;
+            }
+
+            columns.forEach((column) => {
+                const colWidth = column.width * scale;
+                doc.setFillColor(30, 41, 59);
+                doc.setDrawColor(148, 163, 184);
+                doc.setTextColor(255, 255, 255);
+                doc.rect(x, y, colWidth, headerHeight, 'F');
+                doc.rect(x, y, colWidth, headerHeight);
+                doc.setFontSize(8);
+                doc.text(column.title, x + 2, y + 8, { maxWidth: colWidth - 4 });
+                x += colWidth;
+            });
+            x = 10;
+            y += headerHeight;
+
+            leaves.forEach((leave) => {
+                const rowValues = [
+                    leave.reportFillDate || '-',
+                    leave.companyName || '-',
+                    leave.departmentName || '-',
+                    leave.employeeFullName || '-',
+                    leave.fullLeaveDate || '-',
+                    leave.firstHalfDate || '-',
+                    leave.secondHalfDate || '-',
+                    leave.leaveReason || '-',
+                    leave.totalLeaveDays || '0',
+                    leave.status || 'Pending',
+                    leave.actionBy || '-',
+                    leave.managementReviewed ? 'Yes' : (leave.reviewed ? 'Yes' : 'No')
+                ];
+
+                const maxRowsNeeded = Math.max(...rowValues.map(value => {
+                    const text = String(value);
+                    const wrapped = doc.splitTextToSize(text, columns[rowValues.indexOf(value)].width * scale - 4);
+                    return wrapped.length;
+                }));
+
+                const rowHeight = Math.max(10, maxRowsNeeded * 4 + rowPadding * 2);
+                if (y + rowHeight > pageHeight - 12) {
+                    doc.addPage();
+                    y = 12;
+                    x = 10;
+                }
+
+                rowValues.forEach((value, index) => {
+                    const colWidth = columns[index].width * scale;
+                    const lines = doc.splitTextToSize(String(value), colWidth - 4);
+                    const textLines = lines.length > 0 ? lines : [''];
+                    const effectiveRowHeight = Math.max(rowHeight, textLines.length * 4 + rowPadding * 2);
+                    doc.setFillColor(index % 2 === 0 ? 248 : 255);
+                    doc.setDrawColor(203, 213, 225);
+                    doc.setTextColor(15, 23, 42);
+                    doc.rect(x, y, colWidth, effectiveRowHeight, 'FD');
+                    const textY = y + 4 + (effectiveRowHeight - textLines.length * 4) / 2;
+                    doc.text(textLines, x + 2, textY, { baseline: 'top' });
+                    x += colWidth;
+                });
+
+                x = 10;
+                y += Math.max(10, rowValues.length > 0 ? (Math.max(...rowValues.map(value => doc.splitTextToSize(String(value), columns[rowValues.indexOf(value)].width * scale - 4).length)) * 4 + rowPadding * 2) : 10);
+            });
+
+            doc.save('approved_leave_report.pdf');
+        }
+
+        function exportManagementToExcel() {
+            if (!window.XLSX) {
+                alert('Excel export library is not loaded.');
+                return;
+            }
+
+            const leaves = getFilteredManagementLeaves();
+            const rows = leaves.map(leave => ({
+                'Report Date': leave.reportFillDate || '',
+                'Company': leave.companyName || '',
+                'Department': leave.departmentName || '',
+                'Employee Name': leave.employeeFullName || '',
+                'Full Leave': leave.fullLeaveDate || '',
+                'First Half': leave.firstHalfDate || '',
+                'Second Half': leave.secondHalfDate || '',
+                'Reason': leave.leaveReason || '',
+                'Days': leave.totalLeaveDays || '0',
+                'Status': leave.status || 'Pending',
+                'Action By': leave.actionBy || '',
+                'Reviewed': leave.managementReviewed ? 'Yes' : (leave.reviewed ? 'Yes' : 'No')
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(rows);
+            const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:A1');
+            const headerFill = '2F4B7C';
+            const borderStyle = { top: { style: 'thin', color: { rgb: 'B7C5D8' } }, bottom: { style: 'thin', color: { rgb: 'B7C5D8' } }, left: { style: 'thin', color: { rgb: 'B7C5D8' } }, right: { style: 'thin', color: { rgb: 'B7C5D8' } } };
+
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                    const cell = worksheet[cellAddress];
+                    if (!cell) continue;
+                    cell.s = cell.s || {};
+                    cell.s.border = borderStyle;
+                    cell.s.font = cell.s.font || {};
+                    cell.s.font.name = 'Calibri';
+                    cell.s.font.size = 10;
+                    cell.s.alignment = cell.s.alignment || {};
+                    cell.s.alignment.vertical = 'center';
+                    if (R === range.s.r) {
+                        cell.s.fill = { fgColor: { rgb: headerFill } };
+                        cell.s.font.bold = true;
+                        cell.s.font.color = { rgb: 'FFFFFF' };
+                    }
+                }
+            }
+
+            worksheet['!cols'] = [
+                { wch: 14 }, { wch: 18 }, { wch: 18 }, { wch: 20 }, { wch: 18 },
+                { wch: 16 }, { wch: 16 }, { wch: 26 }, { wch: 10 }, { wch: 14 },
+                { wch: 18 }, { wch: 12 }
+            ];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'All Leave Requests');
+            XLSX.writeFile(workbook, 'approved_leave_report.xlsx');
+        }
         if (document.getElementById('tlDeptFilter')) {
             document.getElementById('tlDeptFilter').addEventListener('change', loadTlApprovals);
         }
@@ -1843,8 +2787,12 @@
 
             let allLeaves = getStoredLeaves();
             newLeave.reviewed = false;
+            newLeave.tlReviewed = false;
+            newLeave.managementReviewed = false;
             newLeave.reviewedBy = '';
             newLeave.reviewedAt = '';
+            newLeave.managementReviewedBy = '';
+            newLeave.managementReviewedAt = '';
             allLeaves.unshift(newLeave);
             persistStoredLeaves(allLeaves);
 

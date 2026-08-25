@@ -724,6 +724,12 @@
         .form-group input, .form-group select, .form-group textarea {
             background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; border-radius: 12px; color: #fff; font-size: 14px; outline: none; transition: all 0.3s ease;
         }
+        .form-group textarea {
+            min-height: 90px;
+            max-height: 220px;
+            resize: none;
+            overflow: hidden;
+        }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
         }
@@ -1367,6 +1373,16 @@
             return `${day}/${month}/${year}`;
         }
 
+        function autoResizeLeaveReason() {
+            const leaveReasonInput = document.getElementById('leaveReason');
+            if (!leaveReasonInput) return;
+
+            leaveReasonInput.style.height = 'auto';
+            const minHeight = 90;
+            const nextHeight = Math.max(minHeight, leaveReasonInput.scrollHeight + 4);
+            leaveReasonInput.style.height = `${Math.min(nextHeight, 220)}px`;
+        }
+
         function setEmployeeNameOnLeaveForm(nameOverride = '') {
             const employeeNameInput = document.getElementById('employeeFullName');
             if (!employeeNameInput) return;
@@ -1391,6 +1407,15 @@
                 if (window.flatpickr && reportDateInput._flatpickr) {
                     reportDateInput._flatpickr.setDate(new Date(), true, 'd/m/Y');
                 }
+            }
+
+            const leaveReasonInput = document.getElementById('leaveReason');
+            if (leaveReasonInput && !leaveReasonInput.dataset.autoResizeBound) {
+                leaveReasonInput.addEventListener('input', autoResizeLeaveReason, { passive: true });
+                leaveReasonInput.dataset.autoResizeBound = 'true';
+            }
+            if (leaveReasonInput) {
+                autoResizeLeaveReason();
             }
 
             const deptSelect = document.getElementById('departmentName');

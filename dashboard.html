@@ -1319,14 +1319,97 @@
         flatpickr("#reportFillDate", {
             dateFormat: "d/m/Y",
             allowInput: false,
-            defaultDate: "today"
+            clickOpens: false,
+            defaultDate: "today",
+            onReady: function() {
+                this.element.readOnly = true;
+                this.element.setAttribute('aria-readonly', 'true');
+            }
         });
 
-        const userData = JSON.parse(localStorage.getItem("loggedInUser"));
+        let userData = null;
+        try {
+            const savedUser = localStorage.getItem("loggedInUser");
+            userData = savedUser ? JSON.parse(savedUser) : null;
+        } catch (error) {
+            userData = null;
+            localStorage.removeItem("loggedInUser");
+        }
+
         let userRole = "";
         let userDept = "N/A";
         let userIdentifier = "";
         let currentUserName = "";
+
+        function getLoggedInUserDisplayName() {
+            if (!userData) return '';
+            const possibleNames = [
+                userData.name,
+                userData.fullName,
+                userData.employeeName,
+                userData.displayName,
+                userData.profileName,
+                userData.username,
+                userData.firstName && userData.lastName ? `${userData.firstName} ${userData.lastName}` : ''
+            ];
+            const cleanName = possibleNames
+                .filter((value) => typeof value === 'string')
+                .map((value) => value.trim())
+                .find((value) => value.length > 0);
+            return cleanName || '';
+        }
+
+        function getTodaysDateString() {
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function setEmployeeNameOnLeaveForm(nameOverride = '') {
+            const employeeNameInput = document.getElementById('employeeFullName');
+            if (!employeeNameInput) return;
+
+            const resolvedName = (nameOverride && String(nameOverride).trim()) || getLoggedInUserDisplayName() || (userData && userData.name) || '';
+            employeeNameInput.value = resolvedName;
+            employeeNameInput.readOnly = true;
+            employeeNameInput.style.background = 'rgba(15, 23, 42, 0.95)';
+        }
+
+        function applyLeaveFormAutoDefaults() {
+            const employeeNameInput = document.getElementById('employeeFullName');
+            if (employeeNameInput && !employeeNameInput.value.trim()) {
+                setEmployeeNameOnLeaveForm();
+            }
+
+            const reportDateInput = document.getElementById('reportFillDate');
+            if (reportDateInput) {
+                reportDateInput.value = getTodaysDateString();
+                reportDateInput.readOnly = true;
+                reportDateInput.setAttribute('aria-readonly', 'true');
+                if (window.flatpickr && reportDateInput._flatpickr) {
+                    reportDateInput._flatpickr.setDate(new Date(), true, 'd/m/Y');
+                }
+            }
+
+            const deptSelect = document.getElementById('departmentName');
+            if (deptSelect && !deptSelect.value && userDept && userDept !== 'N/A') {
+                const matchedOption = Array.from(deptSelect.options).find(option => option.value.toUpperCase() === String(userDept).toUpperCase());
+                if (matchedOption) {
+                    deptSelect.value = matchedOption.value;
+                }
+            }
+
+            const companySelect = document.getElementById('companyName');
+            if (companySelect && !companySelect.value) {
+                const fallbackCompany = 'WEBSANKUL';
+                const matchedCompany = Array.from(companySelect.options).find(option => option.value === fallbackCompany);
+                if (matchedCompany) {
+                    companySelect.value = matchedCompany.value;
+                }
+            }
+        }
 
         function normalizeRole(roleValue) {
             return String(roleValue || '').trim().toLowerCase().replace(/\s+/g, '');
@@ -1345,28 +1428,29 @@
             return [];
         }
 
-        if (!userData) {
-            window.location.href = "login.html";
+        if (!userData || !userData.email && !userData.name && !userData.role) {
+            window.location.href = "index.html";
         } else {
             userRole = userData.role;
-            userIdentifier = userData.email || userData.name;
-            currentUserName = userData.name;
-            
+            userIdentifier = userData.email || userData.name || userData.fullName || '';
+            currentUserName = getLoggedInUserDisplayName();
+             
             const userDepartments = getUserDepartments();
             if (userDepartments.length > 0) {
                 userDept = userDepartments[0];
             }
 
-            document.getElementById('welcomeName').innerText = `Welcome, ${userData.name}!`;
+            const displayName = getLoggedInUserDisplayName();
+            document.getElementById('welcomeName').innerText = `Welcome, ${displayName || userData.name || 'User'}!`;
             document.getElementById('welcomeRoleAndDept').innerText = `Department: ${userDept}`;
             document.getElementById('roleBadge').innerText = userRole;
 
-            document.getElementById('sidebarUserName').innerText = userData.name;
+            document.getElementById('sidebarUserName').innerText = displayName || userData.name || 'User';
             document.getElementById('sidebarUserEmail').innerText = userData.email || 'No Email';
             document.getElementById('sidebarUserRole').innerText = `Role: ${userRole}`;
             document.getElementById('sidebarUserDept').innerText = `Dept: ${userDept}`;
-            
-            document.getElementById('employeeFullName').value = userData.name;
+             
+            setEmployeeNameOnLeaveForm(displayName || userData.name || '');
 
             const savedImage = localStorage.getItem(`profileImage_${userIdentifier}`);
             const avatarBox = document.getElementById('profileAvatarBox');
@@ -1423,6 +1507,8 @@
         });
 
         document.getElementById('openLeaveFormCard').addEventListener('click', () => {
+            setEmployeeNameOnLeaveForm();
+            applyLeaveFormAutoDefaults();
             document.getElementById('employeeCardView').classList.add('hidden');
             document.getElementById('employeeFormView').classList.remove('hidden');
         });
@@ -2750,9 +2836,10 @@
 
         document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const fullName = document.getElementById('employeeFullName').value.trim();
-            if (!fullName.includes(' ')) {
+
+            const fullName = getLoggedInUserDisplayName() || document.getElementById('employeeFullName').value.trim();
+            setEmployeeNameOnLeaveForm(fullName);
+            if (!fullName || !fullName.includes(' ')) {
                 alert('⚠️ ભૂલ: નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.');
                 return;
             }
@@ -2810,8 +2897,9 @@
 
             alert('✅ Success! Your leave request has been submitted to your department TL.');
             this.reset();
-            document.getElementById('employeeFullName').value = userData.name;
-            
+            setEmployeeNameOnLeaveForm();
+            applyLeaveFormAutoDefaults();
+             
             document.getElementById('employeeFormView').classList.add('hidden');
             document.getElementById('employeeCardView').classList.remove('hidden');
             loadLeaveHistory();

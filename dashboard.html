@@ -739,6 +739,87 @@
             background: #6366f1; color: white; border: none; padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); margin-top: 10px;
         }
         .submit-leave-btn:hover { background: #4f46e5; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+
+        .rules-view {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 22px 24px 24px;
+            margin-top: 10px;
+        }
+
+        .rules-box {
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 16px;
+            padding: 20px 22px;
+            margin-top: 18px;
+        }
+
+        .rules-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            counter-reset: rule-counter;
+        }
+
+        .rules-list li {
+            display: grid;
+            grid-template-columns: 28px 1fr;
+            gap: 12px;
+            align-items: start;
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(30, 41, 59, 0.45);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .rules-list li::before {
+            counter-increment: rule-counter;
+            content: counter(rule-counter) ".";
+            color: #38bdf8;
+            font-weight: 700;
+            font-size: 13px;
+            margin-top: 1px;
+        }
+
+        .rules-list li .rule-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .rules-list li .rule-text span {
+            color: #cbd5e1;
+        }
+
+        .rules-list li .rule-text .english {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .rules-agree-btn {
+            background: linear-gradient(135deg, #10b981, #22c55e);
+            border: none;
+            color: white;
+            padding: 14px 26px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 22px;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .rules-agree-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.32);
+        }
     </style>
 </head>
 <body>
@@ -916,6 +997,59 @@
                         </table>
                     </div>
                 </div>
+            </div>
+
+            <div id="employeeRulesView" class="rules-view hidden">
+                <button type="button" class="back-btn" id="backToCardFromRulesBtn">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+
+                <h3><i class="fa-solid fa-circle-exclamation" style="color: #f59e0b; margin-right: 8px;"></i>Important Rules</h3>
+
+                <div class="rules-box">
+                    <ol class="rules-list">
+                        <li>
+                            <div class="rule-text">
+                                <span>સામાન્ય કે આકસ્મિત રજા મેળવવા માટે પણ ફોર્મ ભરવું ફરજિયાત છે.</span>
+                                <span class="english">It is mandatory to fill out a form to obtain ordinary or casual leave as well.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-text">
+                                <span>રજાની મંજૂરી ટીમ લીડર પાસેથી મેળવવાની જવાબદારી જે તે એમ્પ્લોયની જ રેહશે.</span>
+                                <span class="english">The responsibility for obtaining leave approval from the Team Leader rests solely with the concerned employee.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-text">
+                                <span>રજાની પૂર્વ મંજૂરી ટીમ લીડર પાસેથી લેવી ફરજિયાત છે.</span>
+                                <span class="english">Obtaining prior approval for leave from the team leader is mandatory.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-text">
+                                <span>જો ટીમ લીડર પાસેથી મંજૂરી મળ્યા પહેલા, મંજૂરી વગર કે રજા લઈને લીવ ફોર્મ માટે એપ્લાઈ કરશો તો રજાના દિવસોના બે ગણા દિવસો કાપવામાં આવશે.</span>
+                                <span class="english">If you apply for leave without prior approval from the team leader, or take leave without authorization, a number of days equal to double the duration of the leave will be deducted.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-text">
+                                <span>જે તે એમ્પ્લોયીએ આપેલ ફૉર્મટમાં જ એન્ટ્રી કરવાની રેહશે જો તેવું નહીં કરો તો ફોર્મ સબમિટ થશે નહીં.</span>
+                                <span class="english">Employees must make entries only in the prescribed format; failure to do so will result in the form not being submitted.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="rule-text">
+                                <span>વધારાના કપાત દિવસોનું વળતર ફરીથી મળશે નહીં.</span>
+                                <span class="english">Compensation for additional days of deduction will not be provided again.</span>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <button type="button" id="agreeLeaveRulesBtn" class="rules-agree-btn">
+                    <i class="fa-solid fa-check" style="margin-right: 8px;"></i>I Agree
+                </button>
             </div>
 
             <div id="employeeFormView" class="hidden">
@@ -1440,6 +1574,45 @@
             return String(roleValue || '').trim().toLowerCase().replace(/\s+/g, '');
         }
 
+        async function resolveDepartmentFromFirebase(email, name) {
+            const targetEmail = String(email || '').trim().toLowerCase();
+            const targetName = String(name || '').trim().toLowerCase();
+            if (!targetEmail && !targetName) return '';
+
+            try {
+                const snapshot = await db.ref('users').once('value');
+                const allUsers = snapshot.val() || {};
+                const userList = Object.values(allUsers);
+
+                for (const user of userList) {
+                    if (!user || typeof user !== 'object') continue;
+
+                    const userEmail = String(user.email || '').trim().toLowerCase();
+                    const userName = String(user.name || user.fullName || '').trim().toLowerCase();
+                    const emailMatch = targetEmail && userEmail && userEmail === targetEmail;
+                    const nameMatch = targetName && userName && userName === targetName;
+
+                    if (emailMatch || nameMatch) {
+                        const candidateDepartment = user.department || user.dept || user.departments;
+                        if (Array.isArray(candidateDepartment) && candidateDepartment.length > 0) {
+                            return String(candidateDepartment[0]).trim();
+                        }
+                        if (candidateDepartment && typeof candidateDepartment === 'object') {
+                            const deptValue = Object.values(candidateDepartment).find(Boolean);
+                            if (deptValue) return String(deptValue).trim();
+                        }
+                        if (candidateDepartment) {
+                            return String(candidateDepartment).trim();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Department lookup from Firebase failed:', error);
+            }
+
+            return '';
+        }
+
         function isRole(expectedRole) {
             return normalizeRole(userRole) === normalizeRole(expectedRole);
         }
@@ -1453,13 +1626,28 @@
             return [];
         }
 
+        async function refreshUserDepartmentFromFirebase() {
+            if (!userData) return;
+            const currentDept = String(userData.department || '').trim();
+            if (currentDept && currentDept !== 'N/A') return;
+
+            const resolvedDepartment = await resolveDepartmentFromFirebase(userData.email || userData.name || userIdentifier, getLoggedInUserDisplayName() || userData.name || '');
+            if (!resolvedDepartment) return;
+
+            userData.department = resolvedDepartment;
+            userDept = resolvedDepartment;
+            localStorage.setItem('loggedInUser', JSON.stringify(userData));
+            document.getElementById('welcomeRoleAndDept').innerText = `Department: ${userDept}`;
+            document.getElementById('sidebarUserDept').innerText = `Dept: ${userDept}`;
+        }
+
         if (!userData || !userData.email && !userData.name && !userData.role) {
             window.location.href = "index.html";
         } else {
             userRole = userData.role;
             userIdentifier = userData.email || userData.name || userData.fullName || '';
             currentUserName = getLoggedInUserDisplayName();
-             
+              
             const userDepartments = getUserDepartments();
             if (userDepartments.length > 0) {
                 userDept = userDepartments[0];
@@ -1474,7 +1662,7 @@
             document.getElementById('sidebarUserEmail').innerText = userData.email || 'No Email';
             document.getElementById('sidebarUserRole').innerText = `Role: ${userRole}`;
             document.getElementById('sidebarUserDept').innerText = `Dept: ${userDept}`;
-             
+              
             setEmployeeNameOnLeaveForm(displayName || userData.name || '');
 
             const savedImage = localStorage.getItem(`profileImage_${userIdentifier}`);
@@ -1484,6 +1672,8 @@
             } else {
                 document.getElementById('profileInitial').innerText = userData.name.charAt(0).toUpperCase();
             }
+
+            refreshUserDepartmentFromFirebase();
 
             const menuEmp = document.getElementById('menuEmployee');
             const lockEmp = document.getElementById('lockEmployee');
@@ -1535,6 +1725,17 @@
             setEmployeeNameOnLeaveForm();
             applyLeaveFormAutoDefaults();
             document.getElementById('employeeCardView').classList.add('hidden');
+            document.getElementById('employeeRulesView').classList.remove('hidden');
+            document.getElementById('employeeFormView').classList.add('hidden');
+        });
+
+        document.getElementById('backToCardFromRulesBtn').addEventListener('click', () => {
+            document.getElementById('employeeRulesView').classList.add('hidden');
+            document.getElementById('employeeCardView').classList.remove('hidden');
+        });
+
+        document.getElementById('agreeLeaveRulesBtn').addEventListener('click', () => {
+            document.getElementById('employeeRulesView').classList.add('hidden');
             document.getElementById('employeeFormView').classList.remove('hidden');
         });
 
@@ -2077,9 +2278,22 @@
 
         document.getElementById('menuManagement').addEventListener('click', (e) => {
             e.preventDefault();
-            switchTab('management');
             const menu = document.getElementById('managementReportMenu');
-            if (menu) menu.classList.toggle('hidden');
+            const isReportView = ['Daily Report', 'Monthly Report', 'Periodic Report'].includes(currentManagementReportType);
+
+            if (isReportView) {
+                currentManagementReportType = 'Management';
+                setManagementReportView('Management');
+                switchTab('management');
+                if (menu) menu.classList.add('hidden');
+                populateDailyReportLists();
+                return;
+            }
+
+            switchTab('management');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
             populateDailyReportLists();
         });
 

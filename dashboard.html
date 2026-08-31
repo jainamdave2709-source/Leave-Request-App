@@ -1575,16 +1575,23 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
-        flatpickr("#reportFillDate", {
-            dateFormat: "d/m/Y",
-            allowInput: false,
-            clickOpens: false,
-            defaultDate: "today",
-            onReady: function() {
-                this.element.readOnly = true;
-                this.element.setAttribute('aria-readonly', 'true');
+        function initializeReportDateField() {
+            const reportDateInput = document.getElementById('reportFillDate');
+            if (!reportDateInput) return;
+
+            if (window.flatpickr && reportDateInput._flatpickr) {
+                reportDateInput._flatpickr.destroy();
             }
-        });
+
+            reportDateInput.value = getTodaysDateString();
+            reportDateInput.readOnly = true;
+            reportDateInput.setAttribute('aria-readonly', 'true');
+            reportDateInput.setAttribute('autocomplete', 'off');
+            reportDateInput.setAttribute('inputmode', 'none');
+            reportDateInput.style.cursor = 'default';
+            reportDateInput.addEventListener('keydown', (event) => event.preventDefault(), { passive: false });
+            reportDateInput.addEventListener('focus', (event) => event.target.blur(), { passive: true });
+        }
 
         let userData = null;
         try {
@@ -1657,8 +1664,12 @@
                 reportDateInput.value = getTodaysDateString();
                 reportDateInput.readOnly = true;
                 reportDateInput.setAttribute('aria-readonly', 'true');
+                reportDateInput.setAttribute('autocomplete', 'off');
+                reportDateInput.setAttribute('inputmode', 'none');
+                reportDateInput.style.cursor = 'default';
+                reportDateInput.onfocus = () => false;
                 if (window.flatpickr && reportDateInput._flatpickr) {
-                    reportDateInput._flatpickr.setDate(new Date(), true, 'd/m/Y');
+                    reportDateInput._flatpickr.destroy();
                 }
             }
 
@@ -1882,6 +1893,7 @@
 
         document.getElementById('openLeaveFormCard').addEventListener('click', () => {
             setEmployeeNameOnLeaveForm();
+            initializeReportDateField();
             applyLeaveFormAutoDefaults();
             document.getElementById('employeeCardView').classList.add('hidden');
             document.getElementById('employeeRulesView').classList.remove('hidden');

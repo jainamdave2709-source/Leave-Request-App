@@ -416,6 +416,53 @@
             transform: translateY(-2px);
         }
 
+        .delete-history-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 18px 20px;
+            color: #f8fafc;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+        }
+
+        .delete-history-toggle:hover {
+            border-color: rgba(99, 102, 241, 0.6);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .delete-history-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delete-history-toggle .fa-chevron-down {
+            transition: transform 0.2s ease;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .delete-history-toggle.open .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .delete-history-list {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-top: 2px;
+        }
+
         .history-section {
             background: rgba(15, 23, 42, 0.5);
             border: 1px solid rgba(255,255,255,0.08);
@@ -449,6 +496,18 @@
         .leave-table th, .leave-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); white-space: nowrap; }
         .leave-table th { color: #94a3b8; font-weight: 600; background: rgba(30, 41, 59, 0.5); }
         .leave-table td { color: #e2e8f0; }
+        .leave-table td.reason-cell {
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            width: 150px;
+            max-width: 150px;
+            min-width: 120px;
+            vertical-align: top;
+            line-height: 1.4;
+            font-size: 12px;
+            color: #e2e8f0;
+        }
 
         .status-badge {
             padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase;
@@ -490,7 +549,68 @@
         }
         .export-btn.pdf-btn .dot { background: #3b82f6; border-color: #3b82f6; }
         .export-btn.excel-btn .dot { background: transparent; }
+        .export-btn.selected {
+            opacity: 1;
+            filter: brightness(1.15);
+        }
         .export-btn:hover { opacity: 0.9; }
+        .management-export-controls {
+            display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-left: 6px;
+        }
+        .export-radio-group {
+            display: inline-flex; align-items: center; gap: 18px; flex-wrap: wrap;
+        }
+        .export-choice {
+            display: inline-flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 26px; font-weight: 600; cursor: pointer; user-select: none;
+        }
+        .export-choice input {
+            position: absolute; opacity: 0; pointer-events: none;
+        }
+        .export-choice .custom-radio {
+            width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.7); background: transparent; display: inline-block; position: relative; flex-shrink: 0;
+        }
+        .export-choice input:checked + .custom-radio {
+            border-color: #60a5fa; background: #60a5fa; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+        }
+        .export-choice input:checked + .custom-radio::after {
+            content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #fff;
+        }
+        .generate-report-btn {
+            border: none;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .generate-report-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(79, 70, 229, 0.32);
+        }
+        .export-notice-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.28); display: none; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .export-notice-overlay.show { display: flex; }
+        .export-notice-modal {
+            width: min(520px, calc(100vw - 40px)); background: rgba(255,255,255,0.98); border-radius: 16px; box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28); border: 1px solid rgba(148, 163, 184, 0.3); overflow: hidden;
+        }
+        .export-notice-header {
+            padding: 18px 20px 10px; font-size: 15px; color: #475569; font-weight: 600; text-align: left;
+        }
+        .export-notice-body {
+            padding: 0 20px 18px; color: #1f2937; font-size: 15px; line-height: 1.5; font-weight: 500;
+        }
+        .export-notice-body strong { font-size: 22px; display: block; margin-bottom: 12px; color: #0f172a; }
+        .export-notice-actions {
+            display: flex; justify-content: flex-end; padding: 0 18px 18px;
+        }
+        .export-notice-ok {
+            background: #2b2d32; color: white; border: none; border-radius: 10px; padding: 10px 24px; font-weight: 700; cursor: pointer; font-size: 16px;
+        }
 
         .management-submenu {
             margin-top: 8px;
@@ -692,15 +812,46 @@
         }
 
         .report-export-option {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #475569;
+            gap: 10px;
+            font-size: 26px;
+            color: #f8fafc;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
         }
 
         .report-export-option input {
-            accent-color: #4f46e5;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .report-export-option .custom-radio {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            background: transparent;
+            display: inline-block;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .report-export-option input:checked + .custom-radio {
+            background: #6366f1;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+        }
+
+        .report-export-option input:checked + .custom-radio::after {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            background: #fff;
         }
 
         .daily-report-selected-summary {
@@ -987,6 +1138,16 @@
             <button class="logout-btn" id="logoutBtn">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </button>
+        </div>
+    </div>
+
+    <div class="export-notice-overlay" id="exportNoticeOverlay">
+        <div class="export-notice-modal" role="dialog" aria-modal="true" aria-labelledby="exportNoticeTitle">
+            <div class="export-notice-header" id="exportNoticeTitle">This page says</div>
+            <div class="export-notice-body" id="exportNoticeBody"></div>
+            <div class="export-notice-actions">
+                <button type="button" class="export-notice-ok" onclick="hideExportNotice()">OK</button>
+            </div>
         </div>
     </div>
 
@@ -1386,6 +1547,18 @@
                     </div>
                 </div>
 
+                <div class="history-section" style="margin-bottom: 20px;">
+                    <div id="managementDeleteHistoryToggle" class="delete-history-toggle" role="button" tabindex="0" aria-expanded="false">
+                        <div class="delete-history-toggle-label">
+                            <i class="fa-solid fa-list-check" style="color: #f59e0b;"></i>
+                            <span>Delete History</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+
+                    <div id="managementDeleteHistoryList" class="delete-history-list hidden"></div>
+                </div>
+
                 <div class="history-section">
                     <div class="history-header">
                         <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
@@ -1443,9 +1616,20 @@
                                 </select>
                             </div>
 
-                            <div class="export-actions">
-                                <button type="button" class="export-btn pdf-btn" onclick="exportManagementToPdf()"><span class="dot"></span><span>PDF</span></button>
-                                <button type="button" class="export-btn excel-btn" onclick="exportManagementToExcel()"><span class="dot"></span><span>Excel</span></button>
+                            <div class="management-export-controls">
+                                <div class="export-radio-group">
+                                    <label class="export-choice">
+                                        <input type="radio" name="managementExportFormat" value="pdf" checked>
+                                        <span class="custom-radio"></span>
+                                        <span>PDF</span>
+                                    </label>
+                                    <label class="export-choice">
+                                        <input type="radio" name="managementExportFormat" value="excel">
+                                        <span class="custom-radio"></span>
+                                        <span>Excel</span>
+                                    </label>
+                                </div>
+                                <button type="button" class="generate-report-btn" onclick="generateManagementExportReport()">Generate</button>
                             </div>
                         </div>
                     </div>
@@ -1559,10 +1743,21 @@
                 </div>
                 <div class="daily-report-footer">
                     <div class="report-export-option-group">
-                        <label class="report-export-option"><input type="radio" name="exportType" value="pdf" checked> PDF</label>
-                        <label class="report-export-option"><input type="radio" name="exportType" value="excel"> Excel</label>
+                        <label class="report-export-option">
+                            <input type="radio" name="exportType" value="pdf" checked>
+                            <span class="custom-radio"></span>
+                            <span>PDF</span>
+                        </label>
+                        <label class="report-export-option">
+                            <input type="radio" name="exportType" value="excel">
+                            <span class="custom-radio"></span>
+                            <span>Excel</span>
+                        </label>
                     </div>
-                    <div class="daily-report-selected-summary">Selected Employee:- <span id="dailyReportSelectedEmployeeCount">0</span></div>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <div class="daily-report-selected-summary">Selected Employee:- <span id="dailyReportSelectedEmployeeCount">0</span></div>
+                        <button type="button" class="generate-report-btn" onclick="generateSelectedDailyReport()">Generate</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2107,6 +2302,160 @@
             return trimmed;
         }
 
+        window.currentManagementExportFormat = 'pdf';
+
+        function getSelectedManagementExportFormat() {
+            const selected = document.querySelector('input[name="managementExportFormat"]:checked');
+            return selected && selected.value === 'excel' ? 'excel' : 'pdf';
+        }
+
+        function selectManagementExportFormat(format) {
+            const selectedFormat = format === 'excel' ? 'excel' : 'pdf';
+            window.currentManagementExportFormat = selectedFormat;
+            const radio = document.querySelector(`input[name="managementExportFormat"][value="${selectedFormat}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        function showExportNotice(message) {
+            const overlay = document.getElementById('exportNoticeOverlay');
+            const body = document.getElementById('exportNoticeBody');
+            if (!overlay || !body) {
+                alert(message);
+                return;
+            }
+            body.innerHTML = `<strong>Alert</strong>${message}`;
+            overlay.classList.add('show');
+        }
+
+        function hideExportNotice() {
+            const overlay = document.getElementById('exportNoticeOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function getManagementExportData() {
+            const selectedMonth = document.getElementById('managementMonthFilter') ? document.getElementById('managementMonthFilter').value : 'all';
+            const reportDateFilter = document.getElementById('managementReportDateFilter') ? document.getElementById('managementReportDateFilter').value : '';
+            const companyFilter = document.getElementById('managementCompanyFilter') ? document.getElementById('managementCompanyFilter').value : 'all';
+            const departmentFilter = document.getElementById('managementDepartmentFilter') ? document.getElementById('managementDepartmentFilter').value : 'all';
+            const actionByFilter = document.getElementById('managementActionByFilter') ? document.getElementById('managementActionByFilter').value : 'all';
+            const searchQuery = document.getElementById('managementSearchName') ? document.getElementById('managementSearchName').value.trim().toLowerCase() : '';
+            let filteredLeaves = getStoredLeaves();
+
+            if (selectedMonth !== 'all') {
+                filteredLeaves = filteredLeaves.filter((leave) => {
+                    if (!leave.reportFillDate) return false;
+                    const parts = leave.reportFillDate.split('/');
+                    return parts.length === 3 && parts[1] === selectedMonth;
+                });
+            }
+
+            if (reportDateFilter) {
+                filteredLeaves = filteredLeaves.filter((leave) => {
+                    if (!leave.reportFillDate) return false;
+                    const [day, month, year] = leave.reportFillDate.split('/');
+                    return `${year}-${month}-${day}` === reportDateFilter;
+                });
+            }
+
+            if (companyFilter && companyFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter((leave) => (leave.companyName || '') === companyFilter);
+            }
+
+            if (departmentFilter && departmentFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter((leave) => (leave.departmentName || '') === departmentFilter);
+            }
+
+            if (actionByFilter && actionByFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter((leave) => (leave.actionBy || '') === actionByFilter);
+            }
+
+            if (searchQuery) {
+                filteredLeaves = filteredLeaves.filter((leave) => {
+                    return leave.employeeFullName && leave.employeeFullName.toLowerCase().includes(searchQuery);
+                });
+            }
+
+            filteredLeaves = filteredLeaves.filter((leave) => (leave.status || 'Pending') === 'Approved');
+            return filteredLeaves;
+        }
+
+        function generateManagementExportReport() {
+            const format = getSelectedManagementExportFormat();
+            window.currentManagementExportFormat = format;
+            if (format === 'excel') {
+                exportManagementToExcel();
+            } else {
+                exportManagementToPdf();
+            }
+        }
+
+        function exportManagementToPdf() {
+            const filteredLeaves = getManagementExportData();
+            if (!filteredLeaves.length) {
+                showExportNotice('No records match the current selected company, department, employee, and date filters.');
+                return;
+            }
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                showExportNotice('PDF library is not loaded. Please refresh the page and try again.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.setFontSize(12);
+            doc.text('Approved Leave Report', 14, 16);
+            doc.setFontSize(8);
+
+            let y = 24;
+            filteredLeaves.forEach((leave, index) => {
+                const line = `${index + 1}. ${leave.reportFillDate || '-'} | ${leave.companyName || '-'} | ${leave.departmentName || '-'} | ${leave.employeeFullName || '-'} | ${leave.totalLeaveDays || '0'} days | ${leave.status || 'Pending'} | ${leave.actionBy || '-'} | ${(leave.leaveReason || '').replace(/\s+/g, ' ').slice(0, 160)}`;
+                const wrapped = doc.splitTextToSize(line, 250);
+
+                if (y + wrapped.length * 4 > 190) {
+                    doc.addPage();
+                    y = 18;
+                }
+
+                doc.text(wrapped, 14, y);
+                y += wrapped.length * 4 + 4;
+            });
+
+            doc.save('approved_leave_report.pdf');
+        }
+
+        function exportManagementToExcel() {
+            const filteredLeaves = getManagementExportData();
+            if (!filteredLeaves.length) {
+                showExportNotice('No records match the current selected company, department, employee, and date filters.');
+                return;
+            }
+
+            const rows = filteredLeaves.map((leave) => ({
+                'Report Date': leave.reportFillDate || '',
+                'Company': leave.companyName || '',
+                'Department': leave.departmentName || '',
+                'Employee Name': leave.employeeFullName || '',
+                'Full Leave': leave.fullLeaveDate || '',
+                'First Half': leave.firstHalfDate || '',
+                'Second Half': leave.secondHalfDate || '',
+                'Reason': leave.leaveReason || '',
+                'Days': leave.totalLeaveDays || '',
+                'Status': leave.status || '',
+                'Action By': leave.actionBy || ''
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Approved Leave Report');
+            XLSX.writeFile(wb, 'approved_leave_report.xlsx');
+        }
+
+        function generateSelectedDailyReport() {
+            const selectedFormat = document.querySelector('input[name="exportType"]:checked')?.value === 'excel' ? 'Excel' : 'PDF';
+            exportSelectedDailyReport(selectedFormat);
+        }
+
         function exportSelectedDailyReport(format = 'PDF') {
             const leaves = getStoredLeaves();
             const datePicker = document.getElementById('dailyReportDatePicker');
@@ -2132,11 +2481,16 @@
             });
 
             if (!filtered.length) {
-                alert('No records match the current selected company, department, employee, and date filters.');
+                showExportNotice('No records match the current selected company, department, employee, and date filters.');
                 return;
             }
 
             if (format === 'Excel') {
+                if (!window.XLSX) {
+                    showExportNotice('Excel library is not loaded. Please refresh the page and try again.');
+                    return;
+                }
+
                 const rows = filtered.map((leave) => ({
                     'Report Date': leave.reportFillDate || '',
                     'Company': leave.companyName || '',
@@ -2155,6 +2509,11 @@
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'Daily Report');
                 XLSX.writeFile(wb, 'daily-report.xlsx');
+                return;
+            }
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                showExportNotice('PDF library is not loaded. Please refresh the page and try again.');
                 return;
             }
 
@@ -2277,7 +2636,13 @@
 
             document.querySelectorAll('input[name="exportType"]').forEach((radio) => {
                 radio.addEventListener('change', () => {
-                    if (radio.checked) exportSelectedDailyReport(radio.value === 'excel' ? 'Excel' : 'PDF');
+                    if (!radio.checked) return;
+                    const selectedFormat = radio.value === 'excel' ? 'Excel' : 'PDF';
+                    const info = document.getElementById('dailyReportSelectedEmployeeCount');
+                    if (info) info.textContent = info.textContent || '0';
+                    if (selectedFormat === 'PDF') {
+                        // Keep selection only; export happens via Generate button.
+                    }
                 });
             });
         }
@@ -2339,6 +2704,116 @@
                 activeLink.style.color = '#ffffff';
                 activeLink.style.boxShadow = '0 4px 15px rgba(99, 102, 241, 0.4)';
             }
+
+            if (tabName === 'management') {
+                renderDeleteHistory();
+                toggleDeleteHistoryList(false);
+            }
+        }
+
+        const DELETE_HISTORY_KEY = 'managementDeleteHistory';
+
+        function getDeleteHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(DELETE_HISTORY_KEY)) || [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function persistDeleteHistory(historyEntries) {
+            localStorage.setItem(DELETE_HISTORY_KEY, JSON.stringify(historyEntries));
+        }
+
+        function escapeDeleteHistoryText(value) {
+            return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function toggleDeleteHistoryList(forceOpen) {
+            const toggle = document.getElementById('managementDeleteHistoryToggle');
+            const list = document.getElementById('managementDeleteHistoryList');
+            if (!toggle || !list) return;
+
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : list.classList.contains('hidden');
+            list.classList.toggle('hidden', !shouldOpen);
+            toggle.classList.toggle('open', shouldOpen);
+            toggle.setAttribute('aria-expanded', String(shouldOpen));
+        }
+
+        function renderDeleteHistory() {
+            const container = document.getElementById('managementDeleteHistoryList');
+            if (!container) return;
+
+            const historyEntries = getDeleteHistory().slice().sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
+            if (!historyEntries.length) {
+                container.innerHTML = '<div style="padding: 14px 16px; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; background: rgba(15, 23, 42, 0.55); color: #cbd5e1;">No deleted leave requests yet.</div>';
+                return;
+            }
+
+            container.innerHTML = historyEntries.map((entry) => {
+                const acknowledged = !!entry.acknowledged;
+                return `
+                    <div style="padding: 14px 16px; border: 1px solid ${acknowledged ? 'rgba(16, 185, 129, 0.4)' : 'rgba(148, 163, 184, 0.18)'}; border-radius: 12px; background: ${acknowledged ? 'rgba(16, 185, 129, 0.08)' : 'rgba(15, 23, 42, 0.55)'}; color: #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center;">
+                            <div>
+                                <strong>${escapeDeleteHistoryText(entry.employeeName || 'Unknown')}</strong>
+                                <span style="margin-left: 8px; color: #94a3b8;">${escapeDeleteHistoryText(entry.department || 'N/A')}</span>
+                            </div>
+                            <span style="font-size: 12px; color: #38bdf8;">${new Date(entry.deletedAt).toLocaleString()}</span>
+                        </div>
+                        <div style="margin-top: 8px; color: #cbd5e1; font-size: 13px;">
+                            Deleted by: ${escapeDeleteHistoryText(entry.deletedBy || 'Unknown')} • Days: ${escapeDeleteHistoryText(entry.days || '0')} • Status: ${escapeDeleteHistoryText(entry.status || 'Pending')}
+                        </div>
+                        <label style="display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; color: #f8fafc; font-size: 13px; cursor: pointer;">
+                            <input type="checkbox" data-delete-history-id="${entry.id}" ${acknowledged ? 'checked' : ''} onchange="toggleDeleteHistoryAcknowledged(this)">
+                            <span>I have seen this deletion</span>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('managementDeleteHistoryToggle')?.addEventListener('click', () => {
+            toggleDeleteHistoryList();
+        });
+
+        document.getElementById('managementDeleteHistoryToggle')?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleDeleteHistoryList();
+            }
+        });
+
+        window.toggleDeleteHistoryAcknowledged = function(checkbox) {
+            if (!checkbox) return;
+            const historyEntries = getDeleteHistory();
+            const targetId = checkbox.dataset.deleteHistoryId;
+            const targetEntry = historyEntries.find((entry) => entry.id === targetId);
+            if (!targetEntry) return;
+
+            targetEntry.acknowledged = !!checkbox.checked;
+            persistDeleteHistory(historyEntries);
+            renderDeleteHistory();
+        };
+
+        function recordDeleteHistoryEntry(leaveToDelete) {
+            if (!leaveToDelete) return;
+
+            const historyEntries = getDeleteHistory();
+            const newEntry = {
+                id: `delete-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+                employeeName: leaveToDelete.employeeFullName || leaveToDelete.employeeName || 'Unknown',
+                department: leaveToDelete.departmentName || 'N/A',
+                days: leaveToDelete.totalLeaveDays || '0',
+                status: leaveToDelete.status || 'Pending',
+                deletedBy: currentUserName || 'Unknown',
+                deletedAt: new Date().toISOString(),
+                acknowledged: false
+            };
+
+            historyEntries.unshift(newEntry);
+            persistDeleteHistory(historyEntries.slice(0, 30));
+            renderDeleteHistory();
         }
 
         const firebaseConfig = {
@@ -2400,6 +2875,7 @@
             await syncGlobalLeavesFromFirebase();
             populateManagementFilterOptions();
             populateDailyReportLists();
+            renderDeleteHistory();
             switchTab('dashboard');
             loadNotifications();
             populateTlDepartmentFilter();
@@ -2628,7 +3104,7 @@
                     <td>${leave.fullLeaveDate || '-'}</td>
                     <td>${leave.firstHalfDate || '-'}</td>
                     <td>${leave.secondHalfDate || '-'}</td>
-                    <td>${leave.leaveReason || '-'}</td>
+                    <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
                         <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
@@ -2756,7 +3232,7 @@
                     <td>${leave.fullLeaveDate || '-'}</td>
                     <td>${leave.firstHalfDate || '-'}</td>
                     <td>${leave.secondHalfDate || '-'}</td>
-                    <td>${leave.leaveReason || '-'}</td>
+                    <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
                         <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
@@ -2889,7 +3365,7 @@
                     <td>${leave.fullLeaveDate || '-'}</td>
                     <td>${leave.firstHalfDate || '-'}</td>
                     <td>${leave.secondHalfDate || '-'}</td>
-                    <td>${leave.leaveReason || '-'}</td>
+                    <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
                         <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
@@ -2962,6 +3438,7 @@
                 return;
             }
 
+            recordDeleteHistoryEntry(leaveToDelete);
             allLeaves = allLeaves.filter(l => l.id !== leaveId);
             persistStoredLeaves(allLeaves);
 
@@ -2971,7 +3448,9 @@
             }
 
             loadTlApprovals();
+            loadManagementRequests();
             loadLeaveHistory();
+            renderDeleteHistory();
             alert('✅ Leave request deleted successfully!');
         };
 

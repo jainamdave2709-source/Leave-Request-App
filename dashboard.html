@@ -740,6 +740,125 @@
         }
         .submit-leave-btn:hover { background: #4f46e5; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
 
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: min(82vw, 300px);
+                height: 100vh;
+                z-index: 200;
+                transform: translateX(-100%);
+            }
+
+            .sidebar:not(.hidden-sidebar) {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                width: 100%;
+                padding: 18px 14px 24px;
+            }
+
+            .top-bar {
+                padding: 16px 18px;
+                border-radius: 16px;
+            }
+
+            .user-info h3 {
+                font-size: 18px;
+            }
+
+            .topbar-right {
+                gap: 8px;
+            }
+
+            .panel-section {
+                padding: 20px 18px;
+                border-radius: 18px;
+            }
+
+            .stats-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .stat-card {
+                min-width: 100%;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .month-filter-box {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .leave-form {
+                gap: 16px;
+            }
+
+            .rules-box {
+                padding: 14px 12px;
+            }
+
+            .rules-list li {
+                grid-template-columns: 22px 1fr;
+                gap: 8px;
+                font-size: 13px;
+                padding: 10px 8px;
+            }
+
+            .rules-agree-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .topbar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .notification-dropdown {
+                width: min(300px, 84vw);
+                right: -12px;
+            }
+
+            .user-profile-box {
+                align-items: flex-start;
+            }
+
+            .profile-info h4,
+            .profile-info p {
+                white-space: normal;
+            }
+
+            .sidebar-bottom {
+                padding-top: 12px;
+            }
+
+            .back-btn {
+                margin-bottom: 12px;
+            }
+
+            .submit-leave-btn {
+                width: 100%;
+            }
+        }
+
         .rules-view {
             background: rgba(15, 23, 42, 0.5);
             border: 1px solid rgba(255,255,255,0.08);

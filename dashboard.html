@@ -236,6 +236,7 @@
 
         .notification-container {
             position: relative;
+            z-index: 1000;
         }
 
         .notification-bell {
@@ -983,9 +984,19 @@
                 justify-content: space-between;
             }
 
+            .notification-container {
+                position: static;
+            }
+
             .notification-dropdown {
-                width: min(300px, 84vw);
-                right: -12px;
+                position: fixed;
+                top: 92px;
+                right: 12px;
+                left: 12px;
+                width: auto;
+                max-width: calc(100vw - 24px);
+                min-width: 0;
+                z-index: 2000;
             }
 
             .user-profile-box {
@@ -2453,23 +2464,91 @@
 
         function generateSelectedDailyReport() {
             const selectedFormat = document.querySelector('input[name="exportType"]:checked')?.value === 'excel' ? 'Excel' : 'PDF';
-            exportSelectedDailyReport(selectedFormat);
+            const reportType = window.currentManagementReportType || 'Daily Report';
+            exportSelectedDailyReport(selectedFormat, reportType);
         }
 
-        function exportSelectedDailyReport(format = 'PDF') {
+        function parseReportDate(dateValue) {
+            const normalized = normalizeDateValue(dateValue);
+            if (!normalized) return null;
+
+            const dateMatch = normalized.match(/^\d{4}-\d{2}-\d{2}$/);
+            if (dateMatch) {
+                const [year, month, day] = normalized.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                if (!Number.isNaN(date.getTime())) return date;
+            }
+
+            const slashMatch = normalized.match(/^\d{2}\/\d{2}\/\d{4}$/);
+            if (slashMatch) {
+                const [day, month, year] = normalized.split('/').map(Number);
+                const date = new Date(year, month - 1, day);
+                if (!Number.isNaN(date.getTime())) return date;
+            }
+
+            return null;
+        }
+
+        function getReportDateCandidates(leave) {
+            return [leave.reportFillDate, leave.fullLeaveDate, leave.firstHalfDate, leave.secondHalfDate]
+                .filter(Boolean)
+                .map((value) => parseReportDate(value))
+                .filter(Boolean);
+        }
+
+        function getFilteredReportLeaves(reportType = 'Daily Report') {
             const leaves = getStoredLeaves();
             const datePicker = document.getElementById('dailyReportDatePicker');
-            const dateValue = normalizeDateValue(datePicker ? datePicker.value : '');
+            const monthPicker = document.getElementById('dailyReportMonthPicker');
+            const yearPicker = document.getElementById('dailyReportYearPicker');
+            const periodicStartPicker = document.getElementById('periodicStartDatePicker');
+            const periodicEndPicker = document.getElementById('periodicEndDatePicker');
             const selectedCompanies = getSelectedCheckboxValues('dailyReportCompanyList');
             const selectedDepartments = getSelectedCheckboxValues('dailyReportDepartmentList');
             const selectedEmployees = getSelectedCheckboxValues('dailyReportEmployeeList');
 
-            const filtered = leaves.filter((leave) => {
-                if (dateValue) {
-                    const leaveDate = normalizeDateValue(leave.reportFillDate || '');
-                    const visitDate = normalizeDateValue(leave.fullLeaveDate || '');
-                    if (leaveDate && leaveDate !== dateValue && visitDate && visitDate !== dateValue) {
-                        return false;
+            const dailyDateValue = normalizeDateValue(datePicker ? datePicker.value : '');
+            const dailyDate = dailyDateValue ? parseReportDate(dailyDateValue) : null;
+            const monthValue = monthPicker ? monthPicker.value : '';
+            const yearValue = yearPicker ? yearPicker.value : '';
+            const startDateValue = normalizeDateValue(periodicStartPicker ? periodicStartPicker.value : '');
+            const endDateValue = normalizeDateValue(periodicEndPicker ? periodicEndPicker.value : '');
+            const startDate = startDateValue ? parseReportDate(startDateValue) : null;
+            const endDate = endDateValue ? parseReportDate(endDateValue) : null;
+
+            return leaves.filter((leave) => {
+                const candidates = getReportDateCandidates(leave);
+                const hasDateMatch = (dateObj) => {
+                    if (!dateObj) return false;
+                    return candidates.some((candidate) => {
+                        return candidate.getFullYear() === dateObj.getFullYear()
+                            && candidate.getMonth() === dateObj.getMonth()
+                            && candidate.getDate() === dateObj.getDate();
+                    });
+                };
+
+                if (reportType === 'Daily Report' && dailyDate) {
+                    if (!hasDateMatch(dailyDate)) return false;
+                }
+
+                if (reportType === 'Monthly Report') {
+                    const monthYearMatch = candidates.some((candidate) => {
+                        return String(candidate.getMonth() + 1).padStart(2, '0') === monthValue
+                            && String(candidate.getFullYear()) === String(yearValue);
+                    });
+                    if (!monthValue || !yearValue || !monthYearMatch) return false;
+                }
+
+                if (reportType === 'Periodic Report') {
+                    if (!startDate && !endDate) {
+                        // no range selected; keep all filtered records
+                    } else {
+                        const rangeMatch = candidates.some((candidate) => {
+                            if (startDate && candidate < startDate) return false;
+                            if (endDate && candidate > endDate) return false;
+                            return true;
+                        });
+                        if (!rangeMatch) return false;
                     }
                 }
 
@@ -2479,6 +2558,10 @@
 
                 return true;
             });
+        }
+
+        function exportSelectedDailyReport(format = 'PDF', reportType = 'Daily Report') {
+            const filtered = getFilteredReportLeaves(reportType);
 
             if (!filtered.length) {
                 showExportNotice('No records match the current selected company, department, employee, and date filters.');
@@ -2507,8 +2590,8 @@
 
                 const ws = XLSX.utils.json_to_sheet(rows);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Daily Report');
-                XLSX.writeFile(wb, 'daily-report.xlsx');
+                XLSX.utils.book_append_sheet(wb, ws, reportType || 'Daily Report');
+                XLSX.writeFile(wb, `${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.xlsx`);
                 return;
             }
 
@@ -2520,7 +2603,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape' });
             doc.setFontSize(12);
-            doc.text('Daily Report', 14, 16);
+            doc.text(reportType || 'Daily Report', 14, 16);
             doc.setFontSize(9);
             let y = 28;
             filtered.slice(0, 35).forEach((leave) => {
@@ -2532,7 +2615,7 @@
                 doc.text(line, 14, y);
                 y += 6;
             });
-            doc.save('daily-report.pdf');
+            doc.save(`${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.pdf`);
         }
 
         function populateDailyReportLists() {

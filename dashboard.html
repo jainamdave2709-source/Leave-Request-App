@@ -576,6 +576,26 @@
         .export-choice input:checked + .custom-radio::after {
             content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #fff;
         }
+        .export-email-inline {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .export-email-field {
+            min-width: 220px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: rgba(15, 23, 42, 0.45);
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+        .export-email-field::placeholder {
+            color: rgba(226, 232, 240, 0.6);
+        }
+        .export-email-field:focus {
+            border-color: rgba(96, 165, 250, 0.9);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.14);
+        }
         .generate-report-btn {
             border: none;
             background: linear-gradient(135deg, #4f46e5, #6366f1);
@@ -817,7 +837,7 @@
             align-items: center;
             gap: 10px;
             font-size: 26px;
-            color: #f8fafc;
+            color: #1f2937;
             font-weight: 600;
             cursor: pointer;
             user-select: none;
@@ -834,7 +854,7 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.7);
+            border: 2px solid rgba(31, 41, 55, 0.7);
             background: transparent;
             display: inline-block;
             position: relative;
@@ -1639,6 +1659,14 @@
                                         <span class="custom-radio"></span>
                                         <span>Excel</span>
                                     </label>
+                                    <label class="export-choice">
+                                        <input type="radio" name="managementExportFormat" value="google_sheet">
+                                        <span class="custom-radio"></span>
+                                        <span>Google Sheet</span>
+                                    </label>
+                                </div>
+                                <div class="export-email-inline">
+                                    <input type="email" id="managementGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Enter email address" aria-label="Google Sheet email">
                                 </div>
                                 <button type="button" class="generate-report-btn" onclick="generateManagementExportReport()">Generate</button>
                             </div>
@@ -1764,8 +1792,16 @@
                             <span class="custom-radio"></span>
                             <span>Excel</span>
                         </label>
+                        <label class="report-export-option">
+                            <input type="radio" name="exportType" value="google_sheet">
+                            <span class="custom-radio"></span>
+                            <span>Google Sheet</span>
+                        </label>
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <div class="export-email-inline">
+                            <input type="email" id="dailyReportGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Email address" aria-label="Google Sheet email">
+                        </div>
                         <div class="daily-report-selected-summary">Selected Employee:- <span id="dailyReportSelectedEmployeeCount">0</span></div>
                         <button type="button" class="generate-report-btn" onclick="generateSelectedDailyReport()">Generate</button>
                     </div>
@@ -2317,14 +2353,77 @@
 
         function getSelectedManagementExportFormat() {
             const selected = document.querySelector('input[name="managementExportFormat"]:checked');
-            return selected && selected.value === 'excel' ? 'excel' : 'pdf';
+            if (!selected) return 'pdf';
+            if (selected.value === 'excel') return 'excel';
+            if (selected.value === 'google_sheet') return 'google_sheet';
+            return 'pdf';
         }
 
         function selectManagementExportFormat(format) {
-            const selectedFormat = format === 'excel' ? 'excel' : 'pdf';
+            const selectedFormat = format === 'excel' ? 'excel' : (format === 'google_sheet' ? 'google_sheet' : 'pdf');
             window.currentManagementExportFormat = selectedFormat;
             const radio = document.querySelector(`input[name="managementExportFormat"][value="${selectedFormat}"]`);
             if (radio) radio.checked = true;
+        }
+
+        function getExportEmailAddress(selector) {
+            const field = document.querySelector(selector);
+            if (!field) return 'websankulhr@gmail.com';
+            const email = String(field.value || '').trim();
+            return email || 'websankulhr@gmail.com';
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+        }
+
+        function escapeCsvValue(value) {
+            const safeValue = value === null || value === undefined ? '' : String(value);
+            const normalized = safeValue.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').trim();
+            if (/[",]/.test(normalized)) {
+                return `"${normalized.replace(/"/g, '""')}"`;
+            }
+            return normalized;
+        }
+
+        function buildCsvContentFromRows(rows, sheetName = 'Report') {
+            const headers = Object.keys(rows[0] || {
+                'Report Date': '',
+                'Company': '',
+                'Department': '',
+                'Employee Name': '',
+                'Full Leave': '',
+                'First Half': '',
+                'Second Half': '',
+                'Reason': '',
+                'Days': '',
+                'Status': '',
+                'Action By': ''
+            });
+            const csvLines = [headers.join(',')];
+            rows.forEach((row) => {
+                csvLines.push(headers.map((header) => escapeCsvValue(row[header])).join(','));
+            });
+            return `\uFEFF${csvLines.join('\n')}`;
+        }
+
+        function downloadCsvBlob(fileName, csvContent) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const anchor = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            anchor.href = url;
+            anchor.download = fileName;
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+
+        function openGoogleSheetMail(email, fileName, csvContent) {
+            const subject = encodeURIComponent(`${fileName} - Google Sheet Report`);
+            const body = encodeURIComponent(`Please import this CSV report into Google Sheets.\n\n${csvContent.slice(0, 12000)}`);
+            const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+            window.open(mailtoUrl, '_blank');
         }
 
         function showExportNotice(message) {
@@ -2395,9 +2494,45 @@
             window.currentManagementExportFormat = format;
             if (format === 'excel') {
                 exportManagementToExcel();
+            } else if (format === 'google_sheet') {
+                exportManagementToGoogleSheet();
             } else {
                 exportManagementToPdf();
             }
+        }
+
+        function exportManagementToGoogleSheet() {
+            const filteredLeaves = getManagementExportData();
+            if (!filteredLeaves.length) {
+                showExportNotice('No records match the current selected company, department, employee, and date filters.');
+                return;
+            }
+
+            const email = getExportEmailAddress('#managementGoogleSheetEmail');
+            if (!isValidEmail(email)) {
+                showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
+                return;
+            }
+
+            const rows = filteredLeaves.map((leave) => ({
+                'Report Date': leave.reportFillDate || '',
+                'Company': leave.companyName || '',
+                'Department': leave.departmentName || '',
+                'Employee Name': leave.employeeFullName || '',
+                'Full Leave': leave.fullLeaveDate || '',
+                'First Half': leave.firstHalfDate || '',
+                'Second Half': leave.secondHalfDate || '',
+                'Reason': leave.leaveReason || '',
+                'Days': leave.totalLeaveDays || '',
+                'Status': leave.status || '',
+                'Action By': leave.actionBy || ''
+            }));
+
+            const fileName = 'approved_leave_report.csv';
+            const csvContent = buildCsvContentFromRows(rows, 'Approved Leave Report');
+            downloadCsvBlob(fileName, csvContent);
+            openGoogleSheetMail(email, 'Approved Leave Report', csvContent);
+            showExportNotice('Google Sheet report generated. The file has been downloaded and a mail draft has been opened for ' + email + '.');
         }
 
         function exportManagementToPdf() {
@@ -2463,9 +2598,98 @@
         }
 
         function generateSelectedDailyReport() {
-            const selectedFormat = document.querySelector('input[name="exportType"]:checked')?.value === 'excel' ? 'Excel' : 'PDF';
+            const selectedRadio = document.querySelector('input[name="exportType"]:checked');
+            const selectedFormat = selectedRadio ? selectedRadio.value : 'pdf';
             const reportType = window.currentManagementReportType || 'Daily Report';
             exportSelectedDailyReport(selectedFormat, reportType);
+        }
+
+        function exportSelectedDailyReport(format = 'pdf', reportType = 'Daily Report') {
+            const normalizedFormat = String(format || 'pdf').toLowerCase();
+            const filtered = getFilteredReportLeaves(reportType);
+
+            if (!filtered.length) {
+                showExportNotice('No records match the current selected company, department, employee, and date filters.');
+                return;
+            }
+
+            if (normalizedFormat === 'excel') {
+                if (!window.XLSX) {
+                    showExportNotice('Excel library is not loaded. Please refresh the page and try again.');
+                    return;
+                }
+
+                const rows = filtered.map((leave) => ({
+                    'Report Date': leave.reportFillDate || '',
+                    'Company': leave.companyName || '',
+                    'Department': leave.departmentName || '',
+                    'Employee Name': leave.employeeFullName || '',
+                    'Full Leave': leave.fullLeaveDate || '',
+                    'First Half': leave.firstHalfDate || '',
+                    'Second Half': leave.secondHalfDate || '',
+                    'Reason': leave.leaveReason || '',
+                    'Days': leave.totalLeaveDays || '',
+                    'Status': leave.status || '',
+                    'Action By': leave.actionBy || ''
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(rows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, reportType || 'Daily Report');
+                XLSX.writeFile(wb, `${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.xlsx`);
+                return;
+            }
+
+            if (normalizedFormat === 'google_sheet') {
+                const email = getExportEmailAddress('#dailyReportGoogleSheetEmail');
+                if (!isValidEmail(email)) {
+                    showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
+                    return;
+                }
+
+                const rows = filtered.map((leave) => ({
+                    'Report Date': leave.reportFillDate || '',
+                    'Company': leave.companyName || '',
+                    'Department': leave.departmentName || '',
+                    'Employee Name': leave.employeeFullName || '',
+                    'Full Leave': leave.fullLeaveDate || '',
+                    'First Half': leave.firstHalfDate || '',
+                    'Second Half': leave.secondHalfDate || '',
+                    'Reason': leave.leaveReason || '',
+                    'Days': leave.totalLeaveDays || '',
+                    'Status': leave.status || '',
+                    'Action By': leave.actionBy || ''
+                }));
+
+                const fileName = `${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.csv`;
+                const csvContent = buildCsvContentFromRows(rows, reportType || 'Report');
+                downloadCsvBlob(fileName, csvContent);
+                openGoogleSheetMail(email, reportType || 'Daily Report', csvContent);
+                showExportNotice('Google Sheet report generated. The file has been downloaded and a mail draft has been opened for ' + email + '.');
+                return;
+            }
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                showExportNotice('PDF library is not loaded. Please refresh the page and try again.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.setFontSize(12);
+            doc.text(reportType || 'Daily Report', 14, 16);
+            doc.setFontSize(9);
+            let y = 28;
+            filtered.slice(0, 35).forEach((leave) => {
+                const line = `${leave.reportFillDate || '-'} | ${leave.companyName || '-'} | ${leave.departmentName || '-'} | ${leave.employeeFullName || '-'} | ${leave.totalLeaveDays || '0'} days`;
+                if (y > 190) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.text(line, 14, y);
+                y += 6;
+            });
+            doc.save(`${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.pdf`);
         }
 
         function parseReportDate(dateValue) {
@@ -2558,64 +2782,6 @@
 
                 return true;
             });
-        }
-
-        function exportSelectedDailyReport(format = 'PDF', reportType = 'Daily Report') {
-            const filtered = getFilteredReportLeaves(reportType);
-
-            if (!filtered.length) {
-                showExportNotice('No records match the current selected company, department, employee, and date filters.');
-                return;
-            }
-
-            if (format === 'Excel') {
-                if (!window.XLSX) {
-                    showExportNotice('Excel library is not loaded. Please refresh the page and try again.');
-                    return;
-                }
-
-                const rows = filtered.map((leave) => ({
-                    'Report Date': leave.reportFillDate || '',
-                    'Company': leave.companyName || '',
-                    'Department': leave.departmentName || '',
-                    'Employee Name': leave.employeeFullName || '',
-                    'Full Leave': leave.fullLeaveDate || '',
-                    'First Half': leave.firstHalfDate || '',
-                    'Second Half': leave.secondHalfDate || '',
-                    'Reason': leave.leaveReason || '',
-                    'Days': leave.totalLeaveDays || '',
-                    'Status': leave.status || '',
-                    'Action By': leave.actionBy || ''
-                }));
-
-                const ws = XLSX.utils.json_to_sheet(rows);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, reportType || 'Daily Report');
-                XLSX.writeFile(wb, `${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.xlsx`);
-                return;
-            }
-
-            if (!window.jspdf || !window.jspdf.jsPDF) {
-                showExportNotice('PDF library is not loaded. Please refresh the page and try again.');
-                return;
-            }
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(12);
-            doc.text(reportType || 'Daily Report', 14, 16);
-            doc.setFontSize(9);
-            let y = 28;
-            filtered.slice(0, 35).forEach((leave) => {
-                const line = `${leave.reportFillDate || '-'} | ${leave.companyName || '-'} | ${leave.departmentName || '-'} | ${leave.employeeFullName || '-'} | ${leave.totalLeaveDays || '0'} days`;
-                if (y > 190) {
-                    doc.addPage();
-                    y = 20;
-                }
-                doc.text(line, 14, y);
-                y += 6;
-            });
-            doc.save(`${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.pdf`);
         }
 
         function populateDailyReportLists() {

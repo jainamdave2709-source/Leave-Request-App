@@ -38,6 +38,116 @@
             border: none;
         }
 
+        @media (min-width: 901px) {
+            .sidebar.hidden-sidebar {
+                transform: translateX(0);
+                width: 78px;
+                padding: 25px 12px;
+                overflow: visible;
+                border-right: 1px solid rgba(255,255,255,0.08);
+            }
+
+            .sidebar.hidden-sidebar .sidebar-brand {
+                justify-content: center;
+                padding: 0;
+                font-size: 0;
+            }
+
+            .sidebar.hidden-sidebar .brand-logo-img {
+                width: 42px;
+                height: 42px;
+            }
+
+            .sidebar.hidden-sidebar .sidebar-top {
+                gap: 25px;
+            }
+
+            .sidebar.hidden-sidebar .nav-links {
+                gap: 13px;
+            }
+
+            .sidebar.hidden-sidebar .nav-links a {
+                justify-content: center;
+                padding: 12px 8px;
+                font-size: 0;
+                gap: 0;
+            }
+
+            .sidebar.hidden-sidebar .nav-links a > i:first-child,
+            .sidebar.hidden-sidebar .nav-links a > span > i:first-child {
+                font-size: 18px;
+                margin: 0;
+            }
+
+            .sidebar.hidden-sidebar .nav-links a > span {
+                font-size: 0;
+            }
+
+            .sidebar.hidden-sidebar .lock-icon,
+            .sidebar.hidden-sidebar .management-submenu {
+                display: none;
+            }
+
+            .sidebar.hidden-sidebar:hover,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded {
+                width: 290px;
+                padding: 25px 18px;
+            }
+
+            .sidebar.hidden-sidebar:hover .sidebar-brand,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .sidebar-brand {
+                justify-content: flex-start;
+                padding: 0 5px;
+                font-size: 18px;
+            }
+
+            .sidebar.hidden-sidebar:hover .brand-logo-img,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .brand-logo-img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .sidebar.hidden-sidebar:hover .nav-links,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .nav-links {
+                gap: 8px;
+            }
+
+            .sidebar.hidden-sidebar:hover .nav-links a,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .nav-links a {
+                justify-content: flex-start;
+                padding: 12px 15px;
+                font-size: 14px;
+                gap: 14px;
+            }
+
+            .sidebar.hidden-sidebar:hover .nav-links a > i:first-child,
+            .sidebar.hidden-sidebar:hover .nav-links a > span > i:first-child,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .nav-links a > i:first-child,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .nav-links a > span > i:first-child {
+                font-size: inherit;
+            }
+
+            .sidebar.hidden-sidebar:hover .nav-links a > span,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .nav-links a > span {
+                font-size: inherit;
+            }
+
+            .sidebar.hidden-sidebar:hover .lock-icon,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .lock-icon {
+                display: inline-block;
+            }
+
+            .sidebar.hidden-sidebar:hover .management-submenu,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .management-submenu {
+                display: flex;
+            }
+
+            .sidebar.hidden-sidebar:hover .management-submenu.hidden,
+            .sidebar.hidden-sidebar.sidebar-hover-expanded .management-submenu.hidden {
+                display: none;
+            }
+        }
+
         .sidebar-top { display: flex; flex-direction: column; gap: 25px; }
 
         .sidebar-brand { 
@@ -99,6 +209,13 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+
+        .topbar-user-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 240px;
         }
 
         .user-profile-box {
@@ -205,23 +322,39 @@
         }
 
         .toggle-sidebar-btn {
-            background: rgba(99, 102, 241, 0.15);
-            color: #6366f1;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
+            background: #fff;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
             transition: all 0.2s ease;
             flex-shrink: 0;
         }
         .toggle-sidebar-btn:hover {
-            background: #6366f1;
-            color: #fff;
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .sidebar-toggle-icon {
+            width: 22px;
+            height: 22px;
+            border: 2px solid currentColor;
+            border-radius: 7px;
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+        }
+
+        .sidebar-toggle-icon::after {
+            content: "";
+            width: 2px;
+            margin-left: 7px;
+            background: currentColor;
         }
 
         .user-info h3 { font-size: 20px; color: #fff; font-weight: 700; }
@@ -632,6 +765,29 @@
         .export-notice-ok {
             background: #2b2d32; color: white; border: none; border-radius: 10px; padding: 10px 24px; font-weight: 700; cursor: pointer; font-size: 16px;
         }
+        .tl-edit-modal {
+            width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow-y: auto;
+            background: #fff; border-radius: 16px; box-shadow: 0 18px 50px rgba(15, 23, 42, 0.35);
+        }
+        .tl-edit-header {
+            display: flex; justify-content: space-between; align-items: center; padding: 18px 20px;
+            color: #0f172a; font-size: 18px; font-weight: 700; border-bottom: 1px solid #e2e8f0;
+        }
+        .tl-edit-close { border: none; background: transparent; color: #64748b; font-size: 22px; cursor: pointer; }
+        .tl-edit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px; }
+        .tl-edit-field { display: flex; flex-direction: column; gap: 6px; }
+        .tl-edit-field.full-width { grid-column: 1 / -1; }
+        .tl-edit-field label { color: #475569; font-size: 12px; font-weight: 700; }
+        .tl-edit-field input, .tl-edit-field textarea {
+            width: 100%; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px;
+            padding: 10px; color: #1e293b; background: #f8fafc; font-size: 14px;
+        }
+        .tl-edit-field textarea { min-height: 72px; resize: vertical; }
+        .tl-edit-field input[readonly], .tl-edit-field textarea[readonly] { background: #e2e8f0; color: #64748b; }
+        .tl-edit-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 0 20px 20px; }
+        .tl-edit-actions button { border: none; border-radius: 8px; padding: 10px 18px; font-weight: 700; cursor: pointer; }
+        .tl-edit-cancel { background: #e2e8f0; color: #334155; }
+        .tl-edit-save { background: #2563eb; color: #fff; }
 
         .management-submenu {
             margin-top: 8px;
@@ -650,12 +806,22 @@
             display: none;
         }
 
+        .panel-menu-chevron {
+            margin-left: auto;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .panel-menu-chevron.open {
+            transform: rotate(180deg);
+        }
+
         .report-dropdown-item {
             background: transparent;
             border: none;
             color: #e2e8f0;
             text-align: left;
-            padding: 10px 12px;
+            padding: 9px 12px 9px 38px;
             font-size: 14px;
             font-weight: 500;
             border-radius: 10px;
@@ -925,6 +1091,7 @@
                 height: 100vh;
                 z-index: 200;
                 transform: translateX(-100%);
+                box-shadow: 12px 0 30px rgba(0, 0, 0, 0.35);
             }
 
             .sidebar:not(.hidden-sidebar) {
@@ -939,6 +1106,7 @@
             .top-bar {
                 padding: 16px 18px;
                 border-radius: 16px;
+                align-items: flex-start;
             }
 
             .user-info h3 {
@@ -947,6 +1115,87 @@
 
             .topbar-right {
                 gap: 8px;
+            }
+
+            .topbar-user-area {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .panel-section {
+                width: 100%;
+                min-width: 0;
+                padding: 18px 14px;
+                border-radius: 16px;
+            }
+
+            .history-section {
+                padding: 14px 10px;
+            }
+
+            .history-header {
+                width: 100%;
+            }
+
+            .history-header > div {
+                width: 100%;
+            }
+
+            .history-header > div[style*="display: flex"] {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+
+            .month-filter-box {
+                width: 100%;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .month-filter-box select,
+            .month-filter-box input {
+                width: min(62vw, 220px) !important;
+                min-width: 0;
+            }
+
+            .management-export-controls,
+            .export-radio-group,
+            .export-email-inline {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                margin-left: 0;
+            }
+
+            .export-choice {
+                font-size: 14px;
+            }
+
+            .export-email-field,
+            .management-export-controls .generate-report-btn {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .delete-history-toggle {
+                font-size: 16px;
+                padding: 15px 14px;
+            }
+
+            .tl-edit-grid {
+                grid-template-columns: 1fr;
+                padding: 14px;
+            }
+
+            .tl-edit-field.full-width {
+                grid-column: auto;
+            }
+
+            .tl-edit-actions {
+                padding: 0 14px 14px;
             }
 
             .panel-section {
@@ -997,11 +1246,16 @@
             .top-bar {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 14px;
             }
 
             .topbar-right {
                 width: 100%;
                 justify-content: space-between;
+            }
+
+            .topbar-right .topbar-user-area {
+                flex: 1;
             }
 
             .notification-container {
@@ -1017,6 +1271,31 @@
                 max-width: calc(100vw - 24px);
                 min-width: 0;
                 z-index: 2000;
+            }
+
+            .notif-header {
+                padding: 12px 14px;
+            }
+
+            .notif-item {
+                padding: 12px 14px;
+                font-size: 12px;
+                line-height: 1.45;
+                overflow-wrap: anywhere;
+            }
+
+            .table-responsive {
+                margin: 0 -8px;
+                width: calc(100% + 16px);
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .leave-table {
+                min-width: 980px;
+            }
+
+            .action-btn-group {
+                flex-wrap: wrap;
             }
 
             .user-profile-box {
@@ -1133,12 +1412,35 @@
             
             <ul class="nav-links">
                 <li><a id="navDashboard"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-                <li><a id="menuEmployee"><i class="fa-solid fa-file-pen"></i> Employee Panel <i id="lockEmployee" class="fa-solid fa-lock lock-icon hidden"></i></a></li>
-                <li><a id="menuTL"><i class="fa-solid fa-users-gear"></i> Team Leader <i id="lockTL" class="fa-solid fa-lock lock-icon hidden"></i></a></li>
+                <li>
+                    <a id="menuEmployee" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-solid fa-file-pen"></i> Employee Panel</span>
+                        <i id="lockEmployee" class="fa-solid fa-lock lock-icon hidden"></i>
+                        <i class="fa-solid fa-chevron-down panel-menu-chevron" aria-hidden="true"></i>
+                    </a>
+                    <div id="employeeReportMenu" class="management-submenu hidden">
+                        <button type="button" class="report-dropdown-item" data-report-type="Daily Report">Daily Report</button>
+                        <button type="button" class="report-dropdown-item" data-report-type="Monthly Report">Monthly Report</button>
+                        <button type="button" class="report-dropdown-item" data-report-type="Periodic Report">Periodic Report</button>
+                    </div>
+                </li>
+                <li>
+                    <a id="menuTL" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-solid fa-users-gear"></i> Team Leader</span>
+                        <i id="lockTL" class="fa-solid fa-lock lock-icon hidden"></i>
+                        <i class="fa-solid fa-chevron-down panel-menu-chevron" aria-hidden="true"></i>
+                    </a>
+                    <div id="tlReportMenu" class="management-submenu hidden">
+                        <button type="button" class="report-dropdown-item" data-report-type="Daily Report">Daily Report</button>
+                        <button type="button" class="report-dropdown-item" data-report-type="Monthly Report">Monthly Report</button>
+                        <button type="button" class="report-dropdown-item" data-report-type="Periodic Report">Periodic Report</button>
+                    </div>
+                </li>
                 <li>
                     <a id="menuManagement" style="display: flex; align-items: center; justify-content: space-between;">
                         <span><i class="fa-solid fa-chart-pie"></i> Management</span>
                         <i id="lockManagement" class="fa-solid fa-lock lock-icon hidden"></i>
+                        <i class="fa-solid fa-chevron-down panel-menu-chevron" aria-hidden="true"></i>
                     </a>
                     <div id="managementReportMenu" class="management-submenu hidden">
                         <button type="button" class="report-dropdown-item" data-report-type="Daily Report">Daily Report</button>
@@ -1149,27 +1451,6 @@
             </ul>
         </div>
 
-        <div class="sidebar-bottom">
-            <div class="user-profile-box">
-                <div class="profile-avatar-container" id="avatarContainer" title="Click to change photo">
-                    <div class="profile-avatar" id="profileAvatarBox">
-                        <span id="profileInitial">U</span>
-                    </div>
-                    <div class="upload-overlay"><i class="fa-solid fa-camera"></i></div>
-                </div>
-                <input type="file" id="profileImageInput" accept="image/*" class="hidden">
-
-                <div class="profile-info">
-                    <h4 id="sidebarUserName">User Name</h4>
-                    <p id="sidebarUserEmail">email@example.com</p>
-                    <p id="sidebarUserRole">Role: N/A</p>
-                    <p id="sidebarUserDept">Dept: N/A</p>
-                </div>
-            </div>
-            <button class="logout-btn" id="logoutBtn">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
-            </button>
-        </div>
     </div>
 
     <div class="export-notice-overlay" id="exportNoticeOverlay">
@@ -1182,11 +1463,37 @@
         </div>
     </div>
 
+    <div class="export-notice-overlay" id="tlEditOverlay">
+        <form class="tl-edit-modal" id="tlEditForm" role="dialog" aria-modal="true" aria-labelledby="tlEditTitle">
+            <div class="tl-edit-header">
+                <span id="tlEditTitle">Edit TL Request</span>
+                <button type="button" class="tl-edit-close" aria-label="Close edit dialog" onclick="closeTlEditModal()">&times;</button>
+            </div>
+            <div class="tl-edit-grid">
+                <div class="tl-edit-field"><label>Employee Name</label><input id="tlEditEmployeeName" readonly></div>
+                <div class="tl-edit-field"><label>Report Date</label><input id="tlEditReportDate" readonly></div>
+                <div class="tl-edit-field"><label>Company</label><input id="tlEditCompany" readonly></div>
+                <div class="tl-edit-field"><label>Department</label><input id="tlEditDepartment" readonly></div>
+                <div class="tl-edit-field"><label>Full Leave</label><input id="tlEditFullLeave"></div>
+                <div class="tl-edit-field"><label>First Half</label><input id="tlEditFirstHalf"></div>
+                <div class="tl-edit-field"><label>Second Half</label><input id="tlEditSecondHalf"></div>
+                <div class="tl-edit-field"><label>Days</label><input id="tlEditDays" type="number" min="0" step="0.5" required></div>
+                <div class="tl-edit-field full-width"><label>Reason</label><textarea id="tlEditReason" readonly></textarea></div>
+                <div class="tl-edit-field"><label>Status</label><input id="tlEditStatus" readonly></div>
+                <div class="tl-edit-field"><label>Action By</label><input id="tlEditActionBy" readonly></div>
+            </div>
+            <div class="tl-edit-actions">
+                <button type="button" class="tl-edit-cancel" onclick="closeTlEditModal()">Cancel</button>
+                <button type="submit" class="tl-edit-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
     <div class="main-content">
         <div class="top-bar">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <button class="toggle-sidebar-btn" id="toggleSidebarBtn" title="Toggle Sidebar">
-                    <i class="fa-solid fa-bars"></i>
+                <button class="toggle-sidebar-btn" id="toggleSidebarBtn" type="button" title="Toggle Sidebar" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="sidebarElement">
+                    <span class="sidebar-toggle-icon" aria-hidden="true"></span>
                 </button>
                 <div class="user-info">
                     <h3 id="welcomeName">Welcome, User!</h3>
@@ -1215,6 +1522,28 @@
 
                 <div>
                     <span id="roleBadge" class="role-badge">Role</span>
+                </div>
+
+                <div class="topbar-user-area">
+                    <div class="user-profile-box">
+                        <div class="profile-avatar-container" id="avatarContainer" title="Click to change photo">
+                            <div class="profile-avatar" id="profileAvatarBox">
+                                <span id="profileInitial">U</span>
+                            </div>
+                            <div class="upload-overlay"><i class="fa-solid fa-camera"></i></div>
+                        </div>
+                        <input type="file" id="profileImageInput" accept="image/*" class="hidden">
+
+                        <div class="profile-info">
+                            <h4 id="sidebarUserName">User Name</h4>
+                            <p id="sidebarUserEmail">email@example.com</p>
+                            <p id="sidebarUserRole">Role: N/A</p>
+                            <p id="sidebarUserDept">Dept: N/A</p>
+                        </div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
                 </div>
             </div>
         </div>
@@ -1263,13 +1592,19 @@
                 </div>
 
                 <div class="history-section">
-                    <div class="history-header">
-                        <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-clock-rotate-left" style="color: #10b981;"></i> My Leave History
-                        </h4>
-                        
+                    <div id="employeeLeaveHistoryToggle" class="delete-history-toggle" role="button" tabindex="0" aria-expanded="false">
+                        <div class="delete-history-toggle-label">
+                            <i class="fa-solid fa-clock-rotate-left" style="color: #10b981;"></i>
+                            <span>My Leave History</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+
+                    <div id="employeeLeaveHistoryContent" class="hidden" style="margin-top: 14px;">
+                        <div class="history-header">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
                         <div class="month-filter-box">
-                            <label for="monthFilter">Filter Month:</label>
+                            <label for="monthFilter">Month:</label>
                             <select id="monthFilter">
                                 <option value="all">All Months</option>
                                 <option value="01">January</option>
@@ -1286,26 +1621,69 @@
                                 <option value="12">December</option>
                             </select>
                         </div>
-                    </div>
+                        <div class="month-filter-box">
+                            <label for="employeeReportDateFilter">Report Date:</label>
+                            <input type="date" id="employeeReportDateFilter" style="width: 160px;">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeCompanyFilter">Company:</label>
+                            <select id="employeeCompanyFilter" style="width: 140px;"><option value="all">All Companies</option></select>
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeDepartmentFilter">Department:</label>
+                            <select id="employeeDepartmentFilter" style="width: 150px;"><option value="all">All Departments</option></select>
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeFullLeaveFilter">Full Leave:</label>
+                            <input type="text" id="employeeFullLeaveFilter" placeholder="Search..." style="width: 120px;">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeFirstHalfFilter">First Half:</label>
+                            <input type="text" id="employeeFirstHalfFilter" placeholder="Search..." style="width: 120px;">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeSecondHalfFilter">Second Half:</label>
+                            <input type="text" id="employeeSecondHalfFilter" placeholder="Search..." style="width: 120px;">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeDaysFilter">Days:</label>
+                            <input type="number" id="employeeDaysFilter" min="0" step="0.5" placeholder="Days" style="width: 90px;">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeStatusFilter">Status:</label>
+                            <select id="employeeStatusFilter" style="width: 130px;">
+                                <option value="all">All Statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="employeeActionByFilter">Action By:</label>
+                            <input type="text" id="employeeActionByFilter" placeholder="Search..." style="width: 120px;">
+                        </div>
+                        </div>
+                        </div>
 
-                    <div class="table-responsive">
-                        <table class="leave-table">
-                            <thead>
-                                <tr>
-                                    <th>Report Date</th>
-                                    <th>Company</th>
-                                    <th>Department</th>
-                                    <th>Employee Name</th>
-                                    <th>Full Leave</th>
-                                    <th>First Half</th>
-                                    <th>Second Half</th>
-                                    <th>Reason</th>
-                                    <th>Days</th>
-                                    <th>Status & Action By</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaveHistoryTableBody"></tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="leave-table">
+                                <thead>
+                                    <tr>
+                                        <th>Report Date</th>
+                                        <th>Company</th>
+                                        <th>Department</th>
+                                        <th>Employee Name</th>
+                                        <th>Full Leave</th>
+                                        <th>First Half</th>
+                                        <th>Second Half</th>
+                                        <th>Reason</th>
+                                        <th>Days</th>
+                                        <th>Status & Action By</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaveHistoryTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1405,7 +1783,7 @@
                     <div class="form-group">
                         <label for="employeeFullName">EMPLOYEE NAME *</label>
                         <input type="text" id="employeeFullName" placeholder="તમારું પૂરું નામ લખો (દા.ત. Jainam Dave)" required>
-                        <small>નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.</small>
+                        <small>નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.<br>Enter both first name and surname with a space between them.</small>
                     </div>
 
                     <div class="form-group">
@@ -1416,31 +1794,31 @@
                     <div class="form-group">
                         <label for="reportFillDate">LEAVE REPORT FILL DATE *</label>
                         <input type="text" id="reportFillDate" placeholder="ક્લિક કરીને કેલેન્ડરથી તારીખ પસંદ કરો (dd/mm/yyyy)" readonly required style="cursor: pointer;">
-                        <small>ફક્ત કેલેન્ડર પરથી જ ડાયરેક્ટ તારીખ સિલેક્ટ કરી શકાશે (dd/mm/yyyy ફોર્મેટ).</small>
+                        <small>ફક્ત કેલેન્ડર પરથી જ ડાયરેક્ટ તારીખ સિલેક્ટ કરી શકાશે (dd/mm/yyyy ફોર્મેટ).<br>The date can only be selected directly from the calendar (dd/mm/yyyy format).</small>
                     </div>
 
                     <div class="form-group">
                         <label for="fullLeaveDate">FULL LEAVE DATE</label>
                         <input type="text" id="fullLeaveDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસની રજા હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</small>
+                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસની રજા હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.<br>Use the dd/mm/yyyy format. For more than one leave day, separate the dates with commas (,).</small>
                     </div>
 
                     <div class="form-group">
                         <label for="firstHalfDate">FIRST HALF LEAVE DATE</label>
                         <input type="text" id="firstHalfDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</small>
+                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.<br>Use the dd/mm/yyyy format. For more than one day, separate the dates with commas (,).</small>
                     </div>
 
                     <div class="form-group">
                         <label for="secondHalfDate">SECOND HALF LEAVE DATE</label>
                         <input type="text" id="secondHalfDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.</small>
+                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.<br>Use the dd/mm/yyyy format. For more than one day, separate the dates with commas (,).</small>
                     </div>
 
                     <div class="form-group">
                         <label for="totalLeaveDays">TOTAL DAYS OF LEAVES *</label>
                         <input type="number" step="0.5" id="totalLeaveDays" placeholder="કુલ રજાના દિવસો લખો (દા.ત. 1)" required>
-                        <small>ફક્ત નંબર જ લખી શકાશે.</small>
+                        <small>ફક્ત નંબર જ લખી શકાશે.<br>Only numbers are allowed.</small>
                     </div>
 
                     <button type="submit" class="submit-leave-btn"><i class="fa-solid fa-check" style="margin-right: 6px;"></i>Submit Leave Request</button>
@@ -1576,6 +1954,88 @@
                             <span>Days</span>
                         </div>
                     </div>
+                    <div class="stat-card approved-counter" style="cursor: default;">
+                        <div class="stat-card-title">Deleted History Total:</div>
+                        <div class="stat-badge-box">
+                            <div class="stat-circle" id="mgmtDeletedHistoryCountBadge">0</div>
+                            <span>Records</span>
+                        </div>
+                    </div>
+                    <div class="stat-card balance" style="cursor: default;">
+                        <div class="stat-card-title">Active Accounts:</div>
+                        <div class="stat-badge-box">
+                            <div class="stat-circle" id="mgmtActiveAccountsCountBadge">0</div>
+                            <span>Accounts</span>
+                        </div>
+                    </div>
+                    <div class="stat-card approved-counter" style="cursor: default;">
+                        <div class="stat-card-title">Inactive Accounts:</div>
+                        <div class="stat-badge-box">
+                            <div class="stat-circle" id="mgmtInactiveAccountsCountBadge">0</div>
+                            <span>Accounts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-section" style="margin-bottom: 20px;">
+                    <div id="managementAccountsToggle" class="delete-history-toggle" role="button" tabindex="0" aria-expanded="false">
+                        <div class="delete-history-toggle-label">
+                            <i class="fa-solid fa-user-shield" style="color: #38bdf8;"></i>
+                            <span>Employee & TL Accounts</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+
+                    <div id="managementAccountsContent" class="hidden" style="margin-top: 14px;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin-bottom: 14px;">
+                            <div class="month-filter-box">
+                                <label for="managementUserNameFilter">Name:</label>
+                                <input type="text" id="managementUserNameFilter" placeholder="Search name..." style="width: 160px;">
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="managementUserRoleFilter">Role:</label>
+                                <select id="managementUserRoleFilter" style="width: 140px;">
+                                    <option value="all">All Roles</option>
+                                    <option value="Employee">Employee</option>
+                                    <option value="TL">TL</option>
+                                </select>
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="managementUserDepartmentFilter">Department:</label>
+                                <select id="managementUserDepartmentFilter" style="width: 160px;">
+                                    <option value="all">All Departments</option>
+                                </select>
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="managementUserStatusFilter">Status:</label>
+                                <select id="managementUserStatusFilter" style="width: 140px;">
+                                    <option value="all">All Statuses</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Deleted">Deleted</option>
+                                </select>
+                            </div>
+                            <button type="button" class="generate-report-btn" id="refreshUserAccountsBtn">Refresh</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="leave-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="managementUserAccountsBody">
+                                    <tr><td colspan="6" class="no-data">Loading accounts...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="history-section" style="margin-bottom: 20px;">
@@ -1587,14 +2047,57 @@
                         <i class="fa-solid fa-chevron-down"></i>
                     </div>
 
-                    <div id="managementDeleteHistoryList" class="delete-history-list hidden"></div>
+                    <div id="managementDeleteHistoryContent" class="hidden" style="margin-top: 14px;">
+                        <div id="managementDeleteHistoryFilters" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+                            <div class="month-filter-box">
+                                <label for="deleteHistoryReportDateFilter">Report Date:</label>
+                                <input type="date" id="deleteHistoryReportDateFilter" style="width: 170px;">
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="deleteHistoryCompanyFilter">Company:</label>
+                                <select id="deleteHistoryCompanyFilter" style="width: 150px;"><option value="all">All Companies</option></select>
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="deleteHistoryDepartmentFilter">Department:</label>
+                                <select id="deleteHistoryDepartmentFilter" style="width: 150px;"><option value="all">All Departments</option></select>
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="deleteHistoryActionByFilter">Action By:</label>
+                                <select id="deleteHistoryActionByFilter" style="width: 150px;"><option value="all">All</option></select>
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="deleteHistorySearchName"><i class="fa-solid fa-search"></i> Search:</label>
+                                <input type="text" id="deleteHistorySearchName" placeholder="Employee Name..." style="width: 150px;">
+                            </div>
+                            <div class="month-filter-box">
+                                <label for="deleteHistoryMonthFilter">Month:</label>
+                                <select id="deleteHistoryMonthFilter">
+                                    <option value="all">All Months</option>
+                                    <option value="01">January</option><option value="02">February</option>
+                                    <option value="03">March</option><option value="04">April</option>
+                                    <option value="05">May</option><option value="06">June</option>
+                                    <option value="07">July</option><option value="08">August</option>
+                                    <option value="09">September</option><option value="10">October</option>
+                                    <option value="11">November</option><option value="12">December</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="managementDeleteHistoryList" class="delete-history-list"></div>
+                    </div>
                 </div>
 
                 <div class="history-section">
-                    <div class="history-header">
-                        <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-list-check" style="color: #f59e0b;"></i> All Leave Requests
-                        </h4>
+                    <div id="managementLeaveRequestsToggle" class="delete-history-toggle" role="button" tabindex="0" aria-expanded="false">
+                        <div class="delete-history-toggle-label">
+                            <i class="fa-solid fa-list-check" style="color: #f59e0b;"></i>
+                            <span>All Leave Requests</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+
+                    <div id="managementLeaveRequestsContent" class="hidden" style="margin-top: 14px;">
+                        <div class="history-header">
 
                         <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
                             <div class="month-filter-box">
@@ -1671,27 +2174,28 @@
                                 <button type="button" class="generate-report-btn" onclick="generateManagementExportReport()">Generate</button>
                             </div>
                         </div>
-                    </div>
+                        </div>
 
-                    <div class="table-responsive">
-                        <table class="leave-table">
-                            <thead>
-                                <tr>
-                                    <th>Report Date</th>
-                                    <th>Company</th>
-                                    <th>Department</th>
-                                    <th>Employee Name</th>
-                                    <th>Full Leave</th>
-                                    <th>First Half</th>
-                                    <th>Second Half</th>
-                                    <th>Reason</th>
-                                    <th>Days</th>
-                                    <th>Status & Action By</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="managementTableBody"></tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="leave-table">
+                                <thead>
+                                    <tr>
+                                        <th>Report Date</th>
+                                        <th>Company</th>
+                                        <th>Department</th>
+                                        <th>Employee Name</th>
+                                        <th>Full Leave</th>
+                                        <th>First Half</th>
+                                        <th>Second Half</th>
+                                        <th>Reason</th>
+                                        <th>Days</th>
+                                        <th>Status & Action By</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="managementTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1792,14 +2296,14 @@
                             <span class="custom-radio"></span>
                             <span>Excel</span>
                         </label>
-                        <label class="report-export-option">
+                        <label class="report-export-option" id="dailyReportGoogleSheetOption">
                             <input type="radio" name="exportType" value="google_sheet">
                             <span class="custom-radio"></span>
                             <span>Google Sheet</span>
                         </label>
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <div class="export-email-inline">
+                        <div class="export-email-inline" id="dailyReportGoogleSheetEmailWrap">
                             <input type="email" id="dailyReportGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Email address" aria-label="Google Sheet email">
                         </div>
                         <div class="daily-report-selected-summary">Selected Employee:- <span id="dailyReportSelectedEmployeeCount">0</span></div>
@@ -2069,35 +2573,27 @@
             }
         }
 
-        function syncMobileSidebarState() {
+        function updateSidebarToggleState() {
             const sidebar = document.getElementById('sidebarElement');
-            if (!sidebar) return;
+            const toggleBtn = document.getElementById('toggleSidebarBtn');
+            if (!sidebar || !toggleBtn) return;
 
-            if (window.innerWidth <= 900) {
-                sidebar.classList.add('hidden-sidebar');
-            } else {
-                sidebar.classList.remove('hidden-sidebar');
-            }
+            const isOpen = !sidebar.classList.contains('hidden-sidebar');
+            toggleBtn.setAttribute('aria-expanded', String(isOpen));
+            toggleBtn.setAttribute('aria-label', `${isOpen ? 'Close' : 'Open'} sidebar`);
+            toggleBtn.title = `${isOpen ? 'Close' : 'Open'} Sidebar`;
         }
 
         document.getElementById('toggleSidebarBtn').addEventListener('click', () => {
             const sidebar = document.getElementById('sidebarElement');
             if (!sidebar) return;
 
-            if (window.innerWidth <= 900) {
-                sidebar.classList.toggle('hidden-sidebar');
-                return;
-            }
-
-            sidebar.classList.remove('hidden-sidebar');
+            sidebar.classList.toggle('hidden-sidebar');
+            updateSidebarToggleState();
         });
 
         window.addEventListener('resize', () => {
-            if (window.innerWidth <= 900) {
-                document.getElementById('sidebarElement')?.classList.add('hidden-sidebar');
-            } else {
-                document.getElementById('sidebarElement')?.classList.remove('hidden-sidebar');
-            }
+            updateSidebarToggleState();
         });
 
         document.addEventListener('click', (event) => {
@@ -2109,10 +2605,29 @@
             const clickedToggle = toggleBtn.contains(event.target);
             if (!clickedInsideSidebar && !clickedToggle && !sidebar.classList.contains('hidden-sidebar')) {
                 sidebar.classList.add('hidden-sidebar');
+                updateSidebarToggleState();
             }
         });
 
-        syncMobileSidebarState();
+        if (window.innerWidth <= 900) {
+            document.getElementById('sidebarElement').classList.add('hidden-sidebar');
+        }
+        updateSidebarToggleState();
+
+        const sidebarElement = document.getElementById('sidebarElement');
+        sidebarElement.addEventListener('mouseenter', () => {
+            if (window.innerWidth > 900 && sidebarElement.classList.contains('hidden-sidebar')) {
+                sidebarElement.classList.add('sidebar-hover-expanded');
+            }
+        });
+        sidebarElement.addEventListener('mouseleave', () => {
+            sidebarElement.classList.remove('sidebar-hover-expanded');
+        });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 900) {
+                sidebarElement.classList.remove('sidebar-hover-expanded');
+            }
+        });
 
         document.getElementById('avatarContainer').addEventListener('click', () => {
             document.getElementById('profileImageInput').click();
@@ -2191,6 +2706,21 @@
             localStorage.setItem(`notifications_${targetUserIdentifier}`, JSON.stringify(userNotifs));
         }
 
+        function addSharedNotification(storageKey, message) {
+            const notifications = JSON.parse(localStorage.getItem(storageKey)) || [];
+            notifications.unshift({
+                id: Date.now(),
+                message,
+                read: false,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            localStorage.setItem(storageKey, JSON.stringify(notifications));
+        }
+
+        function addManagementNotification(message) {
+            addSharedNotification('management_notifications', message);
+        }
+
         function getDepartmentNotificationKeys() {
             const deptKeys = [];
             const departments = getUserDepartments();
@@ -2228,6 +2758,28 @@
                 if (unreadCount > 0) {
                     badgeCount.innerText = unreadCount;
                     badgeCount.classList.remove('hidden');
+                } else if (isRole('Management') || isRole('MANAGEMENT')) {
+                    const managementNotifs = JSON.parse(localStorage.getItem('management_notifications')) || [];
+                    const personalNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
+                    const combined = [...managementNotifs, ...personalNotifs];
+                    listContainer.innerHTML = '';
+                    const unreadCount = combined.filter(n => !n.read).length;
+                    if (unreadCount > 0) {
+                        badgeCount.innerText = unreadCount;
+                        badgeCount.classList.remove('hidden');
+                    } else {
+                        badgeCount.classList.add('hidden');
+                    }
+                    if (combined.length === 0) {
+                        listContainer.innerHTML = `<div class="notif-item">No notifications found</div>`;
+                        return;
+                    }
+                    combined.forEach(notif => {
+                        const div = document.createElement('div');
+                        div.className = `notif-item ${notif.read ? '' : 'unread'}`;
+                        div.innerHTML = `<span>${notif.message}</span><span class="notif-time">${notif.time}</span>`;
+                        listContainer.appendChild(div);
+                    });
                 } else {
                     badgeCount.classList.add('hidden');
                 }
@@ -2276,6 +2828,10 @@
             }
         }
 
+        window.setInterval(() => {
+            if (userIdentifier) loadNotifications();
+        }, 5000);
+
         document.getElementById('markAllReadBtn').addEventListener('click', () => {
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
                 getDepartmentNotificationKeys().forEach(deptKey => {
@@ -2286,6 +2842,11 @@
 
                 let personalNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
                 personalNotifs = personalNotifs.map(n => ({ ...n, read: true }));
+                localStorage.setItem(getNotificationKey(), JSON.stringify(personalNotifs));
+            } else if (isRole('Management') || isRole('MANAGEMENT')) {
+                const managementNotifs = (JSON.parse(localStorage.getItem('management_notifications')) || []).map(n => ({ ...n, read: true }));
+                const personalNotifs = (JSON.parse(localStorage.getItem(getNotificationKey())) || []).map(n => ({ ...n, read: true }));
+                localStorage.setItem('management_notifications', JSON.stringify(managementNotifs));
                 localStorage.setItem(getNotificationKey(), JSON.stringify(personalNotifs));
             } else {
                 let userNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
@@ -2547,27 +3108,84 @@
                 return;
             }
 
+            createLeaveTablePdf(filteredLeaves, 'Approved Leave Report', 'approved_leave_report.pdf');
+        }
+
+        function createLeaveTablePdf(leaves, title, fileName) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(12);
-            doc.text('Approved Leave Report', 14, 16);
-            doc.setFontSize(8);
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 8;
+            const headerHeight = 9;
+            const rowPadding = 2;
+            const columns = [
+                { title: 'Report Date', width: 25, value: (leave) => leave.reportFillDate },
+                { title: 'Company', width: 25, value: (leave) => leave.companyName },
+                { title: 'Department', width: 28, value: (leave) => leave.departmentName },
+                { title: 'Employee Name', width: 30, value: (leave) => leave.employeeFullName },
+                { title: 'Full Leave', width: 25, value: (leave) => leave.fullLeaveDate },
+                { title: 'First Half', width: 23, value: (leave) => leave.firstHalfDate },
+                { title: 'Second Half', width: 23, value: (leave) => leave.secondHalfDate },
+                { title: 'Reason', width: 42, value: (leave) => leave.leaveReason },
+                { title: 'Days', width: 13, value: (leave) => leave.totalLeaveDays || '0' },
+                { title: 'Status', width: 22, value: (leave) => leave.status || 'Pending' },
+                { title: 'Action By', width: 25, value: (leave) => leave.actionBy },
+                { title: 'Reviewed', width: 18, value: (leave) => leave.managementReviewed || leave.reviewed ? 'Yes' : 'No' }
+            ];
+            const scale = Math.min(1, (pageWidth - margin * 2) / columns.reduce((sum, column) => sum + column.width, 0));
+            const scaledColumns = columns.map((column) => ({ ...column, width: column.width * scale }));
+            const lineHeight = 3.5;
 
-            let y = 24;
-            filteredLeaves.forEach((leave, index) => {
-                const line = `${index + 1}. ${leave.reportFillDate || '-'} | ${leave.companyName || '-'} | ${leave.departmentName || '-'} | ${leave.employeeFullName || '-'} | ${leave.totalLeaveDays || '0'} days | ${leave.status || 'Pending'} | ${leave.actionBy || '-'} | ${(leave.leaveReason || '').replace(/\s+/g, ' ').slice(0, 160)}`;
-                const wrapped = doc.splitTextToSize(line, 250);
+            const drawHeader = () => {
+                let x = margin;
+                doc.setFontSize(7);
+                scaledColumns.forEach((column) => {
+                    doc.setFillColor(30, 41, 59);
+                    doc.setDrawColor(148, 163, 184);
+                    doc.setTextColor(255, 255, 255);
+                    doc.rect(x, margin + 9, column.width, headerHeight, 'FD');
+                    doc.text(column.title, x + 1.5, margin + 15, { maxWidth: column.width - 3 });
+                    x += column.width;
+                });
+                return margin + 9 + headerHeight;
+            };
 
-                if (y + wrapped.length * 4 > 190) {
+            doc.setFontSize(14);
+            doc.setTextColor(15, 23, 42);
+            doc.text(title, margin, margin + 5);
+            let y = drawHeader();
+
+            leaves.forEach((leave) => {
+                const rowLines = scaledColumns.map((column) => {
+                    const value = column.value(leave);
+                    return doc.splitTextToSize(String(value || '-'), Math.max(8, column.width - 3));
+                });
+                const rowHeight = Math.max(8, Math.max(...rowLines.map((lines) => lines.length)) * lineHeight + rowPadding * 2);
+
+                if (y + rowHeight > pageHeight - margin) {
                     doc.addPage();
-                    y = 18;
+                    doc.setFontSize(14);
+                    doc.setTextColor(15, 23, 42);
+                    doc.text(title, margin, margin + 5);
+                    y = drawHeader();
                 }
 
-                doc.text(wrapped, 14, y);
-                y += wrapped.length * 4 + 4;
+                let x = margin;
+                rowLines.forEach((lines, index) => {
+                    const column = scaledColumns[index];
+                    doc.setFillColor(index % 2 === 0 ? 248 : 255);
+                    doc.setDrawColor(203, 213, 225);
+                    doc.setTextColor(15, 23, 42);
+                    doc.rect(x, y, column.width, rowHeight, 'FD');
+                    doc.setFontSize(6.5);
+                    doc.text(lines, x + 1.5, y + rowPadding + lineHeight, { baseline: 'top', maxWidth: column.width - 3 });
+                    x += column.width;
+                });
+                y += rowHeight;
             });
 
-            doc.save('approved_leave_report.pdf');
+            doc.save(fileName);
         }
 
         function exportManagementToExcel() {
@@ -2674,22 +3292,11 @@
                 return;
             }
 
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(12);
-            doc.text(reportType || 'Daily Report', 14, 16);
-            doc.setFontSize(9);
-            let y = 28;
-            filtered.slice(0, 35).forEach((leave) => {
-                const line = `${leave.reportFillDate || '-'} | ${leave.companyName || '-'} | ${leave.departmentName || '-'} | ${leave.employeeFullName || '-'} | ${leave.totalLeaveDays || '0'} days`;
-                if (y > 190) {
-                    doc.addPage();
-                    y = 20;
-                }
-                doc.text(line, 14, y);
-                y += 6;
-            });
-            doc.save(`${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.pdf`);
+            createLeaveTablePdf(
+                filtered,
+                reportType || 'Daily Report',
+                `${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.pdf`
+            );
         }
 
         function parseReportDate(dateValue) {
@@ -2720,8 +3327,26 @@
                 .filter(Boolean);
         }
 
+        function getReportOwnerLeaves() {
+            let leaves = getStoredLeaves();
+            if (currentReportOwner === 'employee') {
+                const employeeName = String(userData?.name || userData?.fullName || '').trim().toLowerCase();
+                leaves = leaves.filter((leave) => {
+                    return leave.employeeEmail === userIdentifier
+                        || String(leave.employeeFullName || '').trim().toLowerCase() === employeeName;
+                });
+            } else if (currentReportOwner === 'tl') {
+                const departments = getUserDepartments().map((department) => String(department).trim().toUpperCase());
+                const fallbackDepartment = String(userDept || '').trim().toUpperCase();
+                const allowedDepartments = departments.length ? departments : [fallbackDepartment];
+                leaves = leaves.filter((leave) => allowedDepartments.includes(String(leave.departmentName || '').trim().toUpperCase()));
+            }
+            return leaves;
+        }
+
         function getFilteredReportLeaves(reportType = 'Daily Report') {
-            const leaves = getStoredLeaves();
+            const leaves = getReportOwnerLeaves();
+
             const datePicker = document.getElementById('dailyReportDatePicker');
             const monthPicker = document.getElementById('dailyReportMonthPicker');
             const yearPicker = document.getElementById('dailyReportYearPicker');
@@ -2756,10 +3381,10 @@
                 }
 
                 if (reportType === 'Monthly Report') {
-                    const monthYearMatch = candidates.some((candidate) => {
-                        return String(candidate.getMonth() + 1).padStart(2, '0') === monthValue
-                            && String(candidate.getFullYear()) === String(yearValue);
-                    });
+                    const reportDate = parseReportDate(leave.reportFillDate);
+                    const monthYearMatch = reportDate
+                        && String(reportDate.getMonth() + 1).padStart(2, '0') === monthValue
+                        && String(reportDate.getFullYear()) === String(yearValue);
                     if (!monthValue || !yearValue || !monthYearMatch) return false;
                 }
 
@@ -2776,16 +3401,18 @@
                     }
                 }
 
-                if (selectedCompanies.length && !(leave.companyName && selectedCompanies.includes(leave.companyName))) return false;
-                if (selectedDepartments.length && !(leave.departmentName && selectedDepartments.includes(leave.departmentName))) return false;
-                if (selectedEmployees.length && !(leave.employeeFullName && selectedEmployees.includes(leave.employeeFullName))) return false;
+                if (currentReportOwner !== 'tl') {
+                    if (selectedCompanies.length && !(leave.companyName && selectedCompanies.includes(leave.companyName))) return false;
+                    if (selectedDepartments.length && !(leave.departmentName && selectedDepartments.includes(leave.departmentName))) return false;
+                    if (selectedEmployees.length && !(leave.employeeFullName && selectedEmployees.includes(leave.employeeFullName))) return false;
+                }
 
                 return true;
             });
         }
 
         function populateDailyReportLists() {
-            const leaves = getStoredLeaves();
+            const leaves = getReportOwnerLeaves();
             const companyList = document.getElementById('dailyReportCompanyList');
             const departmentList = document.getElementById('dailyReportDepartmentList');
             const employeeList = document.getElementById('dailyReportEmployeeList');
@@ -2913,6 +3540,15 @@
                 }
             }
 
+            if (window.innerWidth <= 900) {
+                const mobileSidebar = document.getElementById('sidebarElement');
+                if (mobileSidebar) {
+                    mobileSidebar.classList.add('hidden-sidebar');
+                    mobileSidebar.classList.remove('sidebar-hover-expanded');
+                    updateSidebarToggleState();
+                }
+            }
+
             document.getElementById('employeeFormView').classList.add('hidden');
             document.getElementById('employeeCardView').classList.remove('hidden');
 
@@ -2927,6 +3563,7 @@
             document.getElementById('employeePanel').classList.add('hidden');
             document.getElementById('tlPanel').classList.add('hidden');
             document.getElementById('managementPanel').classList.add('hidden');
+            document.getElementById('dailyReportView').classList.add('hidden');
 
             let activeLink = null;
             if (tabName === 'dashboard') {
@@ -2935,17 +3572,25 @@
             } else if (tabName === 'employee') {
                 activeLink = document.getElementById('menuEmployee');
                 document.getElementById('employeePanel').classList.remove('hidden');
+                currentReportOwner = 'employee';
+                toggleEmployeeLeaveHistory(false);
                 loadLeaveHistory(); 
             } else if (tabName === 'tl') {
                 activeLink = document.getElementById('menuTL');
                 document.getElementById('tlPanel').classList.remove('hidden');
+                currentReportOwner = 'tl';
                 loadTlApprovals();
             } else if (tabName === 'management') {
                 activeLink = document.getElementById('menuManagement');
                 document.getElementById('managementPanel').classList.remove('hidden');
+                currentReportOwner = 'management';
+                document.getElementById('managementPanel').appendChild(document.getElementById('dailyReportView'));
+                document.getElementById('dailyReportGoogleSheetOption')?.classList.remove('hidden');
+                document.getElementById('dailyReportGoogleSheetEmailWrap')?.classList.remove('hidden');
                 setManagementReportView(currentManagementReportType === 'Management' ? 'Management' : currentManagementReportType);
                 populateDailyReportLists();
                 loadManagementRequests();
+                loadManagementUserAccounts();
             }
 
             if (activeLink) {
@@ -2957,6 +3602,7 @@
             if (tabName === 'management') {
                 renderDeleteHistory();
                 toggleDeleteHistoryList(false);
+                toggleManagementLeaveRequests(false);
             }
         }
 
@@ -2980,11 +3626,11 @@
 
         function toggleDeleteHistoryList(forceOpen) {
             const toggle = document.getElementById('managementDeleteHistoryToggle');
-            const list = document.getElementById('managementDeleteHistoryList');
-            if (!toggle || !list) return;
+            const content = document.getElementById('managementDeleteHistoryContent');
+            if (!toggle || !content) return;
 
-            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : list.classList.contains('hidden');
-            list.classList.toggle('hidden', !shouldOpen);
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : content.classList.contains('hidden');
+            content.classList.toggle('hidden', !shouldOpen);
             toggle.classList.toggle('open', shouldOpen);
             toggle.setAttribute('aria-expanded', String(shouldOpen));
         }
@@ -2993,13 +3639,49 @@
             const container = document.getElementById('managementDeleteHistoryList');
             if (!container) return;
 
-            const historyEntries = getDeleteHistory().slice().sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
-            if (!historyEntries.length) {
+            const allHistoryEntries = getDeleteHistory().slice().sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
+            const deletedHistoryCount = document.getElementById('mgmtDeletedHistoryCountBadge');
+            if (deletedHistoryCount) deletedHistoryCount.innerText = allHistoryEntries.length;
+
+            const companyFilter = document.getElementById('deleteHistoryCompanyFilter');
+            const departmentFilter = document.getElementById('deleteHistoryDepartmentFilter');
+            const actionByFilter = document.getElementById('deleteHistoryActionByFilter');
+            const reportDateFilter = document.getElementById('deleteHistoryReportDateFilter')?.value || '';
+            const monthFilter = document.getElementById('deleteHistoryMonthFilter')?.value || 'all';
+            const searchQuery = (document.getElementById('deleteHistorySearchName')?.value || '').trim().toLowerCase();
+            const uniqueValues = (key) => [...new Set(allHistoryEntries.map((entry) => entry[key]).filter(Boolean))].sort();
+            const updateOptions = (select, values, allLabel) => {
+                if (!select) return;
+                const current = select.value;
+                select.innerHTML = `<option value="all">${allLabel}</option>${values.map((value) => `<option value="${escapeDeleteHistoryText(value)}">${escapeDeleteHistoryText(value)}</option>`).join('')}`;
+                select.value = values.includes(current) ? current : 'all';
+            };
+            updateOptions(companyFilter, uniqueValues('company'), 'All Companies');
+            updateOptions(departmentFilter, uniqueValues('department'), 'All Departments');
+            updateOptions(actionByFilter, uniqueValues('deletedBy'), 'All');
+            const selectedCompany = companyFilter?.value || 'all';
+            const selectedDepartment = departmentFilter?.value || 'all';
+            const selectedActionBy = actionByFilter?.value || 'all';
+
+            const filteredHistoryEntries = allHistoryEntries.filter((entry) => {
+                if (selectedCompany !== 'all' && (entry.company || '') !== selectedCompany) return false;
+                if (selectedDepartment !== 'all' && (entry.department || '') !== selectedDepartment) return false;
+                if (selectedActionBy !== 'all' && (entry.deletedBy || '') !== selectedActionBy) return false;
+                if (searchQuery && !(entry.employeeName || '').toLowerCase().includes(searchQuery)) return false;
+                if (reportDateFilter && normalizeDateValue(entry.reportDate) !== reportDateFilter) return false;
+                if (monthFilter !== 'all') {
+                    const date = parseReportDate(entry.reportDate) || new Date(entry.deletedAt);
+                    if (Number.isNaN(date.getTime()) || String(date.getMonth() + 1).padStart(2, '0') !== monthFilter) return false;
+                }
+                return true;
+            });
+
+            if (!filteredHistoryEntries.length) {
                 container.innerHTML = '<div style="padding: 14px 16px; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; background: rgba(15, 23, 42, 0.55); color: #cbd5e1;">No deleted leave requests yet.</div>';
                 return;
             }
 
-            container.innerHTML = historyEntries.map((entry) => {
+            container.innerHTML = filteredHistoryEntries.map((entry) => {
                 const acknowledged = !!entry.acknowledged;
                 return `
                     <div style="padding: 14px 16px; border: 1px solid ${acknowledged ? 'rgba(16, 185, 129, 0.4)' : 'rgba(148, 163, 184, 0.18)'}; border-radius: 12px; background: ${acknowledged ? 'rgba(16, 185, 129, 0.08)' : 'rgba(15, 23, 42, 0.55)'}; color: #e2e8f0;">
@@ -3011,7 +3693,28 @@
                             <span style="font-size: 12px; color: #38bdf8;">${new Date(entry.deletedAt).toLocaleString()}</span>
                         </div>
                         <div style="margin-top: 8px; color: #cbd5e1; font-size: 13px;">
-                            Deleted by: ${escapeDeleteHistoryText(entry.deletedBy || 'Unknown')} • Days: ${escapeDeleteHistoryText(entry.days || '0')} • Status: ${escapeDeleteHistoryText(entry.status || 'Pending')}
+                            Deleted by: ${escapeDeleteHistoryText(entry.deletedBy || 'Unknown')} • Deleted on: ${new Date(entry.deletedAt).toLocaleString()}
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(148, 163, 184, 0.14);">
+                            ${Object.entries(entry.details || {
+                                'Report Date': entry.reportDate || '',
+                                'Company': entry.company || '',
+                                'Department': entry.department || '',
+                                'Employee Name': entry.employeeName || '',
+                                'Full Leave': entry.fullLeaveDate || '',
+                                'First Half': entry.firstHalfDate || '',
+                                'Second Half': entry.secondHalfDate || '',
+                                'Reason': entry.leaveReason || '',
+                                'Days': entry.days || '0',
+                                'Status': entry.status || 'Pending',
+                                'Action By': entry.actionBy || '',
+                                'Employee Email': entry.employeeEmail || ''
+                            }).map(([label, value]) => `
+                                <div style="color: #cbd5e1; font-size: 12px; line-height: 1.45;">
+                                    <strong style="color: #94a3b8;">${escapeDeleteHistoryText(label)}:</strong>
+                                    ${escapeDeleteHistoryText(value || '-')}
+                                </div>
+                            `).join('')}
                         </div>
                         <label style="display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; color: #f8fafc; font-size: 13px; cursor: pointer;">
                             <input type="checkbox" data-delete-history-id="${entry.id}" ${acknowledged ? 'checked' : ''} onchange="toggleDeleteHistoryAcknowledged(this)">
@@ -3033,6 +3736,10 @@
             }
         });
 
+        ['deleteHistoryReportDateFilter', 'deleteHistoryCompanyFilter', 'deleteHistoryDepartmentFilter', 'deleteHistoryActionByFilter', 'deleteHistoryMonthFilter']
+            .forEach((id) => document.getElementById(id)?.addEventListener('change', renderDeleteHistory));
+        document.getElementById('deleteHistorySearchName')?.addEventListener('input', renderDeleteHistory);
+
         window.toggleDeleteHistoryAcknowledged = function(checkbox) {
             if (!checkbox) return;
             const historyEntries = getDeleteHistory();
@@ -3052,9 +3759,32 @@
             const newEntry = {
                 id: `delete-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
                 employeeName: leaveToDelete.employeeFullName || leaveToDelete.employeeName || 'Unknown',
+                company: leaveToDelete.companyName || '',
                 department: leaveToDelete.departmentName || 'N/A',
+                reportDate: leaveToDelete.reportFillDate || '',
                 days: leaveToDelete.totalLeaveDays || '0',
                 status: leaveToDelete.status || 'Pending',
+                fullLeaveDate: leaveToDelete.fullLeaveDate || '',
+                firstHalfDate: leaveToDelete.firstHalfDate || '',
+                secondHalfDate: leaveToDelete.secondHalfDate || '',
+                leaveReason: leaveToDelete.leaveReason || '',
+                actionBy: leaveToDelete.actionBy || '',
+                employeeEmail: leaveToDelete.employeeEmail || '',
+                details: {
+                    'Report Date': leaveToDelete.reportFillDate || '',
+                    'Company': leaveToDelete.companyName || '',
+                    'Department': leaveToDelete.departmentName || '',
+                    'Employee Name': leaveToDelete.employeeFullName || leaveToDelete.employeeName || '',
+                    'Full Leave': leaveToDelete.fullLeaveDate || '',
+                    'First Half': leaveToDelete.firstHalfDate || '',
+                    'Second Half': leaveToDelete.secondHalfDate || '',
+                    'Reason': leaveToDelete.leaveReason || '',
+                    'Days': leaveToDelete.totalLeaveDays || '0',
+                    'Status': leaveToDelete.status || 'Pending',
+                    'Action By': leaveToDelete.actionBy || '',
+                    'Employee Email': leaveToDelete.employeeEmail || '',
+                    'Submitted At': leaveToDelete.timestamp || ''
+                },
                 deletedBy: currentUserName || 'Unknown',
                 deletedAt: new Date().toISOString(),
                 acknowledged: false
@@ -3078,6 +3808,135 @@
         const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
         const db = firebase.database(firebaseApp);
         const FIREBASE_LEAVES_KEY = 'officeLeaveRequests';
+        const MANAGEMENT_USERS_KEY = 'users';
+
+        function getUserRecordKey(email) {
+            return String(email || '').trim().toLowerCase().replace(/[.#$\[\]]/g, '_');
+        }
+
+        function getAccountStatusLabel(user) {
+            if (user.deleted === true) return 'Deleted';
+            return user.accountStatus === 'inactive' ? 'Inactive' : 'Active';
+        }
+
+        function getAccountRoleLabel(user) {
+            return ['TL', 'TeamLeader', 'Team Leader'].includes(user.role) ? 'TL' : 'Employee';
+        }
+
+        function updateManagementAccountCounters(users) {
+            const activeCount = users.filter((user) => getAccountStatusLabel(user) === 'Active').length;
+            const inactiveCount = users.length - activeCount;
+            const activeBadge = document.getElementById('mgmtActiveAccountsCountBadge');
+            const inactiveBadge = document.getElementById('mgmtInactiveAccountsCountBadge');
+            if (activeBadge) activeBadge.innerText = activeCount;
+            if (inactiveBadge) inactiveBadge.innerText = inactiveCount;
+        }
+
+        async function loadManagementUserAccounts() {
+            const tbody = document.getElementById('managementUserAccountsBody');
+            if (!tbody || !isRole('Management')) return;
+
+            try {
+                const snapshot = await db.ref(MANAGEMENT_USERS_KEY).once('value');
+                const users = Object.values(snapshot.val() || {})
+                    .filter((user) => user && ['Employee', 'TL', 'TeamLeader', 'Team Leader'].includes(user.role));
+                updateManagementAccountCounters(users);
+                const nameFilter = (document.getElementById('managementUserNameFilter')?.value || '').trim().toLowerCase();
+                const roleFilter = document.getElementById('managementUserRoleFilter')?.value || 'all';
+                const departmentFilter = document.getElementById('managementUserDepartmentFilter')?.value || 'all';
+                const statusFilter = document.getElementById('managementUserStatusFilter')?.value || 'all';
+                const departmentSelect = document.getElementById('managementUserDepartmentFilter');
+                const departments = [...new Set(users.map((user) => user.department || user.dept).filter(Boolean))].sort();
+
+                if (departmentSelect) {
+                    const previousDepartment = departmentSelect.value;
+                    departmentSelect.innerHTML = `<option value="all">All Departments</option>${departments.map((department) => `<option value="${escapeDeleteHistoryText(department)}">${escapeDeleteHistoryText(department)}</option>`).join('')}`;
+                    departmentSelect.value = departments.includes(previousDepartment) ? previousDepartment : 'all';
+                }
+
+                const filteredUsers = users.filter((user) => {
+                    const name = String(user.name || user.fullName || '').toLowerCase();
+                    const role = getAccountRoleLabel(user);
+                    const department = String(user.department || user.dept || '');
+                    const status = getAccountStatusLabel(user);
+                    return (!nameFilter || name.includes(nameFilter))
+                        && (roleFilter === 'all' || role === roleFilter)
+                        && (departmentFilter === 'all' || department === departmentFilter)
+                        && (statusFilter === 'all' || status === statusFilter);
+                });
+
+                if (!users.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="no-data">No employee or TL accounts found.</td></tr>';
+                    return;
+                }
+
+                if (!filteredUsers.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="no-data">No accounts match the selected filters.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = filteredUsers
+                    .sort((a, b) => String(a.name || a.email).localeCompare(String(b.name || b.email)))
+                    .map((user) => {
+                        const email = String(user.email || '');
+                        const status = getAccountStatusLabel(user);
+                        const statusColor = status === 'Active' ? '#10b981' : status === 'Inactive' ? '#f59e0b' : '#ef4444';
+                        return `
+                            <tr>
+                                <td>${escapeDeleteHistoryText(user.name || user.fullName || '-')}</td>
+                                <td>${escapeDeleteHistoryText(email || '-')}</td>
+                                <td>${escapeDeleteHistoryText(getAccountRoleLabel(user))}</td>
+                                <td>${escapeDeleteHistoryText(user.department || user.dept || '-')}</td>
+                                <td style="color: ${statusColor}; font-weight: 700;">${status}</td>
+                                <td>
+                                    <button type="button" class="report-dropdown-item" style="display: inline-block; color: #10b981;" onclick="updateManagedUserStatus('${encodeURIComponent(email)}', 'active')">Active</button>
+                                    <button type="button" class="report-dropdown-item" style="display: inline-block; color: #f59e0b;" onclick="updateManagedUserStatus('${encodeURIComponent(email)}', 'inactive')">Inactive</button>
+                                    <button type="button" class="report-dropdown-item" style="display: inline-block; color: #ef4444;" onclick="deleteManagedUser('${encodeURIComponent(email)}')">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+            } catch (error) {
+                console.warn('User account list failed:', error);
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">Unable to load accounts.</td></tr>';
+            }
+        }
+
+        window.updateManagedUserStatus = async function(encodedEmail, status) {
+            const email = decodeURIComponent(encodedEmail || '');
+            if (!email || !['active', 'inactive'].includes(status)) return;
+
+            try {
+                await db.ref(`${MANAGEMENT_USERS_KEY}/${getUserRecordKey(email)}`).update({
+                    accountStatus: status,
+                    deleted: false,
+                    accountStatusUpdatedAt: new Date().toISOString(),
+                    accountStatusUpdatedBy: currentUserName || 'Management'
+                });
+                await loadManagementUserAccounts();
+            } catch (error) {
+                console.error('Account status update failed:', error);
+                alert('Account status update failed. Please try again.');
+            }
+        };
+
+        window.deleteManagedUser = async function(encodedEmail) {
+            const email = decodeURIComponent(encodedEmail || '');
+            if (!email || !confirm('Delete this account? Login will be blocked, but all leave data will remain safe.')) return;
+
+            try {
+                await db.ref(`${MANAGEMENT_USERS_KEY}/${getUserRecordKey(email)}`).update({
+                    accountStatus: 'inactive',
+                    deleted: true,
+                    deletedAt: new Date().toISOString(),
+                    deletedBy: currentUserName || 'Management'
+                });
+                await loadManagementUserAccounts();
+            } catch (error) {
+                console.error('Account delete failed:', error);
+                alert('Account delete failed. Please try again.');
+            }
+        };
 
         function getStoredLeaves() {
             try {
@@ -3131,8 +3990,56 @@
         });
 
         document.getElementById('navDashboard').addEventListener('click', (e) => { e.preventDefault(); switchTab('dashboard'); });
-        document.getElementById('menuEmployee').addEventListener('click', (e) => { e.preventDefault(); switchTab('employee'); });
-        document.getElementById('menuTL').addEventListener('click', (e) => { e.preventDefault(); switchTab('tl'); });
+        let currentReportOwner = 'management';
+        const employeeReportMenu = document.getElementById('employeeReportMenu');
+        const tlReportMenu = document.getElementById('tlReportMenu');
+        const reportMenus = [employeeReportMenu, tlReportMenu].filter(Boolean);
+        const employeeMenuChevron = document.querySelector('#menuEmployee .panel-menu-chevron');
+        const tlMenuChevron = document.querySelector('#menuTL .panel-menu-chevron');
+        const managementMenuChevron = document.querySelector('#menuManagement .panel-menu-chevron');
+
+        function setMenuChevron(chevron, isOpen) {
+            if (chevron) chevron.classList.toggle('open', isOpen);
+        }
+
+        function openRoleReport(reportType, owner) {
+            const dailyReportView = document.getElementById('dailyReportView');
+            const targetPanel = document.getElementById(owner === 'employee' ? 'employeePanel' : owner === 'tl' ? 'tlPanel' : 'managementPanel');
+            if (!dailyReportView || !targetPanel) return;
+
+            currentReportOwner = owner;
+            targetPanel.appendChild(dailyReportView);
+            const googleSheetOption = document.getElementById('dailyReportGoogleSheetOption');
+            const googleSheetEmailWrap = document.getElementById('dailyReportGoogleSheetEmailWrap');
+            const googleSheetRadio = document.querySelector('input[name="exportType"][value="google_sheet"]');
+            const showGoogleSheet = owner === 'management';
+            if (googleSheetOption) googleSheetOption.classList.toggle('hidden', !showGoogleSheet);
+            if (googleSheetEmailWrap) googleSheetEmailWrap.classList.toggle('hidden', !showGoogleSheet);
+            if (!showGoogleSheet && googleSheetRadio?.checked) {
+                document.querySelector('input[name="exportType"][value="pdf"]').checked = true;
+            }
+            setManagementReportView(reportType);
+            populateDailyReportLists();
+        }
+
+        document.getElementById('menuEmployee').addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('employee');
+            const isOpen = employeeReportMenu.classList.toggle('hidden') === false;
+            tlReportMenu.classList.add('hidden');
+            setMenuChevron(employeeMenuChevron, isOpen);
+            setMenuChevron(tlMenuChevron, false);
+            setMenuChevron(managementMenuChevron, false);
+        });
+        document.getElementById('menuTL').addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('tl');
+            const isOpen = tlReportMenu.classList.toggle('hidden') === false;
+            employeeReportMenu.classList.add('hidden');
+            setMenuChevron(tlMenuChevron, isOpen);
+            setMenuChevron(employeeMenuChevron, false);
+            setMenuChevron(managementMenuChevron, false);
+        });
         let currentManagementReportType = 'Management';
 
         function setManagementReportView(reportType) {
@@ -3182,14 +4089,19 @@
                 setManagementReportView('Management');
                 switchTab('management');
                 if (menu) menu.classList.add('hidden');
+                setMenuChevron(managementMenuChevron, false);
                 populateDailyReportLists();
                 return;
             }
 
             switchTab('management');
             if (menu) {
-                menu.classList.toggle('hidden');
+                const isOpen = menu.classList.toggle('hidden') === false;
+                setMenuChevron(managementMenuChevron, isOpen);
             }
+            reportMenus.forEach((reportMenu) => reportMenu.classList.add('hidden'));
+            setMenuChevron(employeeMenuChevron, false);
+            setMenuChevron(tlMenuChevron, false);
             populateDailyReportLists();
         });
 
@@ -3299,11 +4211,30 @@
         function loadLeaveHistory() {
             const tbody = document.getElementById('leaveHistoryTableBody');
             const selectedMonth = document.getElementById('monthFilter').value;
+            const reportDateFilter = document.getElementById('employeeReportDateFilter')?.value || '';
+            const companyFilter = document.getElementById('employeeCompanyFilter')?.value || 'all';
+            const departmentFilter = document.getElementById('employeeDepartmentFilter')?.value || 'all';
+            const fullLeaveFilter = (document.getElementById('employeeFullLeaveFilter')?.value || '').trim().toLowerCase();
+            const firstHalfFilter = (document.getElementById('employeeFirstHalfFilter')?.value || '').trim().toLowerCase();
+            const secondHalfFilter = (document.getElementById('employeeSecondHalfFilter')?.value || '').trim().toLowerCase();
+            const daysFilter = document.getElementById('employeeDaysFilter')?.value || '';
+            const statusFilter = document.getElementById('employeeStatusFilter')?.value || 'all';
+            const actionByFilter = (document.getElementById('employeeActionByFilter')?.value || '').trim().toLowerCase();
             const allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
 
             const myLeaves = allLeaves.filter(l => l.employeeEmail === userIdentifier || l.employeeFullName.toLowerCase() === userData.name.toLowerCase());
 
             tbody.innerHTML = '';
+
+            const updateOptions = (id, values, label) => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                const currentValue = select.value;
+                select.innerHTML = `<option value="all">${label}</option>${values.map(value => `<option value="${escapeDeleteHistoryText(value)}">${escapeDeleteHistoryText(value)}</option>`).join('')}`;
+                select.value = values.includes(currentValue) ? currentValue : 'all';
+            };
+            updateOptions('employeeCompanyFilter', [...new Set(myLeaves.map(leave => leave.companyName).filter(Boolean))].sort(), 'All Companies');
+            updateOptions('employeeDepartmentFilter', [...new Set(myLeaves.map(leave => leave.departmentName).filter(Boolean))].sort(), 'All Departments');
 
             let filteredLeaves = myLeaves;
             if (selectedMonth !== 'all') {
@@ -3316,6 +4247,33 @@
                     }
                     return false;
                 });
+            }
+            if (reportDateFilter) {
+                filteredLeaves = filteredLeaves.filter(leave => normalizeDateValue(leave.reportFillDate) === reportDateFilter);
+            }
+            if (companyFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.companyName || '') === companyFilter);
+            }
+            if (departmentFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.departmentName || '') === departmentFilter);
+            }
+            if (fullLeaveFilter) {
+                filteredLeaves = filteredLeaves.filter(leave => String(leave.fullLeaveDate || '').toLowerCase().includes(fullLeaveFilter));
+            }
+            if (firstHalfFilter) {
+                filteredLeaves = filteredLeaves.filter(leave => String(leave.firstHalfDate || '').toLowerCase().includes(firstHalfFilter));
+            }
+            if (secondHalfFilter) {
+                filteredLeaves = filteredLeaves.filter(leave => String(leave.secondHalfDate || '').toLowerCase().includes(secondHalfFilter));
+            }
+            if (daysFilter !== '') {
+                filteredLeaves = filteredLeaves.filter(leave => String(leave.totalLeaveDays ?? '') === daysFilter);
+            }
+            if (statusFilter !== 'all') {
+                filteredLeaves = filteredLeaves.filter(leave => (leave.status || 'Pending') === statusFilter);
+            }
+            if (actionByFilter) {
+                filteredLeaves = filteredLeaves.filter(leave => String(leave.actionBy || '').toLowerCase().includes(actionByFilter));
             }
 
             let pendingDays = 0;
@@ -3491,6 +4449,7 @@
                         <div class="action-btn-group">
                             <button class="action-btn btn-approve" onclick="updateLeaveStatus(${leave.id}, 'Approved')"><i class="fa-solid fa-check"></i></button>
                             <button class="action-btn btn-reject" onclick="updateLeaveStatus(${leave.id}, 'Rejected')"><i class="fa-solid fa-xmark"></i></button>
+                            <button class="action-btn" style="background: #2563eb;" onclick="editTlRequest(${leave.id})" title="Edit Request"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-btn btn-delete" onclick="deleteLeaveRequest(${leave.id})" title="Delete Request"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
@@ -3643,7 +4602,7 @@
 
                 if (isReviewed) {
                     const targetEmpIdentifier = allLeaves[leaveIndex].employeeEmail;
-                    addNotification(targetEmpIdentifier, `Your leave request has been reviewed and marked as handled by ${currentUserName}.`);
+                    addNotification(targetEmpIdentifier, `Your leave request has been reviewed by ${currentUserName}. It has been marked as handled.`);
                 }
 
                 checkbox.checked = isReviewed;
@@ -3666,7 +4625,14 @@
                 persistStoredLeaves(allLeaves);
                    
                 const targetEmpIdentifier = allLeaves[leaveIndex].employeeEmail;
-                addNotification(targetEmpIdentifier, `Your leave request for ${allLeaves[leaveIndex].totalLeaveDays} day(s) has been ${newStatus} by ${currentUserName}.`);
+                const employeeName = allLeaves[leaveIndex].employeeFullName || 'the employee';
+                const statusMessage = newStatus === 'Approved'
+                    ? 'approved'
+                    : newStatus === 'Rejected'
+                        ? 'rejected'
+                        : newStatus.toLowerCase();
+                addNotification(targetEmpIdentifier, `Your leave request (${allLeaves[leaveIndex].reportFillDate || 'no report date'}) has been ${statusMessage} by ${currentUserName}.`);
+                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}.`);
 
                 loadTlApprovals();
                 loadManagementRequests();
@@ -3674,6 +4640,91 @@
                 alert(`✅ Leave request successfully marked as ${newStatus}!`);
             }
         };
+
+        let currentTlEditLeaveId = null;
+
+        window.closeTlEditModal = function() {
+            currentTlEditLeaveId = null;
+            document.getElementById('tlEditOverlay')?.classList.remove('show');
+        };
+
+        window.editTlRequest = function(leaveId) {
+            if (!(isRole('TL') || isRole('TeamLeader') || isRole('Team Leader'))) {
+                alert('❌ Only Team Leaders can edit TL requests.');
+                return;
+            }
+
+            const allLeaves = getStoredLeaves();
+            const leaveIndex = allLeaves.findIndex((leave) => leave.id === leaveId);
+            if (leaveIndex === -1) {
+                alert('❌ Leave request not found.');
+                return;
+            }
+
+            const leave = allLeaves[leaveIndex];
+            const allowedDepartments = getUserDepartments().map((department) => String(department).trim().toUpperCase());
+            if (allowedDepartments.length && !allowedDepartments.includes(String(leave.departmentName || '').trim().toUpperCase())) {
+                alert('❌ You can edit requests only from your department.');
+                return;
+            }
+
+            currentTlEditLeaveId = leaveId;
+            const fields = {
+                tlEditEmployeeName: leave.employeeFullName || '',
+                tlEditReportDate: leave.reportFillDate || '',
+                tlEditCompany: leave.companyName || '',
+                tlEditDepartment: leave.departmentName || '',
+                tlEditFullLeave: leave.fullLeaveDate || '',
+                tlEditFirstHalf: leave.firstHalfDate || '',
+                tlEditSecondHalf: leave.secondHalfDate || '',
+                tlEditDays: leave.totalLeaveDays || '0',
+                tlEditReason: leave.leaveReason || '',
+                tlEditStatus: leave.status || 'Pending',
+                tlEditActionBy: leave.actionBy || ''
+            };
+            Object.entries(fields).forEach(([id, value]) => {
+                const field = document.getElementById(id);
+                if (field) field.value = value;
+            });
+            document.getElementById('tlEditOverlay')?.classList.add('show');
+        };
+
+        document.getElementById('tlEditForm')?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (currentTlEditLeaveId === null) return;
+
+            const parsedDays = Number(document.getElementById('tlEditDays')?.value);
+            if (!Number.isFinite(parsedDays) || parsedDays < 0) {
+                alert('❌ Days must be a valid number.');
+                return;
+            }
+
+            const allLeaves = getStoredLeaves();
+            const leaveIndex = allLeaves.findIndex((leave) => leave.id === currentTlEditLeaveId);
+            if (leaveIndex === -1) {
+                alert('❌ Leave request not found.');
+                closeTlEditModal();
+                return;
+            }
+
+            allLeaves[leaveIndex] = {
+                ...allLeaves[leaveIndex],
+                fullLeaveDate: document.getElementById('tlEditFullLeave').value.trim(),
+                firstHalfDate: document.getElementById('tlEditFirstHalf').value.trim(),
+                secondHalfDate: document.getElementById('tlEditSecondHalf').value.trim(),
+                totalLeaveDays: parsedDays
+            };
+            persistStoredLeaves(allLeaves);
+            if (allLeaves[leaveIndex].employeeEmail) {
+                addNotification(allLeaves[leaveIndex].employeeEmail, `Your leave request was updated by ${currentUserName}. The Full Leave, First Half, Second Half, and Days details were changed.`);
+            }
+            addManagementNotification(`Leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} was updated by ${currentUserName}.`);
+            closeTlEditModal();
+            loadTlApprovals();
+            loadManagementRequests();
+            loadLeaveHistory();
+            alert('✅ TL request updated successfully.');
+        });
 
         window.deleteLeaveRequest = function(leaveId) {
             const confirmDelete = confirm('Are you sure you want to delete this leave request?');
@@ -3693,8 +4744,9 @@
 
             const targetEmpIdentifier = leaveToDelete.employeeEmail;
             if (targetEmpIdentifier) {
-                addNotification(targetEmpIdentifier, `Your leave request for ${leaveToDelete.totalLeaveDays} day(s) has been deleted by ${currentUserName}.`);
+                addNotification(targetEmpIdentifier, `Your leave request dated ${leaveToDelete.reportFillDate || 'without a report date'} was deleted by ${currentUserName}.`);
             }
+            addManagementNotification(`Leave request from ${leaveToDelete.employeeFullName || 'an employee'} was deleted by ${currentUserName}.`);
 
             loadTlApprovals();
             loadManagementRequests();
@@ -3704,6 +4756,28 @@
         };
 
         document.getElementById('monthFilter').addEventListener('change', loadLeaveHistory);
+        const employeeLeaveHistoryToggle = document.getElementById('employeeLeaveHistoryToggle');
+        const employeeLeaveHistoryContent = document.getElementById('employeeLeaveHistoryContent');
+        function toggleEmployeeLeaveHistory(forceOpen) {
+            if (!employeeLeaveHistoryToggle || !employeeLeaveHistoryContent) return;
+            const shouldOpen = typeof forceOpen === 'boolean'
+                ? forceOpen
+                : employeeLeaveHistoryContent.classList.contains('hidden');
+            employeeLeaveHistoryContent.classList.toggle('hidden', !shouldOpen);
+            employeeLeaveHistoryToggle.classList.toggle('open', shouldOpen);
+            employeeLeaveHistoryToggle.setAttribute('aria-expanded', String(shouldOpen));
+        }
+        employeeLeaveHistoryToggle?.addEventListener('click', () => toggleEmployeeLeaveHistory());
+        employeeLeaveHistoryToggle?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleEmployeeLeaveHistory();
+            }
+        });
+        ['employeeReportDateFilter', 'employeeCompanyFilter', 'employeeDepartmentFilter', 'employeeStatusFilter']
+            .forEach((id) => document.getElementById(id)?.addEventListener('change', loadLeaveHistory));
+        ['employeeFullLeaveFilter', 'employeeFirstHalfFilter', 'employeeSecondHalfFilter', 'employeeDaysFilter', 'employeeActionByFilter']
+            .forEach((id) => document.getElementById(id)?.addEventListener('input', loadLeaveHistory));
         document.getElementById('tlMonthFilter').addEventListener('change', loadTlApprovals);
         document.getElementById('tlSearchName').addEventListener('input', loadTlApprovals);
         document.getElementById('managementMonthFilter').addEventListener('change', loadManagementRequests);
@@ -3712,6 +4786,50 @@
         document.getElementById('managementCompanyFilter').addEventListener('change', loadManagementRequests);
         document.getElementById('managementDepartmentFilter').addEventListener('change', loadManagementRequests);
         document.getElementById('managementActionByFilter').addEventListener('change', loadManagementRequests);
+        document.getElementById('refreshUserAccountsBtn')?.addEventListener('click', loadManagementUserAccounts);
+        const managementLeaveRequestsToggle = document.getElementById('managementLeaveRequestsToggle');
+        const managementLeaveRequestsContent = document.getElementById('managementLeaveRequestsContent');
+        function toggleManagementLeaveRequests(forceOpen) {
+            if (!managementLeaveRequestsToggle || !managementLeaveRequestsContent) return;
+            const shouldOpen = typeof forceOpen === 'boolean'
+                ? forceOpen
+                : managementLeaveRequestsContent.classList.contains('hidden');
+            managementLeaveRequestsContent.classList.toggle('hidden', !shouldOpen);
+            managementLeaveRequestsToggle.classList.toggle('open', shouldOpen);
+            managementLeaveRequestsToggle.setAttribute('aria-expanded', String(shouldOpen));
+        }
+        managementLeaveRequestsToggle?.addEventListener('click', () => toggleManagementLeaveRequests());
+        managementLeaveRequestsToggle?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleManagementLeaveRequests();
+            }
+        });
+        const managementAccountsToggle = document.getElementById('managementAccountsToggle');
+        const managementAccountsContent = document.getElementById('managementAccountsContent');
+        const toggleManagementAccounts = (forceOpen) => {
+            if (!managementAccountsToggle || !managementAccountsContent) return;
+            const shouldOpen = typeof forceOpen === 'boolean'
+                ? forceOpen
+                : managementAccountsContent.classList.contains('hidden');
+            managementAccountsContent.classList.toggle('hidden', !shouldOpen);
+            managementAccountsToggle.classList.toggle('open', shouldOpen);
+            managementAccountsToggle.setAttribute('aria-expanded', String(shouldOpen));
+        };
+        managementAccountsToggle?.addEventListener('click', () => toggleManagementAccounts());
+        managementAccountsToggle?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleManagementAccounts();
+            }
+        });
+        ['managementUserNameFilter', 'managementUserRoleFilter', 'managementUserDepartmentFilter', 'managementUserStatusFilter']
+            .forEach((id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener(element.tagName === 'INPUT' ? 'input' : 'change', loadManagementUserAccounts);
+                }
+            });
 
         const managementReportMenu = document.getElementById('managementReportMenu');
         const managementNavLink = document.getElementById('menuManagement');
@@ -3719,9 +4837,20 @@
             document.querySelectorAll('.report-dropdown-item').forEach((button) => {
                 button.addEventListener('click', () => {
                     const type = button.dataset.reportType || 'Report';
+                    const clickedMenu = button.closest('.management-submenu');
+                    const owner = clickedMenu?.id === 'employeeReportMenu'
+                        ? 'employee'
+                        : clickedMenu?.id === 'tlReportMenu'
+                            ? 'tl'
+                            : 'management';
+                    reportMenus.forEach((menu) => menu.classList.add('hidden'));
                     managementReportMenu.classList.add('hidden');
+                    setMenuChevron(employeeMenuChevron, false);
+                    setMenuChevron(tlMenuChevron, false);
+                    setMenuChevron(managementMenuChevron, false);
                     if (['Daily Report', 'Monthly Report', 'Periodic Report'].includes(type)) {
-                        setManagementReportView(type);
+                        switchTab(owner);
+                        openRoleReport(type, owner);
                     } else {
                         setManagementReportView('Management');
                         alert(`${type} selected. Export is based on the current filtered management data.`);
@@ -3730,13 +4859,24 @@
             });
         }
 
-        if (managementReportMenu && managementNavLink) {
-            document.addEventListener('click', (event) => {
-                if (!managementReportMenu.contains(event.target) && !managementNavLink.contains(event.target)) {
-                    managementReportMenu.classList.add('hidden');
-                }
-            });
-        }
+        document.addEventListener('click', (event) => {
+            const menuLinks = [
+                managementNavLink,
+                document.getElementById('menuEmployee'),
+                document.getElementById('menuTL')
+            ].filter(Boolean);
+            const clickedInsideMenu = reportMenus.some((menu) => menu.contains(event.target))
+                || (managementReportMenu && managementReportMenu.contains(event.target));
+            const clickedMenuLink = menuLinks.some((link) => link.contains(event.target));
+
+            if (!clickedInsideMenu && !clickedMenuLink) {
+                reportMenus.forEach((menu) => menu.classList.add('hidden'));
+                if (managementReportMenu) managementReportMenu.classList.add('hidden');
+                setMenuChevron(employeeMenuChevron, false);
+                setMenuChevron(tlMenuChevron, false);
+                setMenuChevron(managementMenuChevron, false);
+            }
+        });
 
         function getFilteredManagementLeaves() {
             const selectedMonth = document.getElementById('managementMonthFilter').value;
@@ -3797,108 +4937,11 @@
             }
 
             const leaves = getFilteredManagementLeaves();
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const fontSize = 8;
-            const headerHeight = 12;
-            const rowPadding = 2;
-            const columns = [
-                { title: 'Report Date', width: 24 },
-                { title: 'Company', width: 26 },
-                { title: 'Department', width: 28 },
-                { title: 'Employee Name', width: 30 },
-                { title: 'Full Leave', width: 25 },
-                { title: 'First Half', width: 22 },
-                { title: 'Second Half', width: 22 },
-                { title: 'Reason', width: 36 },
-                { title: 'Days', width: 14 },
-                { title: 'Status', width: 20 },
-                { title: 'Action By', width: 24 },
-                { title: 'Reviewed', width: 18 }
-            ];
-
-            let x = 10;
-            let y = 18;
-            const maxWidth = pageWidth - 20;
-
-            const totalColumnWidth = columns.reduce((sum, col) => sum + col.width, 0);
-            const scale = totalColumnWidth > maxWidth ? maxWidth / totalColumnWidth : 1;
-
-            doc.setFontSize(16);
-            doc.setTextColor(15, 23, 42);
-            doc.text('All Leave Requests', 10, 12);
-
             if (leaves.length === 0) {
-                doc.setFontSize(10);
-                doc.text('No approved leave requests found for the selected filters.', 10, 30);
-                doc.save('approved_leave_report.pdf');
+                showExportNotice('No approved leave requests found for the selected filters.');
                 return;
             }
-
-            columns.forEach((column) => {
-                const colWidth = column.width * scale;
-                doc.setFillColor(30, 41, 59);
-                doc.setDrawColor(148, 163, 184);
-                doc.setTextColor(255, 255, 255);
-                doc.rect(x, y, colWidth, headerHeight, 'F');
-                doc.rect(x, y, colWidth, headerHeight);
-                doc.setFontSize(8);
-                doc.text(column.title, x + 2, y + 8, { maxWidth: colWidth - 4 });
-                x += colWidth;
-            });
-            x = 10;
-            y += headerHeight;
-
-            leaves.forEach((leave) => {
-                const rowValues = [
-                    leave.reportFillDate || '-',
-                    leave.companyName || '-',
-                    leave.departmentName || '-',
-                    leave.employeeFullName || '-',
-                    leave.fullLeaveDate || '-',
-                    leave.firstHalfDate || '-',
-                    leave.secondHalfDate || '-',
-                    leave.leaveReason || '-',
-                    leave.totalLeaveDays || '0',
-                    leave.status || 'Pending',
-                    leave.actionBy || '-',
-                    leave.managementReviewed ? 'Yes' : (leave.reviewed ? 'Yes' : 'No')
-                ];
-
-                const maxRowsNeeded = Math.max(...rowValues.map(value => {
-                    const text = String(value);
-                    const wrapped = doc.splitTextToSize(text, columns[rowValues.indexOf(value)].width * scale - 4);
-                    return wrapped.length;
-                }));
-
-                const rowHeight = Math.max(10, maxRowsNeeded * 4 + rowPadding * 2);
-                if (y + rowHeight > pageHeight - 12) {
-                    doc.addPage();
-                    y = 12;
-                    x = 10;
-                }
-
-                rowValues.forEach((value, index) => {
-                    const colWidth = columns[index].width * scale;
-                    const lines = doc.splitTextToSize(String(value), colWidth - 4);
-                    const textLines = lines.length > 0 ? lines : [''];
-                    const effectiveRowHeight = Math.max(rowHeight, textLines.length * 4 + rowPadding * 2);
-                    doc.setFillColor(index % 2 === 0 ? 248 : 255);
-                    doc.setDrawColor(203, 213, 225);
-                    doc.setTextColor(15, 23, 42);
-                    doc.rect(x, y, colWidth, effectiveRowHeight, 'FD');
-                    const textY = y + 4 + (effectiveRowHeight - textLines.length * 4) / 2;
-                    doc.text(textLines, x + 2, textY, { baseline: 'top' });
-                    x += colWidth;
-                });
-
-                x = 10;
-                y += Math.max(10, rowValues.length > 0 ? (Math.max(...rowValues.map(value => doc.splitTextToSize(String(value), columns[rowValues.indexOf(value)].width * scale - 4).length)) * 4 + rowPadding * 2) : 10);
-            });
-
-            doc.save('approved_leave_report.pdf');
+            createLeaveTablePdf(leaves, 'All Leave Requests', 'approved_leave_report.pdf');
         }
 
         function exportManagementToExcel() {
@@ -4021,19 +5064,20 @@
             allLeaves.unshift(newLeave);
             persistStoredLeaves(allLeaves);
 
-            addNotification(userIdentifier, `Your leave application was successfully submitted to ${selectedDept} department TL.`);
+            addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review.`);
 
             let deptNotifsKey = `dept_notifications_${selectedDept}`;
             let deptNotifs = JSON.parse(localStorage.getItem(deptNotifsKey)) || [];
             deptNotifs.unshift({
                 id: Date.now(),
-                message: `New leave request received from ${fullName} (${selectedDept})`,
+                message: `New leave request from ${fullName} (${selectedDept}) is waiting for your review.`,
                 read: false,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
             localStorage.setItem(deptNotifsKey, JSON.stringify(deptNotifs));
+            addManagementNotification(`New leave request submitted by ${fullName} for the ${selectedDept} department. Status: Pending.`);
 
-            alert('✅ Success! Your leave request has been submitted to your department TL.');
+            alert('✅ Your leave request was submitted successfully. The department Team Leader has been notified.');
             this.reset();
             setEmployeeNameOnLeaveForm();
             applyLeaveFormAutoDefaults();

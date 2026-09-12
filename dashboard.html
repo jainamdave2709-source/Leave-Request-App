@@ -462,6 +462,20 @@
         .notif-item.unread {
             background: rgba(99, 102, 241, 0.08);
         }
+        .notif-item {
+            cursor: pointer;
+            border-left: 4px solid #64748b;
+        }
+        .notif-item.notification-approved { border-left-color: #10b981; }
+        .notif-item.notification-rejected { border-left-color: #ef4444; }
+        .notif-item.notification-edited { border-left-color: #3b82f6; }
+        .notif-item.notification-remarks { border-left-color: #a855f7; }
+        .notif-item.notification-submitted { border-left-color: #f59e0b; }
+        .notif-title {
+            font-weight: 700;
+            color: #f8fafc;
+            font-size: 12px;
+        }
 
         .notif-time {
             font-size: 10px;
@@ -512,11 +526,13 @@
         .stat-card.taken { background: #eef2ff; border: 1px solid #c7d2fe; }
         .stat-card.balance { background: #ecfdf5; border: 1px solid #a7f3d0; }
         .stat-card.approved-counter { background: #f0fdf4; border: 1px solid #bbf7d0; }
+        .stat-card.rejected-counter { background: #fef2f2; border: 1px solid #fecaca; }
 
         .stat-card-title { font-size: 16px; font-weight: 700; }
         .stat-card.taken .stat-card-title { color: #3730a3; }
         .stat-card.balance .stat-card-title { color: #065f46; }
         .stat-card.approved-counter .stat-card-title { color: #166534; }
+        .stat-card.rejected-counter .stat-card-title { color: #b91c1c; }
 
         .stat-badge-box { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; }
         .stat-circle {
@@ -525,10 +541,12 @@
         .stat-card.taken .stat-circle { background: #4f46e5; }
         .stat-card.balance .stat-circle { background: #059669; }
         .stat-card.approved-counter .stat-circle { background: #16a34a; }
+        .stat-card.rejected-counter .stat-circle { background: #dc2626; }
 
         .stat-card.taken .stat-badge-box span:last-child { color: #3730a3; }
         .stat-card.balance .stat-badge-box span:last-child { color: #065f46; }
         .stat-card.approved-counter .stat-badge-box span:last-child { color: #166534; }
+        .stat-card.rejected-counter .stat-badge-box span:last-child { color: #b91c1c; }
 
         /* clickable stat boxes */
         .clickable-stat { cursor: pointer; transition: transform 0.12s ease, box-shadow 0.12s ease; }
@@ -664,6 +682,15 @@
         .btn-reject { background: #ef4444; }
         .btn-delete { background: #f59e0b; }
         .new-request-row { background: rgba(245, 158, 11, 0.10); box-shadow: inset 3px 0 0 #f59e0b; }
+        .notification-target-row {
+            animation: notificationRowPulse 2.5s ease;
+            outline: 2px solid #60a5fa;
+            outline-offset: -2px;
+        }
+        @keyframes notificationRowPulse {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(59, 130, 246, 0.28); }
+        }
         .review-checkbox {
             width: 18px; height: 18px; accent-color: #10b981; cursor: pointer; display: block; margin: 0 auto;
             -webkit-appearance: checkbox; appearance: checkbox;
@@ -1478,6 +1505,7 @@
                 <div class="tl-edit-field"><label>First Half</label><input id="tlEditFirstHalf"></div>
                 <div class="tl-edit-field"><label>Second Half</label><input id="tlEditSecondHalf"></div>
                 <div class="tl-edit-field"><label>Days</label><input id="tlEditDays" type="number" min="0" step="0.5" required></div>
+                <div class="tl-edit-field full-width"><label>Remark</label><textarea id="tlEditRemark" placeholder="Write a remark for this leave request..."></textarea></div>
                 <div class="tl-edit-field full-width"><label>Reason</label><textarea id="tlEditReason" readonly></textarea></div>
                 <div class="tl-edit-field"><label>Status</label><input id="tlEditStatus" readonly></div>
                 <div class="tl-edit-field"><label>Action By</label><input id="tlEditActionBy" readonly></div>
@@ -1975,6 +2003,13 @@
                             <span>Accounts</span>
                         </div>
                     </div>
+                    <div class="stat-card rejected-counter" style="cursor: default;">
+                        <div class="stat-card-title">Deleted Accounts:</div>
+                        <div class="stat-badge-box">
+                            <div class="stat-circle" id="mgmtDeletedAccountsCountBadge">0</div>
+                            <span>Accounts</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="history-section" style="margin-bottom: 20px;">
@@ -2016,6 +2051,29 @@
                                 </select>
                             </div>
                             <button type="button" class="generate-report-btn" id="refreshUserAccountsBtn">Refresh</button>
+                            <div class="management-export-controls">
+                                <div class="export-radio-group">
+                                    <label class="export-choice">
+                                        <input type="radio" name="accountsExportFormat" value="pdf" checked>
+                                        <span class="custom-radio"></span>
+                                        <span>PDF</span>
+                                    </label>
+                                    <label class="export-choice">
+                                        <input type="radio" name="accountsExportFormat" value="excel">
+                                        <span class="custom-radio"></span>
+                                        <span>Excel</span>
+                                    </label>
+                                    <label class="export-choice">
+                                        <input type="radio" name="accountsExportFormat" value="google_sheet">
+                                        <span class="custom-radio"></span>
+                                        <span>Google Sheet</span>
+                                    </label>
+                                </div>
+                                <div class="export-email-inline">
+                                    <input type="email" id="accountsGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Enter email address" aria-label="Accounts Google Sheet email">
+                                </div>
+                                <button type="button" class="generate-report-btn" id="exportAccountsBtn">Export</button>
+                            </div>
                         </div>
 
                         <div class="table-responsive">
@@ -2197,6 +2255,60 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="history-section" style="margin-top: 20px;">
+                <div id="managementActionHistoryToggle" class="delete-history-toggle" role="button" tabindex="0" aria-expanded="false">
+                    <div class="delete-history-toggle-label">
+                        <i class="fa-solid fa-clock-rotate-left" style="color: #8b5cf6;"></i>
+                        <span>Action History</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div id="managementActionHistoryContent" class="hidden" style="margin-top: 14px;">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+                        <div class="month-filter-box">
+                            <label for="actionHistoryDateFilter">Date:</label>
+                            <input type="date" id="actionHistoryDateFilter">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="actionHistoryFromFilter">Periodic From:</label>
+                            <input type="date" id="actionHistoryFromFilter">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="actionHistoryToFilter">Periodic To:</label>
+                            <input type="date" id="actionHistoryToFilter">
+                        </div>
+                        <div class="month-filter-box">
+                            <label for="actionHistoryMonthFilter">Month:</label>
+                            <select id="actionHistoryMonthFilter">
+                                <option value="all">All Months</option>
+                                <option value="01">January</option><option value="02">February</option>
+                                <option value="03">March</option><option value="04">April</option>
+                                <option value="05">May</option><option value="06">June</option>
+                                <option value="07">July</option><option value="08">August</option>
+                                <option value="09">September</option><option value="10">October</option>
+                                <option value="11">November</option><option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="management-export-controls">
+                            <div class="export-radio-group">
+                                <label class="export-choice">
+                                    <input type="radio" name="actionHistoryExportFormat" value="pdf" checked>
+                                    <span class="custom-radio"></span>
+                                    <span>PDF</span>
+                                </label>
+                                <label class="export-choice">
+                                    <input type="radio" name="actionHistoryExportFormat" value="excel">
+                                    <span class="custom-radio"></span>
+                                    <span>Excel</span>
+                                </label>
+                            </div>
+                            <button type="button" class="generate-report-btn" id="exportActionHistoryBtn">Export</button>
+                        </div>
+                    </div>
+                    <div id="managementActionHistoryList" class="delete-history-list"></div>
                 </div>
             </div>
 
@@ -2502,6 +2614,35 @@
             return [];
         }
 
+        function applyRoleBasedPanelVisibility() {
+            const menuMap = {
+                Employee: document.getElementById('menuEmployee'),
+                TL: document.getElementById('menuTL'),
+                Management: document.getElementById('menuManagement')
+            };
+            const panelMap = {
+                Employee: document.getElementById('employeePanel'),
+                TL: document.getElementById('tlPanel'),
+                Management: document.getElementById('managementPanel')
+            };
+
+            const roleKey = isRole('Management')
+                ? 'Management'
+                : (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader'))
+                    ? 'TL'
+                    : isRole('Employee')
+                        ? 'Employee'
+                        : '';
+
+            Object.entries(menuMap).forEach(([key, menu]) => {
+                const menuItem = menu?.closest('li');
+                if (menuItem) menuItem.classList.toggle('hidden', key !== roleKey);
+            });
+            Object.entries(panelMap).forEach(([key, panel]) => {
+                if (panel) panel.classList.toggle('hidden', key !== roleKey);
+            });
+        }
+
         async function refreshUserDepartmentFromFirebase() {
             if (!userData) return;
             const currentDept = String(userData.department || '').trim();
@@ -2571,6 +2712,7 @@
                 menuTL.classList.add('locked'); lockTL.classList.remove('hidden');
                 menuMgmt.classList.remove('locked'); lockMgmt.classList.add('hidden');
             }
+            applyRoleBasedPanelVisibility();
         }
 
         function updateSidebarToggleState() {
@@ -2695,30 +2837,95 @@
             return `notifications_${userIdentifier}`;
         }
 
-        function addNotification(targetUserIdentifier, message) {
+        function addNotification(targetUserIdentifier, message, details = {}) {
             let userNotifs = JSON.parse(localStorage.getItem(`notifications_${targetUserIdentifier}`)) || [];
             userNotifs.unshift({
                 id: Date.now(),
                 message: message,
+                title: details.title || 'Notification',
+                type: details.type || 'info',
+                leaveId: details.leaveId || null,
                 read: false,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
             localStorage.setItem(`notifications_${targetUserIdentifier}`, JSON.stringify(userNotifs));
         }
 
-        function addSharedNotification(storageKey, message) {
+        function addSharedNotification(storageKey, message, details = {}) {
             const notifications = JSON.parse(localStorage.getItem(storageKey)) || [];
             notifications.unshift({
                 id: Date.now(),
                 message,
+                title: details.title || 'Notification',
+                type: details.type || 'info',
+                leaveId: details.leaveId || null,
                 read: false,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
             localStorage.setItem(storageKey, JSON.stringify(notifications));
         }
 
-        function addManagementNotification(message) {
-            addSharedNotification('management_notifications', message);
+        function addManagementNotification(message, details = {}) {
+            addSharedNotification('management_notifications', message, details);
+        }
+
+        function getNotificationClass(type) {
+            return `notification-${['approved', 'rejected', 'edited', 'remarks', 'submitted'].includes(type) ? type : 'info'}`;
+        }
+
+        function renderNotificationItems(listContainer, notifications) {
+            listContainer.innerHTML = '';
+            if (!notifications.length) {
+                listContainer.innerHTML = `<div class="notif-item">No notifications found</div>`;
+                return;
+            }
+            notifications.forEach((notification) => {
+                const div = document.createElement('div');
+                div.className = `notif-item ${notification.read ? '' : 'unread'} ${getNotificationClass(notification.type)}`;
+                div.dataset.leaveId = notification.leaveId || '';
+                const title = document.createElement('span');
+                title.className = 'notif-title';
+                title.textContent = notification.title || 'Notification';
+                const message = document.createElement('span');
+                message.textContent = notification.message || '';
+                const time = document.createElement('span');
+                time.className = 'notif-time';
+                time.textContent = notification.time || '';
+                div.append(title, message, time);
+                div.addEventListener('click', () => {
+                    notification.read = true;
+                    markNotificationRead(notification.id);
+                    if (notification.leaveId !== null && notification.leaveId !== undefined) {
+                        openNotificationRequest(notification.leaveId);
+                    }
+                    loadNotifications();
+                });
+                listContainer.appendChild(div);
+            });
+        }
+
+        function markNotificationRead(notificationId) {
+            const keys = [getNotificationKey(), 'management_notifications', ...getDepartmentNotificationKeys()];
+            keys.forEach((key) => {
+                const stored = JSON.parse(localStorage.getItem(key) || '[]');
+                const updated = stored.map((item) => item.id === notificationId ? { ...item, read: true } : item);
+                localStorage.setItem(key, JSON.stringify(updated));
+            });
+        }
+
+        function openNotificationRequest(leaveId) {
+            const targetId = String(leaveId);
+            const role = isRole('Management') ? 'management' : (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) ? 'tl' : 'employee';
+            switchTab(role);
+            if (role === 'employee') toggleEmployeeLeaveHistory(true);
+            if (role === 'management') toggleManagementLeaveRequests(true);
+            window.setTimeout(() => {
+                const row = document.querySelector(`[data-leave-row-id="${CSS.escape(targetId)}"]`);
+                if (!row) return;
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                row.classList.add('notification-target-row');
+                window.setTimeout(() => row.classList.remove('notification-target-row'), 2500);
+            }, 100);
         }
 
         function getDepartmentNotificationKeys() {
@@ -2741,91 +2948,21 @@
         function loadNotifications() {
             const listContainer = document.getElementById('notificationListContainer');
             const badgeCount = document.getElementById('notificationBadgeCount');
-
+            if (!listContainer || !badgeCount) return;
+            let notifications = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
-                let deptNotifs = [];
                 getDepartmentNotificationKeys().forEach(key => {
-                    const notifications = JSON.parse(localStorage.getItem(key)) || [];
-                    deptNotifs = deptNotifs.concat(notifications);
-                });
-
-                let personalNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
-                let combined = [...deptNotifs, ...personalNotifs];
-
-                listContainer.innerHTML = '';
-
-                let unreadCount = combined.filter(n => !n.read).length;
-                if (unreadCount > 0) {
-                    badgeCount.innerText = unreadCount;
-                    badgeCount.classList.remove('hidden');
-                } else if (isRole('Management') || isRole('MANAGEMENT')) {
-                    const managementNotifs = JSON.parse(localStorage.getItem('management_notifications')) || [];
-                    const personalNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
-                    const combined = [...managementNotifs, ...personalNotifs];
-                    listContainer.innerHTML = '';
-                    const unreadCount = combined.filter(n => !n.read).length;
-                    if (unreadCount > 0) {
-                        badgeCount.innerText = unreadCount;
-                        badgeCount.classList.remove('hidden');
-                    } else {
-                        badgeCount.classList.add('hidden');
-                    }
-                    if (combined.length === 0) {
-                        listContainer.innerHTML = `<div class="notif-item">No notifications found</div>`;
-                        return;
-                    }
-                    combined.forEach(notif => {
-                        const div = document.createElement('div');
-                        div.className = `notif-item ${notif.read ? '' : 'unread'}`;
-                        div.innerHTML = `<span>${notif.message}</span><span class="notif-time">${notif.time}</span>`;
-                        listContainer.appendChild(div);
-                    });
-                } else {
-                    badgeCount.classList.add('hidden');
-                }
-
-                if (combined.length === 0) {
-                    listContainer.innerHTML = `<div class="notif-item">No notifications found</div>`;
-                    return;
-                }
-
-                combined.forEach(notif => {
-                    const div = document.createElement('div');
-                    div.className = `notif-item ${notif.read ? '' : 'unread'}`;
-                    div.innerHTML = `
-                        <span>${notif.message}</span>
-                        <span class="notif-time">${notif.time}</span>
-                    `;
-                    listContainer.appendChild(div);
-                });
-            } else {
-                let userNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
-
-                listContainer.innerHTML = '';
-
-                let unreadCount = userNotifs.filter(n => !n.read).length;
-                if (unreadCount > 0) {
-                    badgeCount.innerText = unreadCount;
-                    badgeCount.classList.remove('hidden');
-                } else {
-                    badgeCount.classList.add('hidden');
-                }
-
-                if (userNotifs.length === 0) {
-                    listContainer.innerHTML = `<div class="notif-item">No notifications found</div>`;
-                    return;
-                }
-
-                userNotifs.forEach(notif => {
-                    const div = document.createElement('div');
-                    div.className = `notif-item ${notif.read ? '' : 'unread'}`;
-                    div.innerHTML = `
-                        <span>${notif.message}</span>
-                        <span class="notif-time">${notif.time}</span>
-                    `;
-                    listContainer.appendChild(div);
+                    notifications = notifications.concat(JSON.parse(localStorage.getItem(key)) || []);
                 });
             }
+            if (isRole('Management') || isRole('MANAGEMENT')) {
+                notifications = notifications.concat(JSON.parse(localStorage.getItem('management_notifications')) || []);
+            }
+            notifications.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
+            const unreadCount = notifications.filter(n => !n.read).length;
+            badgeCount.innerText = unreadCount;
+            badgeCount.classList.toggle('hidden', unreadCount === 0);
+            renderNotificationItems(listContainer, notifications);
         }
 
         window.setInterval(() => {
@@ -3529,7 +3666,7 @@
                 if (isRole("Employee")) {
                     if (tabName === 'employee') hasAccess = true;
                 } else if (isRole("TL") || isRole("TeamLeader") || isRole("Team Leader")) {
-                    if (tabName === 'employee' || tabName === 'tl') hasAccess = true;
+                    if (tabName === 'tl') hasAccess = true;
                 } else if (isRole("Management") || isRole("MANAGEMENT")) {
                     if (tabName === 'management') hasAccess = true;
                 }
@@ -3603,10 +3740,161 @@
                 renderDeleteHistory();
                 toggleDeleteHistoryList(false);
                 toggleManagementLeaveRequests(false);
+                toggleActionHistory(false);
             }
         }
 
         const DELETE_HISTORY_KEY = 'managementDeleteHistory';
+        const ACTION_HISTORY_KEY = 'managementActionHistory';
+
+        function getActionHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(ACTION_HISTORY_KEY)) || [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function recordActionHistory(action, leave, details = {}) {
+            const history = getActionHistory();
+            history.unshift({
+                id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                action,
+                actionAt: new Date().toISOString(),
+                actionBy: currentUserName || 'System',
+                leaveId: leave?.id || null,
+                employeeName: leave?.employeeFullName || 'Unknown',
+                company: leave?.companyName || '',
+                department: leave?.departmentName || '',
+                reportDate: leave?.reportFillDate || '',
+                status: leave?.status || 'Pending',
+                remark: details.remark || ''
+            });
+            localStorage.setItem(ACTION_HISTORY_KEY, JSON.stringify(history.slice(0, 200)));
+        }
+
+        function toggleActionHistory(forceOpen) {
+            const toggle = document.getElementById('managementActionHistoryToggle');
+            const content = document.getElementById('managementActionHistoryContent');
+            if (!toggle || !content) return;
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : content.classList.contains('hidden');
+            content.classList.toggle('hidden', !shouldOpen);
+            toggle.classList.toggle('open', shouldOpen);
+            toggle.setAttribute('aria-expanded', String(shouldOpen));
+            if (shouldOpen) renderActionHistory();
+        }
+
+        function renderActionHistory() {
+            const container = document.getElementById('managementActionHistoryList');
+            if (!container) return;
+            const entries = getFilteredActionHistory();
+            if (!entries.length) {
+                container.innerHTML = '<div style="padding: 14px 16px; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; color: #cbd5e1;">No action history found.</div>';
+                return;
+            }
+            container.innerHTML = entries.map((entry) => `
+                <div style="padding: 12px 16px; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 12px; background: rgba(15, 23, 42, 0.55); color: #e2e8f0; margin-top: 10px;">
+                    <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                        <strong>${escapeDeleteHistoryText(entry.action)}: ${escapeDeleteHistoryText(entry.employeeName)}</strong>
+                        <span style="color:#a78bfa; font-size:12px;">${new Date(entry.actionAt).toLocaleString()}</span>
+                    </div>
+                    <div style="margin-top:6px; color:#cbd5e1; font-size:13px;">
+                        ${escapeDeleteHistoryText(entry.company || 'N/A')} • ${escapeDeleteHistoryText(entry.department || 'N/A')} • Report Date: ${escapeDeleteHistoryText(entry.reportDate || 'N/A')} • By: ${escapeDeleteHistoryText(entry.actionBy)}
+                    </div>
+                    ${entry.remark ? `<div style="margin-top:6px; color:#c4b5fd;">Remark: ${escapeDeleteHistoryText(entry.remark)}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function getFilteredActionHistory() {
+            const dateFilter = document.getElementById('actionHistoryDateFilter')?.value || '';
+            const fromFilter = document.getElementById('actionHistoryFromFilter')?.value || '';
+            const toFilter = document.getElementById('actionHistoryToFilter')?.value || '';
+            const monthFilter = document.getElementById('actionHistoryMonthFilter')?.value || 'all';
+            return getActionHistory().filter((entry) => {
+                const actionDate = new Date(entry.actionAt);
+                if (Number.isNaN(actionDate.getTime())) return false;
+                const day = entry.actionAt.slice(0, 10);
+                if (dateFilter && day !== dateFilter) return false;
+                if (fromFilter && day < fromFilter) return false;
+                if (toFilter && day > toFilter) return false;
+                if (monthFilter !== 'all' && String(actionDate.getMonth() + 1).padStart(2, '0') !== monthFilter) return false;
+                return true;
+            });
+        }
+
+        function exportActionHistory() {
+            const entries = getFilteredActionHistory();
+            if (!entries.length) {
+                showExportNotice('No action history matches the selected filters.');
+                return;
+            }
+            const rows = entries.map((entry) => ({
+                Action: entry.action || '',
+                'Action Date': new Date(entry.actionAt).toLocaleString(),
+                'Employee Name': entry.employeeName || '',
+                Company: entry.company || '',
+                Department: entry.department || '',
+                'Report Date': entry.reportDate || '',
+                'Action By': entry.actionBy || '',
+                Remark: entry.remark || ''
+            }));
+            const format = document.querySelector('input[name="actionHistoryExportFormat"]:checked')?.value || 'pdf';
+            if (format === 'excel') {
+                if (!window.XLSX) {
+                    showExportNotice('Excel export is currently unavailable.');
+                    return;
+                }
+                const worksheet = XLSX.utils.json_to_sheet(rows);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Action History');
+                XLSX.writeFile(workbook, 'action_history.xlsx');
+                return;
+            }
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                showExportNotice('PDF export is currently unavailable.');
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const columns = ['Action', 'Action Date', 'Employee Name', 'Company', 'Department', 'Report Date', 'Action By', 'Remark'];
+            const widths = [25, 38, 38, 32, 32, 27, 34, 60];
+            let y = 20;
+            const rowHeight = 9;
+            const drawTableHeader = () => {
+                let x = 10;
+                doc.setFillColor(76, 29, 149);
+                doc.setDrawColor(71, 85, 105);
+                doc.setTextColor(255, 255, 255);
+                columns.forEach((column, index) => {
+                    doc.rect(x, y, widths[index], rowHeight, 'FD');
+                    doc.text(column, x + 2, y + 6);
+                    x += widths[index];
+                });
+                doc.setTextColor(15, 23, 42);
+                y += rowHeight;
+            };
+            doc.setFontSize(15);
+            doc.text('Action History', 10, 12);
+            doc.setFontSize(7);
+            drawTableHeader();
+            rows.forEach((row) => {
+                if (y > 190) {
+                    doc.addPage();
+                    y = 15;
+                    drawTableHeader();
+                }
+                let x = 10;
+                columns.forEach((column, index) => {
+                    const text = String(row[column] || '-').replace(/\r?\n/g, ' ').slice(0, 52);
+                    doc.rect(x, y, widths[index], rowHeight, 'S');
+                    doc.text(text, x + 2, y + 6);
+                    x += widths[index];
+                });
+                y += rowHeight;
+            });
+            doc.save('action_history.pdf');
+        }
 
         function getDeleteHistory() {
             try {
@@ -3639,7 +3927,10 @@
             const container = document.getElementById('managementDeleteHistoryList');
             if (!container) return;
 
-            const allHistoryEntries = getDeleteHistory().slice().sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
+            const allHistoryEntries = getDeleteHistory()
+                .filter((entry) => entry.status === 'Approved')
+                .slice()
+                .sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
             const deletedHistoryCount = document.getElementById('mgmtDeletedHistoryCountBadge');
             if (deletedHistoryCount) deletedHistoryCount.innerText = allHistoryEntries.length;
 
@@ -3753,7 +4044,7 @@
         };
 
         function recordDeleteHistoryEntry(leaveToDelete) {
-            if (!leaveToDelete) return;
+            if (!leaveToDelete || leaveToDelete.status !== 'Approved') return;
 
             const historyEntries = getDeleteHistory();
             const newEntry = {
@@ -3825,11 +4116,14 @@
 
         function updateManagementAccountCounters(users) {
             const activeCount = users.filter((user) => getAccountStatusLabel(user) === 'Active').length;
-            const inactiveCount = users.length - activeCount;
+            const inactiveCount = users.filter((user) => getAccountStatusLabel(user) === 'Inactive').length;
+            const deletedCount = users.filter((user) => getAccountStatusLabel(user) === 'Deleted').length;
             const activeBadge = document.getElementById('mgmtActiveAccountsCountBadge');
             const inactiveBadge = document.getElementById('mgmtInactiveAccountsCountBadge');
+            const deletedBadge = document.getElementById('mgmtDeletedAccountsCountBadge');
             if (activeBadge) activeBadge.innerText = activeCount;
             if (inactiveBadge) inactiveBadge.innerText = inactiveCount;
+            if (deletedBadge) deletedBadge.innerText = deletedCount;
         }
 
         async function loadManagementUserAccounts() {
@@ -3899,6 +4193,106 @@
             } catch (error) {
                 console.warn('User account list failed:', error);
                 tbody.innerHTML = '<tr><td colspan="6" class="no-data">Unable to load accounts.</td></tr>';
+            }
+        }
+
+        function getAccountsExportFormat() {
+            return document.querySelector('input[name="accountsExportFormat"]:checked')?.value || 'pdf';
+        }
+
+        async function exportManagementAccounts() {
+            const snapshot = await db.ref(MANAGEMENT_USERS_KEY).once('value');
+            const nameFilter = (document.getElementById('managementUserNameFilter')?.value || '').trim().toLowerCase();
+            const roleFilter = document.getElementById('managementUserRoleFilter')?.value || 'all';
+            const departmentFilter = document.getElementById('managementUserDepartmentFilter')?.value || 'all';
+            const statusFilter = document.getElementById('managementUserStatusFilter')?.value || 'all';
+            const users = Object.values(snapshot.val() || {})
+                .filter((user) => user && ['Employee', 'TL', 'TeamLeader', 'Team Leader'].includes(user.role))
+                .filter((user) => {
+                    const name = String(user.name || user.fullName || '').toLowerCase();
+                    const role = getAccountRoleLabel(user);
+                    const department = String(user.department || user.dept || '');
+                    const status = getAccountStatusLabel(user);
+                    return (!nameFilter || name.includes(nameFilter))
+                        && (roleFilter === 'all' || role === roleFilter)
+                        && (departmentFilter === 'all' || department === departmentFilter)
+                        && (statusFilter === 'all' || status === statusFilter);
+                })
+                .sort((a, b) => String(a.name || a.email).localeCompare(String(b.name || b.email)));
+
+            const rows = users.map((user) => ({
+                Name: user.name || user.fullName || '',
+                Email: user.email || '',
+                Role: getAccountRoleLabel(user),
+                Department: user.department || user.dept || '',
+                Status: getAccountStatusLabel(user)
+            }));
+            if (!rows.length) {
+                showExportNotice('No accounts match the selected filters.');
+                return;
+            }
+
+            const format = getAccountsExportFormat();
+            const csvContent = buildCsvContentFromRows(rows, 'Employee and TL Accounts');
+            const fileName = 'employee_tl_accounts';
+            if (format === 'excel') {
+                if (!window.XLSX) {
+                    showExportNotice('Excel export is currently unavailable.');
+                    return;
+                }
+                const worksheet = XLSX.utils.json_to_sheet(rows);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Accounts');
+                XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            } else if (format === 'google_sheet') {
+                const email = getExportEmailAddress('#accountsGoogleSheetEmail');
+                if (!isValidEmail(email)) {
+                    showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
+                    return;
+                }
+                downloadCsvBlob(`${fileName}.csv`, csvContent);
+                openGoogleSheetMail(email, fileName, csvContent);
+                showExportNotice(`Google Sheet report generated. The CSV file has been downloaded and a mail draft has been opened for ${email}.`);
+            } else {
+                if (!window.jspdf || !window.jspdf.jsPDF) {
+                    showExportNotice('PDF export is currently unavailable.');
+                    return;
+                }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                doc.setFontSize(16);
+                doc.text('Employee and TL Accounts', 14, 16);
+                doc.setFontSize(9);
+                let y = 26;
+                const columns = ['Name', 'Email', 'Role', 'Department', 'Status'];
+                const widths = [45, 75, 25, 55, 35];
+                const drawHeader = () => {
+                    doc.setFillColor(30, 41, 59);
+                    doc.setTextColor(255, 255, 255);
+                    let x = 14;
+                    columns.forEach((column, index) => {
+                        doc.rect(x, y - 5, widths[index], 8, 'F');
+                        doc.text(column, x + 2, y);
+                        x += widths[index];
+                    });
+                    doc.setTextColor(15, 23, 42);
+                    y += 9;
+                };
+                drawHeader();
+                rows.forEach((row) => {
+                    if (y > 190) {
+                        doc.addPage();
+                        y = 16;
+                        drawHeader();
+                    }
+                    let x = 14;
+                    columns.forEach((column, index) => {
+                        doc.text(String(row[column] || '-').slice(0, 42), x + 2, y);
+                        x += widths[index];
+                    });
+                    y += 7;
+                });
+                doc.save(`${fileName}.pdf`);
             }
         }
 
@@ -4303,6 +4697,7 @@
                 let actionByName = leave.actionBy ? `<span class="action-by-text">By: ${leave.actionBy}</span>` : '';
 
                 const tr = document.createElement('tr');
+                tr.dataset.leaveRowId = String(leave.id);
                 tr.innerHTML = `
                     <td>${leave.reportFillDate || '-'}</td>
                     <td>${leave.companyName || '-'}</td>
@@ -4426,6 +4821,7 @@
                 let actionByName = leave.actionBy ? `<span class="action-by-text">By: ${leave.actionBy}</span>` : '';
 
                 const tr = document.createElement('tr');
+                tr.dataset.leaveRowId = String(leave.id);
                 tr.innerHTML = `
                     <td>
                         <label class="review-label" title="Mark as action taken">
@@ -4565,6 +4961,7 @@
                 let actionByName = leave.actionBy ? `<span class="action-by-text">By: ${leave.actionBy}</span>` : '';
 
                 const tr = document.createElement('tr');
+                tr.dataset.leaveRowId = String(leave.id);
                 tr.innerHTML = `
                     <td>${leave.reportFillDate || '-'}</td>
                     <td>${leave.companyName || '-'}</td>
@@ -4601,8 +4998,9 @@
                 persistStoredLeaves(allLeaves);
 
                 if (isReviewed) {
+                    recordActionHistory('Reviewed', allLeaves[leaveIndex]);
                     const targetEmpIdentifier = allLeaves[leaveIndex].employeeEmail;
-                    addNotification(targetEmpIdentifier, `Your leave request has been reviewed by ${currentUserName}. It has been marked as handled.`);
+                    addNotification(targetEmpIdentifier, `Your leave request has been reviewed by ${currentUserName}. It has been marked as handled.`, { title: 'Remarks', type: 'remarks', leaveId });
                 }
 
                 checkbox.checked = isReviewed;
@@ -4624,6 +5022,7 @@
                 allLeaves[leaveIndex].reviewedAt = new Date().toISOString();
                 persistStoredLeaves(allLeaves);
                    
+                recordActionHistory(newStatus, allLeaves[leaveIndex]);
                 const targetEmpIdentifier = allLeaves[leaveIndex].employeeEmail;
                 const employeeName = allLeaves[leaveIndex].employeeFullName || 'the employee';
                 const statusMessage = newStatus === 'Approved'
@@ -4631,8 +5030,9 @@
                     : newStatus === 'Rejected'
                         ? 'rejected'
                         : newStatus.toLowerCase();
-                addNotification(targetEmpIdentifier, `Your leave request (${allLeaves[leaveIndex].reportFillDate || 'no report date'}) has been ${statusMessage} by ${currentUserName}.`);
-                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}.`);
+                const notificationDetails = { title: newStatus === 'Approved' ? 'Approved' : newStatus === 'Rejected' ? 'Rejected' : 'Updated', type: newStatus === 'Approved' ? 'approved' : newStatus === 'Rejected' ? 'rejected' : 'edited', leaveId };
+                addNotification(targetEmpIdentifier, `Your leave request (${allLeaves[leaveIndex].reportFillDate || 'no report date'}) has been ${statusMessage} by ${currentUserName}.`, notificationDetails);
+                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}.`, notificationDetails);
 
                 loadTlApprovals();
                 loadManagementRequests();
@@ -4678,6 +5078,7 @@
                 tlEditFirstHalf: leave.firstHalfDate || '',
                 tlEditSecondHalf: leave.secondHalfDate || '',
                 tlEditDays: leave.totalLeaveDays || '0',
+                tlEditRemark: leave.tlRemark || leave.remark || '',
                 tlEditReason: leave.leaveReason || '',
                 tlEditStatus: leave.status || 'Pending',
                 tlEditActionBy: leave.actionBy || ''
@@ -4712,13 +5113,25 @@
                 fullLeaveDate: document.getElementById('tlEditFullLeave').value.trim(),
                 firstHalfDate: document.getElementById('tlEditFirstHalf').value.trim(),
                 secondHalfDate: document.getElementById('tlEditSecondHalf').value.trim(),
-                totalLeaveDays: parsedDays
+                totalLeaveDays: parsedDays,
+                tlRemark: document.getElementById('tlEditRemark').value.trim()
             };
             persistStoredLeaves(allLeaves);
+            const leaveRemark = allLeaves[leaveIndex].tlRemark;
+            recordActionHistory(leaveRemark ? 'Remark Added' : 'Edited', allLeaves[leaveIndex], { remark: leaveRemark });
+            const editNotification = {
+                title: leaveRemark ? 'Remarks' : 'Edited',
+                type: leaveRemark ? 'remarks' : 'edited',
+                leaveId: currentTlEditLeaveId
+            };
             if (allLeaves[leaveIndex].employeeEmail) {
-                addNotification(allLeaves[leaveIndex].employeeEmail, `Your leave request was updated by ${currentUserName}. The Full Leave, First Half, Second Half, and Days details were changed.`);
+                addNotification(allLeaves[leaveIndex].employeeEmail, leaveRemark
+                    ? `A remark was added to your leave request by ${currentUserName}: "${leaveRemark}"`
+                    : `Your leave request was updated by ${currentUserName}. The Full Leave, First Half, Second Half, and Days details were changed.`, editNotification);
             }
-            addManagementNotification(`Leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} was updated by ${currentUserName}.`);
+            addManagementNotification(leaveRemark
+                ? `A remark was added to the leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} by ${currentUserName}: "${leaveRemark}"`
+                : `Leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} was updated by ${currentUserName}.`, editNotification);
             closeTlEditModal();
             loadTlApprovals();
             loadManagementRequests();
@@ -4737,16 +5150,21 @@
                 alert('❌ Leave request not found.');
                 return;
             }
+            if (leaveToDelete.status !== 'Approved') {
+                alert('❌ Only TL-approved leave requests can be deleted.');
+                return;
+            }
 
             recordDeleteHistoryEntry(leaveToDelete);
+            recordActionHistory('Deleted', leaveToDelete);
             allLeaves = allLeaves.filter(l => l.id !== leaveId);
             persistStoredLeaves(allLeaves);
 
             const targetEmpIdentifier = leaveToDelete.employeeEmail;
             if (targetEmpIdentifier) {
-                addNotification(targetEmpIdentifier, `Your leave request dated ${leaveToDelete.reportFillDate || 'without a report date'} was deleted by ${currentUserName}.`);
+                addNotification(targetEmpIdentifier, `Your leave request dated ${leaveToDelete.reportFillDate || 'without a report date'} was deleted by ${currentUserName}.`, { title: 'Deleted', type: 'deleted', leaveId });
             }
-            addManagementNotification(`Leave request from ${leaveToDelete.employeeFullName || 'an employee'} was deleted by ${currentUserName}.`);
+            addManagementNotification(`Leave request from ${leaveToDelete.employeeFullName || 'an employee'} was deleted by ${currentUserName}.`, { title: 'Deleted', type: 'deleted', leaveId });
 
             loadTlApprovals();
             loadManagementRequests();
@@ -4787,6 +5205,12 @@
         document.getElementById('managementDepartmentFilter').addEventListener('change', loadManagementRequests);
         document.getElementById('managementActionByFilter').addEventListener('change', loadManagementRequests);
         document.getElementById('refreshUserAccountsBtn')?.addEventListener('click', loadManagementUserAccounts);
+        document.getElementById('exportAccountsBtn')?.addEventListener('click', () => {
+            exportManagementAccounts().catch((error) => {
+                console.error('Accounts export failed:', error);
+                showExportNotice('Accounts export failed. Please try again.');
+            });
+        });
         const managementLeaveRequestsToggle = document.getElementById('managementLeaveRequestsToggle');
         const managementLeaveRequestsContent = document.getElementById('managementLeaveRequestsContent');
         function toggleManagementLeaveRequests(forceOpen) {
@@ -4805,8 +5229,37 @@
                 toggleManagementLeaveRequests();
             }
         });
+        document.getElementById('managementActionHistoryToggle')?.addEventListener('click', () => toggleActionHistory());
+        document.getElementById('managementActionHistoryToggle')?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleActionHistory();
+            }
+        });
+        ['actionHistoryDateFilter', 'actionHistoryFromFilter', 'actionHistoryToFilter', 'actionHistoryMonthFilter'].forEach((id) => {
+            document.getElementById(id)?.addEventListener('change', renderActionHistory);
+        });
+        document.getElementById('exportActionHistoryBtn')?.addEventListener('click', exportActionHistory);
         const managementAccountsToggle = document.getElementById('managementAccountsToggle');
         const managementAccountsContent = document.getElementById('managementAccountsContent');
+        function arrangeManagementControlSections() {
+            const managementMainView = document.getElementById('managementMainView');
+            const sectionIds = [
+                'managementLeaveRequestsToggle',
+                'managementActionHistoryToggle',
+                'managementDeleteHistoryToggle',
+                'managementAccountsToggle'
+            ];
+            if (!managementMainView) return;
+
+            sectionIds.forEach((toggleId) => {
+                const toggle = document.getElementById(toggleId);
+                const section = toggle?.closest('.history-section');
+                if (section) managementMainView.appendChild(section);
+            });
+        }
+        arrangeManagementControlSections();
+
         const toggleManagementAccounts = (forceOpen) => {
             if (!managementAccountsToggle || !managementAccountsContent) return;
             const shouldOpen = typeof forceOpen === 'boolean'
@@ -5063,19 +5516,23 @@
             newLeave.managementReviewedAt = '';
             allLeaves.unshift(newLeave);
             persistStoredLeaves(allLeaves);
+            recordActionHistory('Submitted', newLeave);
 
-            addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review.`);
+            addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review.`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
             let deptNotifsKey = `dept_notifications_${selectedDept}`;
             let deptNotifs = JSON.parse(localStorage.getItem(deptNotifsKey)) || [];
             deptNotifs.unshift({
                 id: Date.now(),
                 message: `New leave request from ${fullName} (${selectedDept}) is waiting for your review.`,
+                title: 'Submitted',
+                type: 'submitted',
+                leaveId: newLeave.id,
                 read: false,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
             localStorage.setItem(deptNotifsKey, JSON.stringify(deptNotifs));
-            addManagementNotification(`New leave request submitted by ${fullName} for the ${selectedDept} department. Status: Pending.`);
+            addManagementNotification(`New leave request submitted by ${fullName} for the ${selectedDept} department. Status: Pending.`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
             alert('✅ Your leave request was submitted successfully. The department Team Leader has been notified.');
             this.reset();

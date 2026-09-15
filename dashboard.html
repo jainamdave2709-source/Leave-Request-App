@@ -1623,11 +1623,7 @@
             </div>
         </div>
 
-        <!-- Dashboard Overview Panel -->
-        <div id="dashboardPanel" class="panel-section">
-            <h3><i class="fa-solid fa-house" style="color: #6366f1; margin-right: 8px;"></i>Dashboard Overview</h3>
-            <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 0 0;">Welcome to your office leave portal dashboard. Use the sidebar to navigate through panels.</p>
-        </div>
+        <div id="dashboardPanel" class="panel-section hidden" aria-hidden="true"></div>
 
         <!-- Employee Panel -->
         <div id="employeePanel" class="panel-section hidden">
@@ -1934,7 +1930,133 @@
                 </div>
             </div>
 
+            <div class="history-section" style="margin-bottom: 20px;">
+                <button type="button" class="generate-report-btn" id="tlApplyLeaveBtn">
+                    <i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i>Apply For Leave
+                </button>
+                <div id="tlLeaveFormContent" class="hidden" style="margin-top: 16px;">
+                    <div id="tlLeaveRulesView">
+                        <button type="button" class="back-btn" id="tlBackFromRulesBtn">
+                            <i class="fa-solid fa-arrow-left"></i> Back
+                        </button>
+                        <h3><i class="fa-solid fa-circle-exclamation" style="color: #f59e0b; margin-right: 8px;"></i>Important Rules</h3>
+                        <div class="rules-box">
+                            <ol class="rules-list">
+                                <li><div class="rule-text"><span>સામાન્ય કે આકસ્મિત રજા મેળવવા માટે પણ ફોર્મ ભરવું ફરજિયાત છે.</span><span class="english">It is mandatory to fill out a form to obtain ordinary or casual leave as well.</span></div></li>
+                                <li><div class="rule-text"><span>રજાની પૂર્વ મંજૂરી ટીમ લીડર પાસેથી લેવી ફરજિયાત છે.</span><span class="english">Obtaining prior approval for leave from the team leader is mandatory.</span></div></li>
+                                <li><div class="rule-text"><span>ફૉર્મમાં આપેલ ફૉર્મેટ પ્રમાણે જ એન્ટ્રી કરવાની રહેશે.</span><span class="english">All entries must follow the format specified in the form.</span></div></li>
+                                <li><div class="rule-text"><span>વધારાના કપાત દિવસોનું વળતર ફરીથી મળશે નહીં.</span><span class="english">Compensation for additional days of deduction will not be provided again.</span></div></li>
+                            </ol>
+                        </div>
+                        <button type="button" id="tlAgreeLeaveRulesBtn" class="rules-agree-btn">
+                            <i class="fa-solid fa-check" style="margin-right: 8px;"></i>I Agree
+                        </button>
+                    </div>
+                    <div id="tlLeaveEntryView" class="hidden">
+                        <button type="button" class="back-btn" id="tlBackToRulesBtn">
+                            <i class="fa-solid fa-arrow-left"></i> Back
+                        </button>
+                        <h4 style="color: #fff; margin-bottom: 14px;">Apply for New Leave</h4>
+                        <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 14px 0;">Fill out the details below to submit your leave request.</p>
+                        <form id="tlLeaveRequestForm" class="leave-form">
+                        <div class="form-group">
+                            <label>SELECT TEAM LEADER *</label>
+                            <div id="tlLeaveApproverList" class="checkbox-group" style="display: grid; gap: 8px; padding: 10px 12px; border: 1px solid rgba(148, 163, 184, .25); border-radius: 8px;"></div>
+                            <small>Select the Team Leader who should receive this request.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveCompany">COMPANY NAME *</label>
+                            <select id="tlLeaveCompany" required>
+                                <option value="" disabled selected>કંપની પસંદ કરો</option>
+                                <option value="WEBSANKUL">WEBSANKUL</option>
+                                <option value="HOUSIVITY">HOUSIVITY</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveDepartment">DEPARTMENT *</label>
+                            <select id="tlLeaveDepartment" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveName">EMPLOYEE NAME *</label>
+                            <input type="text" id="tlLeaveName" readonly required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveReason">LEAVE REASON *</label>
+                            <textarea id="tlLeaveReason" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveReportDate">LEAVE REPORT FILL DATE *</label>
+                            <input type="text" id="tlLeaveReportDate" placeholder="ક્લિક કરીને કેલેન્ડરથી તારીખ પસંદ કરો (dd/mm/yyyy)" readonly required style="cursor: pointer;">
+                            <small>ફક્ત કેલેન્ડર પરથી જ ડાયરેક્ટ તારીખ સિલેક્ટ કરી શકાશે (dd/mm/yyyy ફોર્મેટ).<br>The date can only be selected directly from the calendar (dd/mm/yyyy format).</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveFullDate">FULL LEAVE DATE</label>
+                            <input type="text" id="tlLeaveFullDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
+                            <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. એકથી વધુ તારીખો માટે comma (,) વાપરો.<br>Use dd/mm/yyyy format and separate multiple dates with commas (,).</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveFirstHalf">FIRST HALF LEAVE DATE</label>
+                            <input type="text" id="tlLeaveFirstHalf" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
+                            <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.<br>Use the dd/mm/yyyy format.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveSecondHalf">SECOND HALF LEAVE DATE</label>
+                            <input type="text" id="tlLeaveSecondHalf" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
+                            <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.<br>Use the dd/mm/yyyy format.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="tlLeaveDays">TOTAL DAYS OF LEAVES *</label>
+                            <input type="number" id="tlLeaveDays" min="0" step="0.5" placeholder="કુલ રજાના દિવસો લખો (દા.ત. 1)" required>
+                            <small>ફક્ત નંબર જ લખી શકાશે.<br>Only numbers are allowed.</small>
+                        </div>
+                        <button type="submit" class="submit-leave-btn"><i class="fa-solid fa-check" style="margin-right: 6px;"></i>Submit Leave Request</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="history-section" style="margin-top: 18px;">
+                    <div id="tlOwnLeaveHistoryToggle" class="delete-history-toggle" role="button" tabindex="0" aria-expanded="false">
+                        <div class="delete-history-toggle-label">
+                            <i class="fa-solid fa-clock-rotate-left" style="color: #10b981;"></i>
+                            <span>My Leave History</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div id="tlOwnLeaveHistory" class="hidden" style="margin-top: 14px;">
+                        <div class="history-header">
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+                                <div class="month-filter-box"><label for="tlOwnMonthFilter">Month:</label><select id="tlOwnMonthFilter">
+                                    <option value="all">All Months</option><option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                                </select></div>
+                                <div class="month-filter-box"><label for="tlOwnReportDateFilter">Report Date:</label><input type="date" id="tlOwnReportDateFilter" style="width: 160px;"></div>
+                                <div class="month-filter-box"><label for="tlOwnCompanyFilter">Company:</label><select id="tlOwnCompanyFilter" style="width: 140px;"><option value="all">All Companies</option></select></div>
+                                <div class="month-filter-box"><label for="tlOwnDepartmentFilter">Department:</label><select id="tlOwnDepartmentFilter" style="width: 150px;"><option value="all">All Departments</option></select></div>
+                                <div class="month-filter-box"><label for="tlOwnFullLeaveFilter">Full Leave:</label><input type="text" id="tlOwnFullLeaveFilter" placeholder="Search..." style="width: 120px;"></div>
+                                <div class="month-filter-box"><label for="tlOwnFirstHalfFilter">First Half:</label><input type="text" id="tlOwnFirstHalfFilter" placeholder="Search..." style="width: 120px;"></div>
+                                <div class="month-filter-box"><label for="tlOwnSecondHalfFilter">Second Half:</label><input type="text" id="tlOwnSecondHalfFilter" placeholder="Search..." style="width: 120px;"></div>
+                                <div class="month-filter-box"><label for="tlOwnDaysFilter">Days:</label><input type="number" id="tlOwnDaysFilter" min="0" step="0.5" placeholder="Days" style="width: 90px;"></div>
+                                <div class="month-filter-box"><label for="tlOwnStatusFilter">Status:</label><select id="tlOwnStatusFilter" style="width: 130px;"><option value="all">All Statuses</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div>
+                                <div class="month-filter-box"><label for="tlOwnActionByFilter">Action By:</label><input type="text" id="tlOwnActionByFilter" placeholder="Search..." style="width: 120px;"></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="leave-table">
+                                <thead><tr><th>Report Date</th><th>Company</th><th>Department</th><th>Employee Name</th><th>Full Leave</th><th>First Half</th><th>Second Half</th><th>Reason</th><th>Days</th><th>Status & Action By</th><th>Remark</th></tr></thead>
+                                <tbody id="tlOwnLeaveHistoryBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="history-section">
+                <div id="tlLeaveRequestsToggle" class="delete-history-toggle" role="button" tabindex="0" aria-expanded="false">
+                    <div class="delete-history-toggle-label">
+                        <i class="fa-solid fa-list-check" style="color: #38bdf8;"></i>
+                        <span>Leave Requests List</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div id="tlLeaveRequestsContent" class="hidden" style="margin-top: 14px;">
                 <div class="history-header">
                     <h4 style="color: #fff; font-size: 15px; display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-list-check" style="color: #38bdf8;"></i> Leave Requests List
@@ -2012,6 +2134,7 @@
                         </thead>
                         <tbody id="tlApprovalTableBody"></tbody>
                     </table>
+                </div>
                 </div>
             </div>
         </div>
@@ -2659,11 +2782,87 @@
 
         function getUserDepartments() {
             if (!userData) return [];
-            if (Array.isArray(userData.departments)) return userData.departments.filter(Boolean);
-            if (userData.departments && typeof userData.departments === 'object') return Object.values(userData.departments).filter(Boolean);
-            if (typeof userData.departments === 'string' && userData.departments.trim()) return [userData.departments.trim()];
-            if (typeof userData.department === 'string' && userData.department.trim()) return [userData.department.trim()];
-            return [];
+            const rawValues = [];
+            const collect = (value) => {
+                if (Array.isArray(value)) {
+                    value.forEach(collect);
+                } else if (value && typeof value === 'object') {
+                    Object.entries(value).forEach(([key, nestedValue]) => {
+                        if (typeof nestedValue === 'boolean') {
+                            if (nestedValue) rawValues.push(key);
+                        } else {
+                            collect(nestedValue);
+                        }
+                    });
+                } else if (value !== null && value !== undefined) {
+                    rawValues.push(String(value));
+                }
+            };
+
+            collect(userData.departments);
+            collect(userData.department);
+            collect(userData.dept);
+
+            return Array.from(new Set(
+                rawValues
+                    .flatMap((value) => value.split(/[,;|\n]+/))
+                    .map((value) => value.trim())
+                    .filter(Boolean)
+            ));
+        }
+
+        function normalizeDepartmentName(value) {
+            return String(value || '')
+                .replace(/\u00a0/g, ' ')
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toUpperCase();
+        }
+
+        async function loadFullUserDepartmentAccess() {
+            if (!userData || !userData.email || !db) return;
+            try {
+                const snapshot = await db.ref('users').once('value');
+                const matchedUser = Object.values(snapshot.val() || {}).find((user) => {
+                    return user && String(user.email || '').trim().toLowerCase() === String(userData.email).trim().toLowerCase();
+                });
+                if (!matchedUser) return;
+
+                const departmentValues = [];
+                const collectDepartments = (value) => {
+                    if (Array.isArray(value)) {
+                        value.forEach(collectDepartments);
+                    } else if (value && typeof value === 'object') {
+                        Object.entries(value).forEach(([key, nestedValue]) => {
+                            if (typeof nestedValue === 'boolean') {
+                                if (nestedValue) departmentValues.push(key);
+                            } else {
+                                collectDepartments(nestedValue);
+                            }
+                        });
+                    } else if (value !== null && value !== undefined) {
+                        departmentValues.push(String(value));
+                    }
+                };
+                ['departments', 'department', 'dept', 'departmentList', 'assignedDepartments', 'tlDepartments', 'managedDepartments']
+                    .forEach((key) => collectDepartments(matchedUser[key]));
+
+                const departments = Array.from(new Set(
+                    departmentValues
+                        .flatMap((value) => value.split(/[,;|]+/))
+                        .map((value) => value.trim())
+                        .filter(Boolean)
+                ));
+                if (!departments.length) return;
+
+                userData = { ...userData, departments, department: departments[0] };
+                userDept = departments[0];
+                localStorage.setItem('loggedInUser', JSON.stringify(userData));
+                document.getElementById('welcomeRoleAndDept').innerText = `Department: ${departments.join(', ')}`;
+                document.getElementById('sidebarUserDept').innerText = `Dept: ${departments.join(', ')}`;
+            } catch (error) {
+                console.warn('Full TL department access lookup failed:', error);
+            }
         }
 
         function applyRoleBasedPanelVisibility() {
@@ -2685,6 +2884,9 @@
                     : isRole('Employee')
                         ? 'Employee'
                         : '';
+
+            const dashboardMenu = document.getElementById('navDashboard')?.closest('li');
+            if (dashboardMenu) dashboardMenu.classList.add('hidden');
 
             Object.entries(menuMap).forEach(([key, menu]) => {
                 const menuItem = menu?.closest('li');
@@ -2921,6 +3123,10 @@
             addSharedNotification('management_notifications', message, details);
         }
 
+        function getLeaveNotificationSummary(leave) {
+            return `Full Leave: ${leave.fullLeaveDate || '-'} | First Half: ${leave.firstHalfDate || '-'} | Second Half: ${leave.secondHalfDate || '-'} | Days: ${leave.totalLeaveDays || '0'}`;
+        }
+
         function getNotificationClass(type) {
             return `notification-${['approved', 'rejected', 'edited', 'remarks', 'submitted'].includes(type) ? type : 'info'}`;
         }
@@ -2970,7 +3176,22 @@
             const role = isRole('Management') ? 'management' : (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) ? 'tl' : 'employee';
             switchTab(role);
             if (role === 'employee') toggleEmployeeLeaveHistory(true);
+            if (role === 'tl') toggleTlLeaveRequests(true);
             if (role === 'management') toggleManagementLeaveRequests(true);
+            if (role === 'tl') {
+                const targetLeave = getStoredLeaves().find((leave) => String(leave.id) === targetId);
+                const departmentSelect = document.getElementById('tlDeptFilter');
+                if (targetLeave && departmentSelect) {
+                    const targetDepartment = normalizeDepartmentName(targetLeave.departmentName);
+                    const matchingOption = Array.from(departmentSelect.options).find(
+                        (option) => normalizeDepartmentName(option.value) === targetDepartment
+                    );
+                    if (matchingOption) {
+                        departmentSelect.value = matchingOption.value;
+                        loadTlApprovals();
+                    }
+                }
+            }
             window.setTimeout(() => {
                 const row = document.querySelector(`[data-leave-row-id="${CSS.escape(targetId)}"]`);
                 if (!row) return;
@@ -2986,12 +3207,12 @@
 
             departments.forEach(dept => {
                 if (dept && dept.trim()) {
-                    deptKeys.push(`dept_notifications_${dept.trim()}`);
+                    deptKeys.push(`dept_notifications_${normalizeDepartmentName(dept)}`);
                 }
             });
 
             if (deptKeys.length === 0 && userDept && userDept !== 'N/A') {
-                deptKeys.push(`dept_notifications_${userDept}`);
+                deptKeys.push(`dept_notifications_${normalizeDepartmentName(userDept)}`);
             }
 
             return Array.from(new Set(deptKeys));
@@ -3753,6 +3974,7 @@
             document.getElementById('tlPanel').classList.add('hidden');
             document.getElementById('managementPanel').classList.add('hidden');
             document.getElementById('dailyReportView').classList.add('hidden');
+            if (tabName === 'tl') toggleTlLeaveRequests(false);
 
             let activeLink = null;
             if (tabName === 'dashboard') {
@@ -3768,6 +3990,9 @@
                 activeLink = document.getElementById('menuTL');
                 document.getElementById('tlPanel').classList.remove('hidden');
                 currentReportOwner = 'tl';
+                populateTlDepartmentFilter();
+                populateTlOwnLeaveFormDepartments();
+                renderTlOwnLeaveHistory();
                 loadTlApprovals();
             } else if (tabName === 'management') {
                 activeLink = document.getElementById('menuManagement');
@@ -4166,6 +4391,33 @@
             return ['TL', 'TeamLeader', 'Team Leader'].includes(user.role) ? 'TL' : 'Employee';
         }
 
+        async function populateTlLeaveApprovers() {
+            const container = document.getElementById('tlLeaveApproverList');
+            if (!container) return;
+            container.innerHTML = '<span style="color:#94a3b8;">Loading Team Leaders...</span>';
+            try {
+                const snapshot = await db.ref(MANAGEMENT_USERS_KEY).once('value');
+                const tls = Object.values(snapshot.val() || {})
+                    .filter((user) => user && ['TL', 'TeamLeader', 'Team Leader'].includes(user.role))
+                    .filter((user) => getAccountStatusLabel(user) === 'Active')
+                    .map((user) => ({
+                        name: String(user.name || user.fullName || user.email || 'Team Leader').trim(),
+                        email: String(user.email || '').trim().toLowerCase()
+                    }))
+                    .filter((user) => user.email)
+                    .sort((a, b) => a.name.localeCompare(b.name));
+                container.innerHTML = tls.length ? tls.map((tl) => `
+                    <label style="display:flex;align-items:center;gap:8px;color:#e2e8f0;cursor:pointer;">
+                        <input type="checkbox" name="tlLeaveApprover" value="${escapeDeleteHistoryText(tl.email)}">
+                        <span>${escapeDeleteHistoryText(tl.name)}</span>
+                    </label>
+                `).join('') : '<span style="color:#fca5a5;">No active Team Leaders found.</span>';
+            } catch (error) {
+                console.warn('Unable to load Team Leaders for leave form:', error);
+                container.innerHTML = '<span style="color:#fca5a5;">Unable to load Team Leaders.</span>';
+            }
+        }
+
         function updateManagementAccountCounters(users) {
             const activeCount = users.filter((user) => getAccountStatusLabel(user) === 'Active').length;
             const inactiveCount = users.filter((user) => getAccountStatusLabel(user) === 'Inactive').length;
@@ -4425,12 +4677,40 @@
             }
         }
 
+        function subscribeToGlobalLeaveUpdates() {
+            if (!db || !db.ref) return;
+            db.ref(FIREBASE_LEAVES_KEY).on('value', (snapshot) => {
+                const firebaseLeaves = snapshot.val();
+                if (!Array.isArray(firebaseLeaves)) return;
+                localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(firebaseLeaves));
+                if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
+                    loadTlApprovals();
+                    renderTlOwnLeaveHistory();
+                } else if (isRole('Management') || isRole('MANAGEMENT')) {
+                    loadManagementRequests();
+                } else if (isRole('Employee')) {
+                    loadLeaveHistory();
+                }
+            }, (error) => {
+                console.warn('Live leave request updates failed:', error);
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             await syncGlobalLeavesFromFirebase();
+            if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
+                await loadFullUserDepartmentAccess();
+            }
+            subscribeToGlobalLeaveUpdates();
             populateManagementFilterOptions();
             populateDailyReportLists();
             renderDeleteHistory();
-            switchTab('dashboard');
+            const defaultPanel = isRole('Management')
+                ? 'management'
+                : (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader'))
+                    ? 'tl'
+                    : 'employee';
+            switchTab(defaultPanel);
             loadNotifications();
             populateTlDepartmentFilter();
         });
@@ -4579,37 +4859,21 @@
             const sel = document.getElementById('tlDeptFilter');
             if (!sel) return;
 
-            // Helper to normalize user departments into an array of strings
-            function getUserDepartments() {
-                if (!userData) return [];
-                if (userData.departments) {
-                    if (Array.isArray(userData.departments)) return userData.departments.slice();
-                    if (typeof userData.departments === 'object') return Object.values(userData.departments);
-                    return [userData.departments];
-                }
-                if (userData.department) return [userData.department];
-                return [];
-            }
-
-            // Clear existing options
+            const previousValue = sel.value;
             sel.innerHTML = '';
 
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
-                const userDeps = getUserDepartments().map(d => (d || '').toString().trim()).filter(Boolean);
-                // If TL has no explicit departments, fall back to user's single dept variable if present
-                if (userDeps.length === 0 && userDept) userDeps.push(userDept);
+                const userDeps = Array.from(new Set(
+                    getUserDepartments()
+                        .map(d => String(d || '').trim())
+                        .filter(Boolean)
+                ));
 
-                // If TL has only one department, show only that and disable the selector so they can't change it.
-                if (userDeps.length === 1) {
-                    const only = userDeps[0];
-                    const opt = document.createElement('option');
-                    opt.value = only;
-                    opt.text = only;
-                    sel.appendChild(opt);
-                    sel.value = only;
-                    sel.disabled = true;
-                } else if (userDeps.length > 1) {
-                    // If multiple departments, show only those departments (no 'All' option)
+                if (userDeps.length > 0) {
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All My Departments';
+                    sel.appendChild(allOption);
                     userDeps.forEach(d => {
                         const opt = document.createElement('option');
                         opt.value = d;
@@ -4617,23 +4881,14 @@
                         sel.appendChild(opt);
                     });
                     sel.disabled = false;
-                    // Try to preserve previously selected if still present
-                    const prev = sel.getAttribute('data-prev') || '';
-                    if (prev && Array.from(sel.options).some(o => o.value === prev)) sel.value = prev;
+                    const prev = previousValue || sel.getAttribute('data-prev') || '';
+                    sel.value = prev && Array.from(sel.options).some(o => o.value === prev) ? prev : 'all';
                 } else {
-                    // fallback to showing all departments if nothing known (shouldn't normally happen)
-                    const optAll = document.createElement('option');
-                    optAll.value = 'all';
-                    optAll.text = 'All Departments';
-                    sel.appendChild(optAll);
-                    DEPARTMENTS.forEach(d => {
-                        const opt = document.createElement('option');
-                        opt.value = d;
-                        opt.text = d;
-                        sel.appendChild(opt);
-                    });
-                    sel.disabled = false;
-                    sel.value = 'all';
+                    const opt = document.createElement('option');
+                    opt.value = '__none__';
+                    opt.text = 'No department assigned';
+                    sel.appendChild(opt);
+                    sel.disabled = true;
                 }
             } else {
                 // For Management or others show all departments and an 'All Departments' option
@@ -4799,20 +5054,36 @@
 
         function loadTlApprovals() {
             const tbody = document.getElementById('tlApprovalTableBody');
+            populateTlDepartmentFilter();
             const selectedMonth = document.getElementById('tlMonthFilter').value;
             const searchQuery = document.getElementById('tlSearchName').value.trim().toLowerCase();
             const allLeaves = getStoredLeaves();
 
             tbody.innerHTML = '';
 
-            const selectedDeptFilter = (document.getElementById('tlDeptFilter') && document.getElementById('tlDeptFilter').value) ? document.getElementById('tlDeptFilter').value : 'all';
+            const departmentSelect = document.getElementById('tlDeptFilter');
+            const selectedDeptFilter = departmentSelect?.value || 'all';
             let departmentLeaves = allLeaves;
-            if (selectedDeptFilter && selectedDeptFilter !== 'all') {
-                departmentLeaves = allLeaves.filter(l => l.departmentName && l.departmentName.toUpperCase() === selectedDeptFilter.toUpperCase());
-            } else if (!(isRole('Management') || isRole('MANAGEMENT'))) {
+            if (!(isRole('Management') || isRole('MANAGEMENT'))) {
                 const deptList = getUserDepartments();
-                const normalizedUserDept = deptList.length > 0 ? deptList.map(d => d.toUpperCase()) : [String(userDept || '').toUpperCase()];
-                departmentLeaves = allLeaves.filter(l => l.departmentName && normalizedUserDept.includes(String(l.departmentName).toUpperCase()));
+                const normalizedUserDept = deptList.length > 0
+                    ? deptList.map(normalizeDepartmentName)
+                    : [normalizeDepartmentName(userDept)];
+                const currentTlEmail = String(userIdentifier || '').trim().toLowerCase();
+                departmentLeaves = allLeaves.filter((leave) => {
+                    if (Array.isArray(leave.assignedTlEmails) && leave.assignedTlEmails.length) {
+                        return leave.assignedTlEmails
+                            .map((email) => String(email || '').trim().toLowerCase())
+                            .includes(currentTlEmail);
+                    }
+                    return normalizedUserDept.includes(normalizeDepartmentName(leave.departmentName));
+                });
+            }
+            if (selectedDeptFilter && selectedDeptFilter !== 'all' && selectedDeptFilter !== '__none__') {
+                const normalizedSelectedDepartment = normalizeDepartmentName(selectedDeptFilter);
+                departmentLeaves = departmentLeaves.filter((leave) => {
+                    return normalizeDepartmentName(leave.departmentName) === normalizedSelectedDepartment;
+                });
             }
 
             let filteredLeaves = departmentLeaves;
@@ -5086,8 +5357,11 @@
                         ? 'rejected'
                         : newStatus.toLowerCase();
                 const notificationDetails = { title: newStatus === 'Approved' ? 'Approved' : newStatus === 'Rejected' ? 'Rejected' : 'Updated', type: newStatus === 'Approved' ? 'approved' : newStatus === 'Rejected' ? 'rejected' : 'edited', leaveId };
-                addNotification(targetEmpIdentifier, `Your leave request (${allLeaves[leaveIndex].reportFillDate || 'no report date'}) has been ${statusMessage} by ${currentUserName}.`, notificationDetails);
-                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}.`, notificationDetails);
+                const leaveSummary = getLeaveNotificationSummary(allLeaves[leaveIndex]);
+                const approvedDays = newStatus === 'Approved' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0';
+                const rejectedDays = newStatus === 'Rejected' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0';
+                addNotification(targetEmpIdentifier, `Your leave request was ${statusMessage} by ${currentUserName}. ${leaveSummary}. Approved Days: ${approvedDays}. Rejected Days: ${rejectedDays}.`, notificationDetails);
+                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}. ${leaveSummary}. Approved Days: ${approvedDays}. Rejected Days: ${rejectedDays}.`, notificationDetails);
 
                 loadTlApprovals();
                 loadManagementRequests();
@@ -5181,12 +5455,12 @@
             };
             if (allLeaves[leaveIndex].employeeEmail) {
                 addNotification(allLeaves[leaveIndex].employeeEmail, leaveRemark
-                    ? `A remark was added to your leave request by ${currentUserName}: "${leaveRemark}"`
-                    : `Your leave request was updated by ${currentUserName}. The Full Leave, First Half, Second Half, and Days details were changed.`, editNotification);
+                    ? `A remark was added by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}. Approved Days: ${allLeaves[leaveIndex].status === 'Approved' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Rejected Days: ${allLeaves[leaveIndex].status === 'Rejected' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Remark: "${leaveRemark}"`
+                    : `Your leave request was updated by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}.`, editNotification);
             }
             addManagementNotification(leaveRemark
-                ? `A remark was added to the leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} by ${currentUserName}: "${leaveRemark}"`
-                : `Leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} was updated by ${currentUserName}.`, editNotification);
+                ? `A remark was added to the leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}. Approved Days: ${allLeaves[leaveIndex].status === 'Approved' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Rejected Days: ${allLeaves[leaveIndex].status === 'Rejected' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Remark: "${leaveRemark}"`
+                : `Leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} was updated by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}.`, editNotification);
             closeTlEditModal();
             loadTlApprovals();
             loadManagementRequests();
@@ -5513,6 +5787,207 @@
             document.getElementById('tlDeptFilter').addEventListener('change', loadTlApprovals);
         }
 
+        function toggleTlLeaveRequests(forceOpen) {
+            const toggle = document.getElementById('tlLeaveRequestsToggle');
+            const content = document.getElementById('tlLeaveRequestsContent');
+            if (!toggle || !content) return;
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : content.classList.contains('hidden');
+            content.classList.toggle('hidden', !shouldOpen);
+            toggle.classList.toggle('open', shouldOpen);
+            toggle.setAttribute('aria-expanded', String(shouldOpen));
+        }
+
+        function toggleTlLeaveForm(forceOpen) {
+            const content = document.getElementById('tlLeaveFormContent');
+            if (!content) return;
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : content.classList.contains('hidden');
+            content.classList.toggle('hidden', !shouldOpen);
+            if (shouldOpen) {
+                document.getElementById('tlLeaveName').value = getLoggedInUserDisplayName() || currentUserName;
+                document.getElementById('tlLeaveReportDate').value = getTodaysDateString();
+                document.getElementById('tlLeaveRulesView').classList.remove('hidden');
+                document.getElementById('tlLeaveEntryView').classList.add('hidden');
+                populateTlOwnLeaveFormDepartments();
+                populateTlLeaveApprovers();
+            }
+        }
+
+        function populateTlOwnLeaveFormDepartments() {
+            const select = document.getElementById('tlLeaveDepartment');
+            if (!select) return;
+            const departments = getUserDepartments();
+            select.innerHTML = departments.length
+                ? departments.map((department) => `<option value="${escapeDeleteHistoryText(department)}">${escapeDeleteHistoryText(department)}</option>`).join('')
+                : '<option value="" disabled selected>No department assigned</option>';
+        }
+
+        function renderTlOwnLeaveHistory() {
+            loadTlOwnLeaveHistory();
+        }
+
+        function loadTlOwnLeaveHistory() {
+            const container = document.getElementById('tlOwnLeaveHistory');
+            const tbody = document.getElementById('tlOwnLeaveHistoryBody');
+            if (!container || !tbody) return;
+            const email = String(userIdentifier || '').trim().toLowerCase();
+            const allLeaves = getStoredLeaves();
+            const ownLeaves = allLeaves.filter((leave) => String(leave.employeeEmail || '').trim().toLowerCase() === email);
+            const read = (id) => (document.getElementById(id)?.value || '');
+            const month = read('tlOwnMonthFilter') || 'all';
+            const reportDate = read('tlOwnReportDateFilter');
+            const company = read('tlOwnCompanyFilter') || 'all';
+            const department = read('tlOwnDepartmentFilter') || 'all';
+            const full = read('tlOwnFullLeaveFilter').toLowerCase().trim();
+            const first = read('tlOwnFirstHalfFilter').toLowerCase().trim();
+            const second = read('tlOwnSecondHalfFilter').toLowerCase().trim();
+            const days = read('tlOwnDaysFilter');
+            const status = read('tlOwnStatusFilter') || 'all';
+            const actionBy = read('tlOwnActionByFilter').toLowerCase().trim();
+            const updateOptions = (id, values, label) => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                const current = select.value;
+                select.innerHTML = `<option value="all">${label}</option>${values.map((value) => `<option value="${escapeDeleteHistoryText(value)}">${escapeDeleteHistoryText(value)}</option>`).join('')}`;
+                select.value = values.includes(current) ? current : 'all';
+            };
+            updateOptions('tlOwnCompanyFilter', [...new Set(ownLeaves.map((leave) => leave.companyName).filter(Boolean))].sort(), 'All Companies');
+            updateOptions('tlOwnDepartmentFilter', [...new Set(ownLeaves.map((leave) => leave.departmentName).filter(Boolean))].sort(), 'All Departments');
+            const filtered = ownLeaves.filter((leave) => {
+                const reportParts = String(leave.reportFillDate || '').split('/');
+                return (month === 'all' || reportParts[1] === month)
+                    && (!reportDate || normalizeDateValue(leave.reportFillDate) === reportDate)
+                    && (company === 'all' || leave.companyName === company)
+                    && (department === 'all' || leave.departmentName === department)
+                    && (!full || String(leave.fullLeaveDate || '').toLowerCase().includes(full))
+                    && (!first || String(leave.firstHalfDate || '').toLowerCase().includes(first))
+                    && (!second || String(leave.secondHalfDate || '').toLowerCase().includes(second))
+                    && (!days || String(leave.totalLeaveDays ?? '') === days)
+                    && (status === 'all' || (leave.status || 'Pending') === status)
+                    && (!actionBy || String(leave.actionBy || '').toLowerCase().includes(actionBy));
+            });
+            if (document.getElementById('tlOwnLeaveHistoryToggle')?.getAttribute('aria-expanded') !== 'true') {
+                container.classList.add('hidden');
+            }
+            tbody.innerHTML = filtered.length ? filtered.map((leave) => {
+                const badgeClass = leave.status === 'Approved' ? 'status-approved' : leave.status === 'Rejected' ? 'status-rejected' : 'status-pending';
+                return `<tr data-leave-row-id="${escapeDeleteHistoryText(leave.id)}">
+                    <td>${escapeDeleteHistoryText(leave.reportFillDate || '-')}</td><td>${escapeDeleteHistoryText(leave.companyName || '-')}</td>
+                    <td>${escapeDeleteHistoryText(leave.departmentName || '-')}</td><td>${escapeDeleteHistoryText(leave.employeeFullName || '-')}</td>
+                    <td>${escapeDeleteHistoryText(leave.fullLeaveDate || '-')}</td><td>${escapeDeleteHistoryText(leave.firstHalfDate || '-')}</td>
+                    <td>${escapeDeleteHistoryText(leave.secondHalfDate || '-')}</td><td class="reason-cell">${escapeDeleteHistoryText(leave.leaveReason || '-')}</td>
+                    <td>${escapeDeleteHistoryText(leave.totalLeaveDays || '0')}</td>
+                    <td><span class="status-badge ${badgeClass}">${escapeDeleteHistoryText(leave.status || 'Pending')}</span>${leave.actionBy ? `<span class="action-by-text">By: ${escapeDeleteHistoryText(leave.actionBy)}</span>` : ''}</td>
+                    <td class="reason-cell">${escapeDeleteHistoryText(leave.tlRemark || leave.remark || '-')}</td>
+                </tr>`;
+            }).join('') : '<tr><td colspan="11" class="no-data">No leave history found for this period.</td></tr>';
+        }
+
+        document.getElementById('tlLeaveRequestsToggle')?.addEventListener('click', () => toggleTlLeaveRequests());
+        document.getElementById('tlLeaveRequestsToggle')?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleTlLeaveRequests();
+            }
+        });
+        document.getElementById('tlApplyLeaveBtn')?.addEventListener('click', () => {
+            toggleTlLeaveForm();
+        });
+        const tlOwnLeaveHistoryToggle = document.getElementById('tlOwnLeaveHistoryToggle');
+        const tlOwnLeaveHistoryContent = document.getElementById('tlOwnLeaveHistory');
+        function toggleTlOwnLeaveHistory(forceOpen) {
+            if (!tlOwnLeaveHistoryToggle || !tlOwnLeaveHistoryContent) return;
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : tlOwnLeaveHistoryContent.classList.contains('hidden');
+            tlOwnLeaveHistoryContent.classList.toggle('hidden', !shouldOpen);
+            tlOwnLeaveHistoryToggle.classList.toggle('open', shouldOpen);
+            tlOwnLeaveHistoryToggle.setAttribute('aria-expanded', String(shouldOpen));
+            if (shouldOpen) loadTlOwnLeaveHistory();
+        }
+        tlOwnLeaveHistoryToggle?.addEventListener('click', () => toggleTlOwnLeaveHistory());
+        tlOwnLeaveHistoryToggle?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleTlOwnLeaveHistory();
+            }
+        });
+        ['tlOwnMonthFilter', 'tlOwnReportDateFilter', 'tlOwnCompanyFilter', 'tlOwnDepartmentFilter', 'tlOwnStatusFilter']
+            .forEach((id) => document.getElementById(id)?.addEventListener('change', loadTlOwnLeaveHistory));
+        ['tlOwnFullLeaveFilter', 'tlOwnFirstHalfFilter', 'tlOwnSecondHalfFilter', 'tlOwnDaysFilter', 'tlOwnActionByFilter']
+            .forEach((id) => document.getElementById(id)?.addEventListener('input', loadTlOwnLeaveHistory));
+
+        document.getElementById('tlBackFromRulesBtn')?.addEventListener('click', () => toggleTlLeaveForm(false));
+        document.getElementById('tlAgreeLeaveRulesBtn')?.addEventListener('click', () => {
+            document.getElementById('tlLeaveRulesView').classList.add('hidden');
+            document.getElementById('tlLeaveEntryView').classList.remove('hidden');
+        });
+        document.getElementById('tlBackToRulesBtn')?.addEventListener('click', () => {
+            document.getElementById('tlLeaveEntryView').classList.add('hidden');
+            document.getElementById('tlLeaveRulesView').classList.remove('hidden');
+        });
+
+        document.getElementById('tlLeaveRequestForm')?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const fullLeave = document.getElementById('tlLeaveFullDate').value.trim();
+            const firstHalf = document.getElementById('tlLeaveFirstHalf').value.trim();
+            const secondHalf = document.getElementById('tlLeaveSecondHalf').value.trim();
+            if (!isValidDateString(fullLeave) || !isValidDateString(firstHalf) || !isValidDateString(secondHalf)) {
+                alert('⚠️ Leave dates must use dd/mm/yyyy format.');
+                return;
+            }
+            const days = Number(document.getElementById('tlLeaveDays').value);
+            if (!Number.isFinite(days) || days < 0) {
+                alert('⚠️ Days must be a valid number.');
+                return;
+            }
+            const department = document.getElementById('tlLeaveDepartment').value;
+            if (!department) {
+                alert('⚠️ Please select a department.');
+                return;
+            }
+            const approverEmails = Array.from(document.querySelectorAll('input[name="tlLeaveApprover"]:checked'))
+                .map((input) => String(input.value || '').trim().toLowerCase())
+                .filter(Boolean);
+            if (!approverEmails.length) {
+                alert('⚠️ Please select at least one Team Leader.');
+                return;
+            }
+            const leave = {
+                id: Date.now(),
+                employeeEmail: userIdentifier,
+                companyName: document.getElementById('tlLeaveCompany').value,
+                departmentName: department,
+                assignedTlEmails: approverEmails,
+                employeeFullName: getLoggedInUserDisplayName() || currentUserName,
+                leaveReason: document.getElementById('tlLeaveReason').value.trim(),
+                reportFillDate: document.getElementById('tlLeaveReportDate').value,
+                fullLeaveDate: fullLeave,
+                firstHalfDate: firstHalf,
+                secondHalfDate: secondHalf,
+                totalLeaveDays: days,
+                status: 'Pending',
+                actionBy: '',
+                timestamp: new Date().toISOString(),
+                reviewed: false,
+                tlReviewed: false,
+                managementReviewed: false
+            };
+            const leaves = getStoredLeaves();
+            leaves.unshift(leave);
+            persistStoredLeaves(leaves);
+            recordActionHistory('Submitted', leave);
+            const notificationDetails = { title: 'Submitted', type: 'submitted', leaveId: leave.id };
+            addNotification(userIdentifier, `Your TL leave request was submitted for review. ${getLeaveNotificationSummary(leave)}`, notificationDetails);
+            approverEmails.forEach((email) => {
+                addNotification(email, `A leave request from ${leave.employeeFullName} was assigned to you for review. ${getLeaveNotificationSummary(leave)}`, notificationDetails);
+            });
+            addManagementNotification(`New leave request submitted by ${leave.employeeFullName} for the ${department} department. Status: Pending.`, notificationDetails);
+            document.getElementById('tlLeaveRequestForm').reset();
+            toggleTlLeaveForm(false);
+            populateTlOwnLeaveFormDepartments();
+            renderTlOwnLeaveHistory();
+            loadTlApprovals();
+            alert('✅ Leave request submitted successfully.');
+        });
+
         function isValidDateString(str) {
             if (!str || str.trim() === "") return true;
             const dates = str.split(',').map(d => d.trim());
@@ -5542,13 +6017,18 @@
                 return;
             }
 
-            const selectedDept = document.getElementById('departmentName').value;
+            const departmentSelect = document.getElementById('departmentName');
+            const selectedDept = String(departmentSelect?.value || '').trim();
+            if (!selectedDept) {
+                alert('⚠️ Please select a department before submitting the leave request.');
+                return;
+            }
 
             const newLeave = {
                 id: Date.now(),
                 employeeEmail: userIdentifier,
                 companyName: document.getElementById('companyName').value,
-                departmentName: selectedDept,
+                departmentName: selectedDept.replace(/\s+/g, ' '),
                 employeeFullName: fullName,
                 leaveReason: document.getElementById('leaveReason').value,
                 reportFillDate: document.getElementById('reportFillDate').value,
@@ -5575,7 +6055,7 @@
 
             addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review.`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
-            let deptNotifsKey = `dept_notifications_${selectedDept}`;
+            const deptNotifsKey = `dept_notifications_${normalizeDepartmentName(selectedDept)}`;
             let deptNotifs = JSON.parse(localStorage.getItem(deptNotifsKey)) || [];
             deptNotifs.unshift({
                 id: Date.now(),

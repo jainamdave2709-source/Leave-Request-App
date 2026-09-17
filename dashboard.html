@@ -171,6 +171,38 @@
 
         .nav-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 
+        .leave-date-picker {
+            cursor: pointer;
+        }
+
+        .leave-year-select {
+            width: 82px;
+            margin-left: 4px;
+            padding: 2px 4px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 4px;
+            background: #1e293b;
+            color: #f8fafc;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .leave-calendar-clear {
+            margin: 8px auto 4px;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 5px;
+            background: #334155;
+            color: #f8fafc;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .leave-calendar-clear:hover {
+            background: #475569;
+        }
+
         .nav-links a { 
             color: #94a3b8; 
             text-decoration: none; 
@@ -684,6 +716,14 @@
         }
 
         .table-responsive { width: 100%; overflow-x: auto; }
+        .table-scroll-top { width: 100%; overflow-x: auto; overflow-y: hidden; height: 14px; margin-bottom: 5px; }
+        .table-scroll-top-inner { height: 1px; }
+        .table-scroll-top::-webkit-scrollbar,
+        .table-responsive::-webkit-scrollbar { height: 10px; }
+        .table-scroll-top::-webkit-scrollbar-thumb,
+        .table-responsive::-webkit-scrollbar-thumb { background: #8b8b8b; border-radius: 8px; }
+        .table-scroll-top::-webkit-scrollbar-track,
+        .table-responsive::-webkit-scrollbar-track { background: #f1f5f9; }
 
         .leave-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
         .leave-table th, .leave-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); white-space: nowrap; }
@@ -1140,6 +1180,51 @@
             border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
         }
         .form-group small { font-size: 11px; color: #94a3b8; }
+        .auto-leave-days {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            min-height: 44px;
+        }
+
+        .leave-date-group {
+            text-align: center;
+        }
+
+        .leave-date-subheader {
+            font-size: 11px;
+            color: #cbd5e1;
+            white-space: nowrap;
+        }
+
+        .leave-date-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: max-content;
+        }
+
+        .leave-date-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 24px;
+            padding: 5px 0;
+            white-space: nowrap;
+        }
+
+        .leave-date-item.has-month-border {
+            padding: 5px 9px;
+            border: 1px solid rgba(125, 211, 252, 0.45);
+            border-radius: 6px;
+        }
+
+        .leave-date-index {
+            display: none;
+        }
 
         .submit-leave-btn {
             background: #6366f1; color: white; border: none; padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); margin-top: 10px;
@@ -1551,16 +1636,17 @@
                 <div class="tl-edit-field"><label>Full Leave</label><input id="tlEditFullLeave"></div>
                 <div class="tl-edit-field"><label>First Half</label><input id="tlEditFirstHalf"></div>
                 <div class="tl-edit-field"><label>Second Half</label><input id="tlEditSecondHalf"></div>
-                <div class="tl-edit-field"><label>Days</label><input id="tlEditDays" type="number" min="0" step="0.5" required></div>
+                <div class="tl-edit-field"><label>Days</label><div id="tlEditDays" class="auto-leave-days" aria-live="polite">0</div></div>
                 <div class="tl-edit-field full-width"><label>Remark</label><textarea id="tlEditRemark" placeholder="Write a remark for this leave request..."></textarea></div>
                 <div class="tl-edit-field full-width"><label>Reason</label><textarea id="tlEditReason" readonly></textarea></div>
                 <div class="tl-edit-field"><label>Status</label><input id="tlEditStatus" readonly></div>
                 <div class="tl-edit-field"><label>Action By</label><input id="tlEditActionBy" readonly></div>
             </div>
             <div class="tl-edit-actions">
-                <button type="button" class="tl-edit-cancel" onclick="closeTlEditModal()">Cancel</button>
-                <button type="submit" class="tl-edit-save">Save Changes</button>
-            </div>
+                    <button type="button" class="tl-edit-cancel" id="resetTlEditBtn">Reset</button>
+                    <button type="button" class="tl-edit-cancel" onclick="closeTlEditModal()">Cancel</button>
+                    <button type="submit" class="tl-edit-save">Save Changes</button>
+                </div>
         </form>
     </div>
 
@@ -1740,17 +1826,22 @@
                             <table class="leave-table">
                                 <thead>
                                     <tr>
-                                        <th>Report Date</th>
-                                        <th>Company</th>
-                                        <th>Department</th>
-                                        <th>Employee Name</th>
-                                        <th>Full Leave</th>
-                                        <th>First Half</th>
-                                        <th>Second Half</th>
-                                        <th>Reason</th>
-                                        <th>Days</th>
-                                        <th>Status & Action By</th>
-                                        <th>Remark</th>
+                                        <th rowspan="2">Report Date</th>
+                                        <th rowspan="2">Company</th>
+                                        <th rowspan="2">Department</th>
+                                        <th rowspan="2">Employee Name</th>
+                                        <th colspan="2" class="leave-date-group">Full Leave</th>
+                                        <th colspan="2" class="leave-date-group">First Half</th>
+                                        <th colspan="2" class="leave-date-group">Second Half</th>
+                                        <th rowspan="2">Reason</th>
+                                        <th rowspan="2">Days</th>
+                                        <th rowspan="2">Status & Action By</th>
+                                        <th rowspan="2">Remark</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
                                     </tr>
                                 </thead>
                                 <tbody id="leaveHistoryTableBody"></tbody>
@@ -1801,8 +1892,8 @@
                         </li>
                         <li>
                             <div class="rule-text">
-                                <span>વધારાના કપાત દિવસોનું વળતર ફરીથી મળશે નહીં.</span>
-                                <span class="english">Compensation for additional days of deduction will not be provided again.</span>
+                                <span>વધારાના કપાત દિવસોનું વળતર મળવા પાત્ર રહેશે નહીં.</span>
+                                <span class="english">Additional deduction days shall not be eligible for compensation.</span>
                             </div>
                         </li>
                     </ol>
@@ -1855,7 +1946,6 @@
                     <div class="form-group">
                         <label for="employeeFullName">EMPLOYEE NAME *</label>
                         <input type="text" id="employeeFullName" placeholder="તમારું પૂરું નામ લખો (દા.ત. Jainam Dave)" required>
-                        <small>નામ અને અટક (Surname) વચ્ચે સ્પેસ મૂકીને બંને ફરજિયાત લખવું.<br>Enter both first name and surname with a space between them.</small>
                     </div>
 
                     <div class="form-group">
@@ -1866,31 +1956,26 @@
                     <div class="form-group">
                         <label for="reportFillDate">LEAVE REPORT FILL DATE *</label>
                         <input type="text" id="reportFillDate" placeholder="ક્લિક કરીને કેલેન્ડરથી તારીખ પસંદ કરો (dd/mm/yyyy)" readonly required style="cursor: pointer;">
-                        <small>ફક્ત કેલેન્ડર પરથી જ ડાયરેક્ટ તારીખ સિલેક્ટ કરી શકાશે (dd/mm/yyyy ફોર્મેટ).<br>The date can only be selected directly from the calendar (dd/mm/yyyy format).</small>
                     </div>
 
                     <div class="form-group">
                         <label for="fullLeaveDate">FULL LEAVE DATE</label>
-                        <input type="text" id="fullLeaveDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસની રજા હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.<br>Use the dd/mm/yyyy format. For more than one leave day, separate the dates with commas (,).</small>
+                        <input type="text" id="fullLeaveDate" class="leave-date-picker" placeholder="કેલેન્ડરમાંથી તારીખ પસંદ કરો" readonly autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="firstHalfDate">FIRST HALF LEAVE DATE</label>
-                        <input type="text" id="firstHalfDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.<br>Use the dd/mm/yyyy format. For more than one day, separate the dates with commas (,).</small>
+                        <input type="text" id="firstHalfDate" class="leave-date-picker" placeholder="કેલેન્ડરમાંથી તારીખ પસંદ કરો" readonly autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="secondHalfDate">SECOND HALF LEAVE DATE</label>
-                        <input type="text" id="secondHalfDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                        <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. જો 1 થી વધુ દિવસ હોય તો તારીખો વચ્ચે અલ્પવિરામ ( , ) મૂકવું ફરજિયાત છે.<br>Use the dd/mm/yyyy format. For more than one day, separate the dates with commas (,).</small>
+                        <input type="text" id="secondHalfDate" class="leave-date-picker" placeholder="કેલેન્ડરમાંથી તારીખ પસંદ કરો" readonly autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="totalLeaveDays">TOTAL DAYS OF LEAVES *</label>
-                        <input type="number" step="0.5" id="totalLeaveDays" placeholder="કુલ રજાના દિવસો લખો (દા.ત. 1)" required>
-                        <small>ફક્ત નંબર જ લખી શકાશે.<br>Only numbers are allowed.</small>
+                        <div id="totalLeaveDays" class="auto-leave-days" aria-live="polite">0</div>
                     </div>
 
                     <button type="submit" class="submit-leave-btn"><i class="fa-solid fa-check" style="margin-right: 6px;"></i>Submit Leave Request</button>
@@ -1945,7 +2030,7 @@
                                 <li><div class="rule-text"><span>સામાન્ય કે આકસ્મિત રજા મેળવવા માટે પણ ફોર્મ ભરવું ફરજિયાત છે.</span><span class="english">It is mandatory to fill out a form to obtain ordinary or casual leave as well.</span></div></li>
                                 <li><div class="rule-text"><span>રજાની પૂર્વ મંજૂરી ટીમ લીડર પાસેથી લેવી ફરજિયાત છે.</span><span class="english">Obtaining prior approval for leave from the team leader is mandatory.</span></div></li>
                                 <li><div class="rule-text"><span>ફૉર્મમાં આપેલ ફૉર્મેટ પ્રમાણે જ એન્ટ્રી કરવાની રહેશે.</span><span class="english">All entries must follow the format specified in the form.</span></div></li>
-                                <li><div class="rule-text"><span>વધારાના કપાત દિવસોનું વળતર ફરીથી મળશે નહીં.</span><span class="english">Compensation for additional days of deduction will not be provided again.</span></div></li>
+                                <li><div class="rule-text"><span>વધારાના કપાત દિવસોનું વળતર મળવા પાત્ર રહેશે નહીં.</span><span class="english">Additional deduction days shall not be eligible for compensation.</span></div></li>
                             </ol>
                         </div>
                         <button type="button" id="tlAgreeLeaveRulesBtn" class="rules-agree-btn">
@@ -2040,7 +2125,18 @@
                         </div>
                         <div class="table-responsive">
                             <table class="leave-table">
-                                <thead><tr><th>Report Date</th><th>Company</th><th>Department</th><th>Employee Name</th><th>Full Leave</th><th>First Half</th><th>Second Half</th><th>Reason</th><th>Days</th><th>Status & Action By</th><th>Remark</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">Report Date</th><th rowspan="2">Company</th><th rowspan="2">Department</th><th rowspan="2">Employee Name</th>
+                                        <th colspan="2" class="leave-date-group">Full Leave</th><th colspan="2" class="leave-date-group">First Half</th><th colspan="2" class="leave-date-group">Second Half</th>
+                                        <th rowspan="2">Reason</th><th rowspan="2">Days</th><th rowspan="2">Status & Action By</th><th rowspan="2">Remark</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="tlOwnLeaveHistoryBody"></tbody>
                             </table>
                         </div>
@@ -2117,19 +2213,24 @@
                     <table class="leave-table">
                         <thead>
                             <tr>
-                                <th>Action Taken</th>
-                                <th>Report Date</th>
-                                <th>Company</th>
-                                <th>Department</th>
-                                <th>Employee Name</th>
-                                <th>Full Leave</th>
-                                <th>First Half</th>
-                                <th>Second Half</th>
-                                <th>Reason</th>
-                                <th>Days</th>
-                                <th>Status & Action By</th>
-                                <th>Remark</th>
-                                <th>Actions</th>
+                                <th rowspan="2">Action Taken</th>
+                                <th rowspan="2">Report Date</th>
+                                <th rowspan="2">Company</th>
+                                <th rowspan="2">Department</th>
+                                <th rowspan="2">Employee Name</th>
+                                <th colspan="2" class="leave-date-group">Full Leave</th>
+                                <th colspan="2" class="leave-date-group">First Half</th>
+                                <th colspan="2" class="leave-date-group">Second Half</th>
+                                <th rowspan="2">Reason</th>
+                                <th rowspan="2">Days</th>
+                                <th rowspan="2">Status & Action By</th>
+                                <th rowspan="2">Remark</th>
+                                <th rowspan="2">Actions</th>
+                            </tr>
+                            <tr>
+                                <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
                             </tr>
                         </thead>
                         <tbody id="tlApprovalTableBody"></tbody>
@@ -2412,18 +2513,23 @@
                             <table class="leave-table">
                                 <thead>
                                     <tr>
-                                        <th>Report Date</th>
-                                        <th>Company</th>
-                                        <th>Department</th>
-                                        <th>Employee Name</th>
-                                        <th>Full Leave</th>
-                                        <th>First Half</th>
-                                        <th>Second Half</th>
-                                        <th>Reason</th>
-                                        <th>Days</th>
-                                        <th>Status & Action By</th>
-                                        <th>Remark</th>
-                                        <th></th>
+                                        <th rowspan="2">Report Date</th>
+                                        <th rowspan="2">Company</th>
+                                        <th rowspan="2">Department</th>
+                                        <th rowspan="2">Employee Name</th>
+                                        <th colspan="2" class="leave-date-group">Full Leave</th>
+                                        <th colspan="2" class="leave-date-group">First Half</th>
+                                        <th colspan="2" class="leave-date-group">Second Half</th>
+                                        <th rowspan="2">Reason</th>
+                                        <th rowspan="2">Days</th>
+                                        <th rowspan="2">Status & Action By</th>
+                                        <th rowspan="2">Remark</th>
+                                        <th rowspan="2"></th>
+                                    </tr>
+                                    <tr>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
+                                        <th class="leave-date-subheader">Date</th><th class="leave-date-subheader">Month / Year</th>
                                     </tr>
                                 </thead>
                                 <tbody id="managementTableBody"></tbody>
@@ -2664,6 +2770,156 @@
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const year = today.getFullYear();
             return `${day}/${month}/${year}`;
+        }
+
+        function addLeaveDateYearSelector(calendar) {
+            const yearInput = calendar.currentYearElement;
+            if (!yearInput || !yearInput.parentElement) return;
+
+            yearInput.style.display = 'none';
+            let yearSelect = yearInput.parentElement.querySelector('.leave-year-select');
+            if (!yearSelect) {
+                yearSelect = document.createElement('select');
+                yearSelect.className = 'leave-year-select';
+                yearSelect.setAttribute('aria-label', 'Select year');
+                yearInput.parentElement.appendChild(yearSelect);
+                yearSelect.addEventListener('change', () => {
+                    calendar.changeYear(Number(yearSelect.value));
+                });
+            }
+
+            const currentYear = new Date().getFullYear();
+            const selectedYear = calendar.currentYear;
+            yearSelect.innerHTML = '';
+            for (let year = currentYear - 10; year <= currentYear + 20; year += 1) {
+                const option = document.createElement('option');
+                option.value = String(year);
+                option.textContent = String(year);
+                option.selected = year === selectedYear;
+                yearSelect.appendChild(option);
+            }
+
+            if (!yearSelect.querySelector(`option[value="${selectedYear}"]`)) {
+                const option = document.createElement('option');
+                option.value = String(selectedYear);
+                option.textContent = String(selectedYear);
+                yearSelect.appendChild(option);
+            }
+            yearSelect.value = String(selectedYear);
+        }
+
+        function addLeaveDateClearButton(calendar) {
+            const calendarContainer = calendar.calendarContainer;
+            if (!calendarContainer || calendarContainer.querySelector('.leave-calendar-clear')) return;
+
+            const clearButton = document.createElement('button');
+            clearButton.type = 'button';
+            clearButton.className = 'leave-calendar-clear';
+            clearButton.textContent = 'Clear';
+            clearButton.addEventListener('click', () => {
+                calendar.clear();
+                calendar.close();
+            });
+            calendarContainer.appendChild(clearButton);
+        }
+
+        function initializeLeaveDatePickers() {
+            if (!window.flatpickr) return;
+            document.querySelectorAll('.leave-date-picker').forEach((input) => {
+                if (input._flatpickr) input._flatpickr.destroy();
+                flatpickr(input, {
+                    mode: 'multiple',
+                    dateFormat: 'd/m/Y',
+                    conjunction: ', ',
+                    allowInput: false,
+                    clickOpens: true,
+                    disableMobile: true,
+                    onChange: function() {
+                        updateAutomaticLeaveDays();
+                    },
+                    onReady: function(selectedDates, dateStr, calendar) {
+                        addLeaveDateYearSelector(calendar);
+                        addLeaveDateClearButton(calendar);
+                    },
+                    onOpen: function(selectedDates, dateStr, calendar) {
+                        addLeaveDateYearSelector(calendar);
+                        addLeaveDateClearButton(calendar);
+                    },
+                    onYearChange: function(selectedDates, dateStr, calendar) {
+                        addLeaveDateYearSelector(calendar);
+                    }
+                });
+                if (!input.dataset.calendarToggleBound) {
+                    input.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const calendar = input._flatpickr;
+                        if (!calendar) return;
+                        if (calendar.isOpen) {
+                            calendar.close();
+                        } else {
+                            calendar.open();
+                        }
+                    }, true);
+                    input.dataset.calendarToggleBound = 'true';
+                }
+            });
+            updateAutomaticLeaveDays();
+        }
+
+        function clearLeaveDatePickers() {
+            document.querySelectorAll('.leave-date-picker').forEach((input) => {
+                if (input._flatpickr) {
+                    input._flatpickr.clear();
+                } else {
+                    input.value = '';
+                }
+            });
+            updateAutomaticLeaveDays();
+        }
+
+        function updateAutomaticLeaveDays() {
+            const fullLeave = document.getElementById('fullLeaveDate')?._flatpickr;
+            const firstHalf = document.getElementById('firstHalfDate')?._flatpickr;
+            const secondHalf = document.getElementById('secondHalfDate')?._flatpickr;
+            const totalDaysInput = document.getElementById('totalLeaveDays');
+            if (!totalDaysInput) return;
+
+            const fullDays = fullLeave ? fullLeave.selectedDates.length : 0;
+            const firstHalfDays = firstHalf ? firstHalf.selectedDates.length : 0;
+            const secondHalfDays = secondHalf ? secondHalf.selectedDates.length : 0;
+            const totalDays = fullDays + ((firstHalfDays + secondHalfDays) * 0.5);
+            totalDaysInput.textContent = totalDays ? String(totalDays) : '0';
+        }
+
+        function addTopTableScrollbars() {
+            document.querySelectorAll('.table-responsive').forEach((tableContainer) => {
+                if (tableContainer.previousElementSibling?.classList.contains('table-scroll-top')) return;
+                const topScrollbar = document.createElement('div');
+                const scrollbarInner = document.createElement('div');
+                topScrollbar.className = 'table-scroll-top';
+                scrollbarInner.className = 'table-scroll-top-inner';
+                topScrollbar.appendChild(scrollbarInner);
+                tableContainer.parentNode.insertBefore(topScrollbar, tableContainer);
+
+                const syncWidth = () => {
+                    scrollbarInner.style.width = `${tableContainer.scrollWidth}px`;
+                    topScrollbar.scrollLeft = tableContainer.scrollLeft;
+                };
+                topScrollbar.addEventListener('scroll', () => {
+                    tableContainer.scrollLeft = topScrollbar.scrollLeft;
+                });
+                tableContainer.addEventListener('scroll', () => {
+                    topScrollbar.scrollLeft = tableContainer.scrollLeft;
+                });
+                if (window.ResizeObserver) {
+                    new ResizeObserver(syncWidth).observe(tableContainer);
+                }
+                if (window.MutationObserver) {
+                    new MutationObserver(syncWidth).observe(tableContainer, { childList: true, subtree: true });
+                }
+                syncWidth();
+            });
         }
 
         function autoResizeLeaveReason() {
@@ -3047,6 +3303,7 @@
         document.getElementById('openLeaveFormCard').addEventListener('click', () => {
             setEmployeeNameOnLeaveForm();
             initializeReportDateField();
+            initializeLeaveDatePickers();
             applyLeaveFormAutoDefaults();
             document.getElementById('employeeCardView').classList.add('hidden');
             document.getElementById('employeeRulesView').classList.remove('hidden');
@@ -3124,7 +3381,60 @@
         }
 
         function getLeaveNotificationSummary(leave) {
-            return `Full Leave: ${leave.fullLeaveDate || '-'} | First Half: ${leave.firstHalfDate || '-'} | Second Half: ${leave.secondHalfDate || '-'} | Days: ${leave.totalLeaveDays || '0'}`;
+            return `Full Leave: ${leave.fullLeaveDate || '-'} | First Half: ${leave.firstHalfDate || '-'} | Second Half: ${leave.secondHalfDate || '-'} | Days: ${getLeaveDaysValue(leave)}`;
+        }
+
+        function calculateLeaveDaysFromDates(leave) {
+            const countDates = (value) => String(value || '')
+                .split(',')
+                .map((date) => date.trim())
+                .filter((date) => date && date !== '-').length;
+            return countDates(leave.fullLeaveDate) + ((countDates(leave.firstHalfDate) + countDates(leave.secondHalfDate)) * 0.5);
+        }
+
+        function getLeaveDaysValue(leave) {
+            const storedDays = Number(leave?.totalLeaveDays);
+            if (Number.isFinite(storedDays) && storedDays > 0) return String(storedDays);
+            const calculatedDays = calculateLeaveDaysFromDates(leave);
+            return calculatedDays > 0 ? String(calculatedDays) : '0';
+        }
+
+        function getRemovedLeaveDates(previousValue, nextValue) {
+            const nextDates = new Set(String(nextValue || '')
+                .split(',')
+                .map((date) => date.trim())
+                .filter(Boolean));
+            return String(previousValue || '')
+                .split(',')
+                .map((date) => date.trim())
+                .filter((date) => date && !nextDates.has(date));
+        }
+
+        function getRejectedLeaveSummary(leave) {
+            const fullLeaveDate = leave.rejectedFullLeaveDate || '-';
+            const firstHalfDate = leave.rejectedFirstHalfDate || '-';
+            const secondHalfDate = leave.rejectedSecondHalfDate || '-';
+            const hasRejectedDates = [fullLeaveDate, firstHalfDate, secondHalfDate].some((date) => date !== '-');
+            return hasRejectedDates
+                ? `Rejected Leave: Full: ${fullLeaveDate} | First Half: ${firstHalfDate} | Second Half: ${secondHalfDate} | Total: ${leave.rejectedLeaveDays || '0'}`
+                : 'Rejected Leave: -';
+        }
+
+        function getLeaveDecisionDaysSummary(leave) {
+            const days = getLeaveDaysValue(leave);
+            if (leave.status === 'Approved') return `Approved Days: ${days} | Rejected Days: -`;
+            if (leave.status === 'Rejected') return `Approved Days: - | Rejected Days: ${days}`;
+            return `Requested Days: ${days} | ${getRejectedLeaveSummary(leave)} | Approval Decision: Pending`;
+        }
+
+        function getLeaveDecisionNotificationSummary(leave) {
+            const approved = leave.status === 'Approved'
+                ? `Full: ${leave.fullLeaveDate || '-'} | First Half: ${leave.firstHalfDate || '-'} | Second Half: ${leave.secondHalfDate || '-'}`
+                : '-';
+            const rejected = leave.status === 'Rejected'
+                ? `Full: ${leave.fullLeaveDate || '-'} | First Half: ${leave.firstHalfDate || '-'} | Second Half: ${leave.secondHalfDate || '-'}`
+                : '-';
+            return `Approved Leave: ${approved} | Rejected Leave: ${rejected}`;
         }
 
         function getNotificationClass(type) {
@@ -4992,7 +5302,7 @@
             document.getElementById('rejectedLeavesCount').innerText = rejectedDays;
 
             if (filteredLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="no-data">No leave history found for this period.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="14" class="no-data">No leave history found for this period.</td></tr>`;
                 return;
             }
 
@@ -5010,9 +5320,9 @@
                     <td>${leave.companyName || '-'}</td>
                     <td>${leave.departmentName || '-'}</td>
                     <td>${leave.employeeFullName || '-'}</td>
-                    <td>${leave.fullLeaveDate || '-'}</td>
-                    <td>${leave.firstHalfDate || '-'}</td>
-                    <td>${leave.secondHalfDate || '-'}</td>
+                    ${renderLeaveDateCells(leave.fullLeaveDate)}
+                    ${renderLeaveDateCells(leave.firstHalfDate)}
+                    ${renderLeaveDateCells(leave.secondHalfDate)}
                     <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
@@ -5133,7 +5443,7 @@
             const tlRejEl = document.getElementById('tlRejectedCountBadge'); if (tlRejEl) tlRejEl.innerText = rejectedDays;
 
             if (filteredLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="13" class="no-data">No leave requests found matching your criteria.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="16" class="no-data">No leave requests found matching your criteria.</td></tr>`;
                 return;
             }
 
@@ -5156,9 +5466,9 @@
                     <td>${leave.companyName || '-'}</td>
                     <td>${leave.departmentName || '-'}</td>
                     <td><strong>${leave.employeeFullName || '-'}</strong></td>
-                    <td>${leave.fullLeaveDate || '-'}</td>
-                    <td>${leave.firstHalfDate || '-'}</td>
-                    <td>${leave.secondHalfDate || '-'}</td>
+                    ${renderLeaveDateCells(leave.fullLeaveDate)}
+                    ${renderLeaveDateCells(leave.firstHalfDate)}
+                    ${renderLeaveDateCells(leave.secondHalfDate)}
                     <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
@@ -5274,7 +5584,7 @@
             const mgAppEl = document.getElementById('mgmtApprovedCountBadge'); if (mgAppEl) mgAppEl.innerText = mgApprovedDays;
 
             if (filteredLeaves.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="no-data">No approved leave requests found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="15" class="no-data">No approved leave requests found.</td></tr>`;
                 return;
             }
 
@@ -5292,9 +5602,9 @@
                     <td>${leave.companyName || '-'}</td>
                     <td>${leave.departmentName || '-'}</td>
                     <td><strong>${leave.employeeFullName || '-'}</strong></td>
-                    <td>${leave.fullLeaveDate || '-'}</td>
-                    <td>${leave.firstHalfDate || '-'}</td>
-                    <td>${leave.secondHalfDate || '-'}</td>
+                    ${renderLeaveDateCells(leave.fullLeaveDate)}
+                    ${renderLeaveDateCells(leave.firstHalfDate)}
+                    ${renderLeaveDateCells(leave.secondHalfDate)}
                     <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
@@ -5358,10 +5668,10 @@
                         : newStatus.toLowerCase();
                 const notificationDetails = { title: newStatus === 'Approved' ? 'Approved' : newStatus === 'Rejected' ? 'Rejected' : 'Updated', type: newStatus === 'Approved' ? 'approved' : newStatus === 'Rejected' ? 'rejected' : 'edited', leaveId };
                 const leaveSummary = getLeaveNotificationSummary(allLeaves[leaveIndex]);
-                const approvedDays = newStatus === 'Approved' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0';
-                const rejectedDays = newStatus === 'Rejected' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0';
-                addNotification(targetEmpIdentifier, `Your leave request was ${statusMessage} by ${currentUserName}. ${leaveSummary}. Approved Days: ${approvedDays}. Rejected Days: ${rejectedDays}.`, notificationDetails);
-                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}. ${leaveSummary}. Approved Days: ${approvedDays}. Rejected Days: ${rejectedDays}.`, notificationDetails);
+                const decisionDays = getLeaveDecisionDaysSummary(allLeaves[leaveIndex]);
+                const decisionSummary = getLeaveDecisionNotificationSummary(allLeaves[leaveIndex]);
+                addNotification(targetEmpIdentifier, `Your leave request was ${statusMessage} by ${currentUserName}. ${decisionSummary}. ${leaveSummary}. ${decisionDays}.`, notificationDetails);
+                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}. ${decisionSummary}. ${leaveSummary}. ${decisionDays}.`, notificationDetails);
 
                 loadTlApprovals();
                 loadManagementRequests();
@@ -5371,6 +5681,41 @@
         };
 
         let currentTlEditLeaveId = null;
+        let currentTlEditOriginalValues = null;
+
+        function getTlEditFormValues() {
+            return {
+                fullLeaveDate: document.getElementById('tlEditFullLeave')?.value || '',
+                firstHalfDate: document.getElementById('tlEditFirstHalf')?.value || '',
+                secondHalfDate: document.getElementById('tlEditSecondHalf')?.value || '',
+                totalLeaveDays: calculateLeaveDaysFromDates({
+                    fullLeaveDate: document.getElementById('tlEditFullLeave')?.value || '',
+                    firstHalfDate: document.getElementById('tlEditFirstHalf')?.value || '',
+                    secondHalfDate: document.getElementById('tlEditSecondHalf')?.value || ''
+                }),
+                remark: document.getElementById('tlEditRemark')?.value || ''
+            };
+        }
+
+        function updateTlEditDays() {
+            const daysElement = document.getElementById('tlEditDays');
+            if (!daysElement) return;
+            const days = calculateLeaveDaysFromDates({
+                fullLeaveDate: document.getElementById('tlEditFullLeave')?.value || '',
+                firstHalfDate: document.getElementById('tlEditFirstHalf')?.value || '',
+                secondHalfDate: document.getElementById('tlEditSecondHalf')?.value || ''
+            });
+            daysElement.textContent = String(days);
+        }
+
+        function resetTlEditForm() {
+            if (!currentTlEditOriginalValues) return;
+            document.getElementById('tlEditFullLeave').value = currentTlEditOriginalValues.fullLeaveDate;
+            document.getElementById('tlEditFirstHalf').value = currentTlEditOriginalValues.firstHalfDate;
+            document.getElementById('tlEditSecondHalf').value = currentTlEditOriginalValues.secondHalfDate;
+            document.getElementById('tlEditRemark').value = currentTlEditOriginalValues.remark;
+            updateTlEditDays();
+        }
 
         window.closeTlEditModal = function() {
             currentTlEditLeaveId = null;
@@ -5406,7 +5751,6 @@
                 tlEditFullLeave: leave.fullLeaveDate || '',
                 tlEditFirstHalf: leave.firstHalfDate || '',
                 tlEditSecondHalf: leave.secondHalfDate || '',
-                tlEditDays: leave.totalLeaveDays || '0',
                 tlEditRemark: leave.tlRemark || leave.remark || '',
                 tlEditReason: leave.leaveReason || '',
                 tlEditStatus: leave.status || 'Pending',
@@ -5416,18 +5760,25 @@
                 const field = document.getElementById(id);
                 if (field) field.value = value;
             });
+            updateTlEditDays();
+            currentTlEditOriginalValues = getTlEditFormValues();
             document.getElementById('tlEditOverlay')?.classList.add('show');
         };
+
+        document.getElementById('resetTlEditBtn')?.addEventListener('click', resetTlEditForm);
+        ['tlEditFullLeave', 'tlEditFirstHalf', 'tlEditSecondHalf'].forEach((id) => {
+            document.getElementById(id)?.addEventListener('input', updateTlEditDays);
+        });
 
         document.getElementById('tlEditForm')?.addEventListener('submit', (event) => {
             event.preventDefault();
             if (currentTlEditLeaveId === null) return;
 
-            const parsedDays = Number(document.getElementById('tlEditDays')?.value);
-            if (!Number.isFinite(parsedDays) || parsedDays < 0) {
-                alert('❌ Days must be a valid number.');
-                return;
-            }
+            const parsedDays = calculateLeaveDaysFromDates({
+                fullLeaveDate: document.getElementById('tlEditFullLeave')?.value || '',
+                firstHalfDate: document.getElementById('tlEditFirstHalf')?.value || '',
+                secondHalfDate: document.getElementById('tlEditSecondHalf')?.value || ''
+            });
 
             const allLeaves = getStoredLeaves();
             const leaveIndex = allLeaves.findIndex((leave) => leave.id === currentTlEditLeaveId);
@@ -5437,30 +5788,66 @@
                 return;
             }
 
-            allLeaves[leaveIndex] = {
-                ...allLeaves[leaveIndex],
+            const previousLeave = allLeaves[leaveIndex];
+            const updatedLeave = {
+                ...previousLeave,
                 fullLeaveDate: document.getElementById('tlEditFullLeave').value.trim(),
                 firstHalfDate: document.getElementById('tlEditFirstHalf').value.trim(),
                 secondHalfDate: document.getElementById('tlEditSecondHalf').value.trim(),
                 totalLeaveDays: parsedDays,
                 tlRemark: document.getElementById('tlEditRemark').value.trim()
             };
+            const removedFullLeave = getRemovedLeaveDates(previousLeave.fullLeaveDate, updatedLeave.fullLeaveDate);
+            const removedFirstHalf = getRemovedLeaveDates(previousLeave.firstHalfDate, updatedLeave.firstHalfDate);
+            const removedSecondHalf = getRemovedLeaveDates(previousLeave.secondHalfDate, updatedLeave.secondHalfDate);
+            const rejectedLeaveDays = removedFullLeave.length
+                + ((removedFirstHalf.length + removedSecondHalf.length) * 0.5);
+            let rejectedLeave = null;
+            allLeaves[leaveIndex] = updatedLeave;
+            if (rejectedLeaveDays > 0) {
+                rejectedLeave = {
+                    ...previousLeave,
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    fullLeaveDate: removedFullLeave.join(', '),
+                    firstHalfDate: removedFirstHalf.join(', '),
+                    secondHalfDate: removedSecondHalf.join(', '),
+                    totalLeaveDays: rejectedLeaveDays,
+                    status: 'Rejected',
+                    actionBy: currentUserName,
+                    tlReviewed: true,
+                    reviewed: true,
+                    reviewedBy: currentUserName,
+                    reviewedAt: new Date().toISOString(),
+                    tlRemark: `Removed during TL edit${updatedLeave.tlRemark ? `: ${updatedLeave.tlRemark}` : ''}`,
+                    rejectedFullLeaveDate: removedFullLeave.join(', '),
+                    rejectedFirstHalfDate: removedFirstHalf.join(', '),
+                    rejectedSecondHalfDate: removedSecondHalf.join(', '),
+                    rejectedLeaveDays
+                };
+                allLeaves.unshift(rejectedLeave);
+            }
             persistStoredLeaves(allLeaves);
-            const leaveRemark = allLeaves[leaveIndex].tlRemark;
-            recordActionHistory(leaveRemark ? 'Remark Added' : 'Edited', allLeaves[leaveIndex], { remark: leaveRemark });
+            const leaveRemark = updatedLeave.tlRemark;
+            recordActionHistory(leaveRemark ? 'Remark Added' : 'Edited', updatedLeave, { remark: leaveRemark });
+            if (rejectedLeave) {
+                recordActionHistory('Rejected', rejectedLeave, { remark: rejectedLeave.tlRemark });
+            }
             const editNotification = {
                 title: leaveRemark ? 'Remarks' : 'Edited',
                 type: leaveRemark ? 'remarks' : 'edited',
                 leaveId: currentTlEditLeaveId
             };
-            if (allLeaves[leaveIndex].employeeEmail) {
-                addNotification(allLeaves[leaveIndex].employeeEmail, leaveRemark
-                    ? `A remark was added by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}. Approved Days: ${allLeaves[leaveIndex].status === 'Approved' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Rejected Days: ${allLeaves[leaveIndex].status === 'Rejected' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Remark: "${leaveRemark}"`
-                    : `Your leave request was updated by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}.`, editNotification);
+            const decisionSummary = getLeaveDecisionNotificationSummary(updatedLeave);
+            const decisionDays = getLeaveDecisionDaysSummary(updatedLeave);
+            const rejectedSummary = rejectedLeave ? getRejectedLeaveSummary(rejectedLeave) : '';
+            if (updatedLeave.employeeEmail) {
+                addNotification(updatedLeave.employeeEmail, leaveRemark
+                    ? `A remark was added by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''} Remark: "${leaveRemark}"`
+                    : `Your leave request was updated by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''}`, editNotification);
             }
             addManagementNotification(leaveRemark
-                ? `A remark was added to the leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}. Approved Days: ${allLeaves[leaveIndex].status === 'Approved' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Rejected Days: ${allLeaves[leaveIndex].status === 'Rejected' ? (allLeaves[leaveIndex].totalLeaveDays || '0') : '0'}. Remark: "${leaveRemark}"`
-                : `Leave request from ${allLeaves[leaveIndex].employeeFullName || 'an employee'} was updated by ${currentUserName}. ${getLeaveNotificationSummary(allLeaves[leaveIndex])}.`, editNotification);
+                ? `A remark was added to the leave request from ${updatedLeave.employeeFullName || 'an employee'} by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''} Remark: "${leaveRemark}"`
+                : `Leave request from ${updatedLeave.employeeFullName || 'an employee'} was updated by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''}`, editNotification);
             closeTlEditModal();
             loadTlApprovals();
             loadManagementRequests();
@@ -5479,11 +5866,6 @@
                 alert('❌ Leave request not found.');
                 return;
             }
-            if (leaveToDelete.status !== 'Approved') {
-                alert('❌ Only TL-approved leave requests can be deleted.');
-                return;
-            }
-
             recordDeleteHistoryEntry(leaveToDelete);
             recordActionHistory('Deleted', leaveToDelete);
             allLeaves = allLeaves.filter(l => l.id !== leaveId);
@@ -5873,13 +6255,15 @@
                 return `<tr data-leave-row-id="${escapeDeleteHistoryText(leave.id)}">
                     <td>${escapeDeleteHistoryText(leave.reportFillDate || '-')}</td><td>${escapeDeleteHistoryText(leave.companyName || '-')}</td>
                     <td>${escapeDeleteHistoryText(leave.departmentName || '-')}</td><td>${escapeDeleteHistoryText(leave.employeeFullName || '-')}</td>
-                    <td>${escapeDeleteHistoryText(leave.fullLeaveDate || '-')}</td><td>${escapeDeleteHistoryText(leave.firstHalfDate || '-')}</td>
-                    <td>${escapeDeleteHistoryText(leave.secondHalfDate || '-')}</td><td class="reason-cell">${escapeDeleteHistoryText(leave.leaveReason || '-')}</td>
+                    ${renderLeaveDateCells(leave.fullLeaveDate)}
+                    ${renderLeaveDateCells(leave.firstHalfDate)}
+                    ${renderLeaveDateCells(leave.secondHalfDate)}
+                    <td class="reason-cell">${escapeDeleteHistoryText(leave.leaveReason || '-')}</td>
                     <td>${escapeDeleteHistoryText(leave.totalLeaveDays || '0')}</td>
                     <td><span class="status-badge ${badgeClass}">${escapeDeleteHistoryText(leave.status || 'Pending')}</span>${leave.actionBy ? `<span class="action-by-text">By: ${escapeDeleteHistoryText(leave.actionBy)}</span>` : ''}</td>
                     <td class="reason-cell">${escapeDeleteHistoryText(leave.tlRemark || leave.remark || '-')}</td>
                 </tr>`;
-            }).join('') : '<tr><td colspan="11" class="no-data">No leave history found for this period.</td></tr>';
+            }).join('') : '<tr><td colspan="14" class="no-data">No leave history found for this period.</td></tr>';
         }
 
         document.getElementById('tlLeaveRequestsToggle')?.addEventListener('click', () => toggleTlLeaveRequests());
@@ -5998,6 +6382,65 @@
             return true;
         }
 
+        function getLeaveDateColumns(value) {
+            const dates = String(value || '')
+                .split(',')
+                .map((date) => date.trim())
+                .filter((date) => date && date !== '-');
+            if (!dates.length) {
+                return { entries: [{ date: '-', monthYear: '-' }] };
+            }
+
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const entries = [];
+            dates.forEach((date) => {
+                const [day, month, year] = date.split('/');
+                if (!day || !month || !year || !monthNames[Number(month) - 1]) {
+                    entries.push({ date, monthYear: '-' });
+                    return;
+                }
+                const monthYear = `${monthNames[Number(month) - 1]} ${year}`;
+                entries.push({ date: day, monthYear });
+            });
+
+            return { entries };
+        }
+
+        function renderLeaveDateCells(value) {
+            const columns = getLeaveDateColumns(value);
+            const groupedEntries = [];
+            columns.entries.forEach((entry) => {
+                const existingGroup = groupedEntries.find((group) => group.monthYear === entry.monthYear);
+                if (existingGroup) {
+                    existingGroup.dates.push(entry.date);
+                } else {
+                    groupedEntries.push({
+                        dates: [entry.date],
+                        monthYear: entry.monthYear
+                    });
+                }
+            });
+
+            if (groupedEntries.length === 1) {
+                return `<td>${escapeDeleteHistoryText(groupedEntries[0].dates.join(', '))}</td><td>${escapeDeleteHistoryText(groupedEntries[0].monthYear)}</td>`;
+            }
+
+            const dateItems = groupedEntries.map((group) => `
+                <div class="leave-date-item has-month-border">
+                    <span>${escapeDeleteHistoryText(group.dates.join(', '))}</span>
+                </div>
+            `).join('');
+            const monthYearItems = groupedEntries.map((group) => `
+                <div class="leave-date-item has-month-border">
+                    <span>${escapeDeleteHistoryText(group.monthYear)}</span>
+                </div>
+            `).join('');
+            return `<td><div class="leave-date-list">${dateItems}</div></td><td><div class="leave-date-list">${monthYearItems}</div></td>`;
+        }
+
         document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -6035,7 +6478,7 @@
                 fullLeaveDate: fullLeaveVal,
                 firstHalfDate: firstHalfVal,
                 secondHalfDate: secondHalfVal,
-                totalLeaveDays: document.getElementById('totalLeaveDays').value,
+                totalLeaveDays: document.getElementById('totalLeaveDays').textContent,
                 status: 'Pending',
                 actionBy: '', 
                 timestamp: new Date().toISOString()
@@ -6071,6 +6514,7 @@
 
             alert('✅ Your leave request was submitted successfully. The department Team Leader has been notified.');
             this.reset();
+            clearLeaveDatePickers();
             setEmployeeNameOnLeaveForm();
             applyLeaveFormAutoDefaults();
              
@@ -6078,6 +6522,9 @@
             document.getElementById('employeeCardView').classList.remove('hidden');
             loadLeaveHistory();
         });
+
+        addTopTableScrollbars();
+        window.addEventListener('resize', addTopTableScrollbars);
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem("loggedInUser");

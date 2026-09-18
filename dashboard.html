@@ -1080,6 +1080,11 @@
             overflow-y: auto;
             padding-right: 4px;
         }
+        .daily-report-search {
+            width: 100%;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
 
         .daily-report-box-list li {
             display: flex;
@@ -1739,6 +1744,13 @@
                             <span>Days</span>
                         </div>
                     </div>
+                    <div class="stat-card approved-counter" style="cursor: default;">
+                        <div class="stat-card-title">Deleted Leave:</div>
+                        <div class="stat-badge-box">
+                            <div class="stat-circle" id="employeeDeletedHistoryCountBadge">0</div>
+                            <span>Records</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="openLeaveFormCard" class="clickable-card">
@@ -2013,6 +2025,13 @@
                         <span>Days</span>
                     </div>
                 </div>
+                <div class="stat-card approved-counter" style="cursor: default;">
+                    <div class="stat-card-title">Deleted Leave:</div>
+                    <div class="stat-badge-box">
+                        <div class="stat-circle" id="tlDeletedHistoryCountBadge">0</div>
+                        <span>Records</span>
+                    </div>
+                </div>
             </div>
 
             <div class="history-section" style="margin-bottom: 20px;">
@@ -2059,7 +2078,23 @@
                         </div>
                         <div class="form-group">
                             <label for="tlLeaveDepartment">DEPARTMENT *</label>
-                            <select id="tlLeaveDepartment" required></select>
+                            <select id="tlLeaveDepartment" required>
+                                <option value="" disabled selected>ડિપાર્ટમેન્ટ પસંદ કરો</option>
+                                <option value="FACULTY">FACULTY</option>
+                                <option value="TYPING">TYPING</option>
+                                <option value="CONTENT">CONTENT</option>
+                                <option value="GRAPHIC">GRAPHIC</option>
+                                <option value="VIDEO EDITING">VIDEO EDITING</option>
+                                <option value="VIDEO RECORDING">VIDEO RECORDING</option>
+                                <option value="OFFLINE">OFFLINE</option>
+                                <option value="CALLING">CALLING</option>
+                                <option value="MARKETING">MARKETING</option>
+                                <option value="SALES">SALES</option>
+                                <option value="MANAGEMENT">MANAGEMENT</option>
+                                <option value="ACCOUNT">ACCOUNT</option>
+                                <option value="IT">IT</option>
+                                <option value="BOOK">BOOK</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="tlLeaveName">EMPLOYEE NAME *</label>
@@ -2072,27 +2107,22 @@
                         <div class="form-group">
                             <label for="tlLeaveReportDate">LEAVE REPORT FILL DATE *</label>
                             <input type="text" id="tlLeaveReportDate" placeholder="ક્લિક કરીને કેલેન્ડરથી તારીખ પસંદ કરો (dd/mm/yyyy)" readonly required style="cursor: pointer;">
-                            <small>ફક્ત કેલેન્ડર પરથી જ ડાયરેક્ટ તારીખ સિલેક્ટ કરી શકાશે (dd/mm/yyyy ફોર્મેટ).<br>The date can only be selected directly from the calendar (dd/mm/yyyy format).</small>
                         </div>
                         <div class="form-group">
                             <label for="tlLeaveFullDate">FULL LEAVE DATE</label>
-                            <input type="text" id="tlLeaveFullDate" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                            <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું. એકથી વધુ તારીખો માટે comma (,) વાપરો.<br>Use dd/mm/yyyy format and separate multiple dates with commas (,).</small>
+                            <input type="text" id="tlLeaveFullDate" class="leave-date-picker" placeholder="કેલેન્ડરમાંથી તારીખ પસંદ કરો" readonly autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="tlLeaveFirstHalf">FIRST HALF LEAVE DATE</label>
-                            <input type="text" id="tlLeaveFirstHalf" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                            <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.<br>Use the dd/mm/yyyy format.</small>
+                            <input type="text" id="tlLeaveFirstHalf" class="leave-date-picker" placeholder="કેલેન્ડરમાંથી તારીખ પસંદ કરો" readonly autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="tlLeaveSecondHalf">SECOND HALF LEAVE DATE</label>
-                            <input type="text" id="tlLeaveSecondHalf" placeholder="dd/mm/yyyy કે તારીખો વચ્ચે comma (,)">
-                            <small>ફરજિયાત dd/mm/yyyy ફોર્મેટમાં લખવું.<br>Use the dd/mm/yyyy format.</small>
+                            <input type="text" id="tlLeaveSecondHalf" class="leave-date-picker" placeholder="કેલેન્ડરમાંથી તારીખ પસંદ કરો" readonly autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="tlLeaveDays">TOTAL DAYS OF LEAVES *</label>
-                            <input type="number" id="tlLeaveDays" min="0" step="0.5" placeholder="કુલ રજાના દિવસો લખો (દા.ત. 1)" required>
-                            <small>ફક્ત નંબર જ લખી શકાશે.<br>Only numbers are allowed.</small>
+                            <div id="tlLeaveDays" class="auto-leave-days" aria-live="polite">0</div>
                         </div>
                         <button type="submit" class="submit-leave-btn"><i class="fa-solid fa-check" style="margin-right: 6px;"></i>Submit Leave Request</button>
                         </form>
@@ -2258,7 +2288,7 @@
                     <div class="stat-card approved-counter" style="cursor: default;">
                         <div class="stat-card-title">Deleted History Total:</div>
                         <div class="stat-badge-box">
-                            <div class="stat-circle" id="mgmtDeletedHistoryCountBadge">0</div>
+                            <div class="stat-circle" id="managementDeletedHistoryCountBadge">0</div>
                             <span>Records</span>
                         </div>
                     </div>
@@ -2383,28 +2413,28 @@
                     <div id="managementDeleteHistoryContent" class="hidden" style="margin-top: 14px;">
                         <div id="managementDeleteHistoryFilters" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
                             <div class="month-filter-box">
-                                <label for="deleteHistoryReportDateFilter">Report Date:</label>
-                                <input type="date" id="deleteHistoryReportDateFilter" style="width: 170px;">
+                                <label for="managementDeleteHistoryReportDateFilter">Report Date:</label>
+                                <input type="date" id="managementDeleteHistoryReportDateFilter" style="width: 170px;">
                             </div>
                             <div class="month-filter-box">
-                                <label for="deleteHistoryCompanyFilter">Company:</label>
-                                <select id="deleteHistoryCompanyFilter" style="width: 150px;"><option value="all">All Companies</option></select>
+                                <label for="managementDeleteHistoryCompanyFilter">Company:</label>
+                                <select id="managementDeleteHistoryCompanyFilter" style="width: 150px;"><option value="all">All Companies</option></select>
                             </div>
                             <div class="month-filter-box">
-                                <label for="deleteHistoryDepartmentFilter">Department:</label>
-                                <select id="deleteHistoryDepartmentFilter" style="width: 150px;"><option value="all">All Departments</option></select>
+                                <label for="managementDeleteHistoryDepartmentFilter">Department:</label>
+                                <select id="managementDeleteHistoryDepartmentFilter" style="width: 150px;"><option value="all">All Departments</option></select>
                             </div>
                             <div class="month-filter-box">
-                                <label for="deleteHistoryActionByFilter">Action By:</label>
-                                <select id="deleteHistoryActionByFilter" style="width: 150px;"><option value="all">All</option></select>
+                                <label for="managementDeleteHistoryActionByFilter">Action By:</label>
+                                <select id="managementDeleteHistoryActionByFilter" style="width: 150px;"><option value="all">All</option></select>
                             </div>
                             <div class="month-filter-box">
-                                <label for="deleteHistorySearchName"><i class="fa-solid fa-search"></i> Search:</label>
-                                <input type="text" id="deleteHistorySearchName" placeholder="Employee Name..." style="width: 150px;">
+                                <label for="managementDeleteHistorySearchName"><i class="fa-solid fa-search"></i> Search:</label>
+                                <input type="text" id="managementDeleteHistorySearchName" placeholder="Employee Name..." style="width: 150px;">
                             </div>
                             <div class="month-filter-box">
-                                <label for="deleteHistoryMonthFilter">Month:</label>
-                                <select id="deleteHistoryMonthFilter">
+                                <label for="managementDeleteHistoryMonthFilter">Month:</label>
+                                <select id="managementDeleteHistoryMonthFilter">
                                     <option value="all">All Months</option>
                                     <option value="01">January</option><option value="02">February</option>
                                     <option value="03">March</option><option value="04">April</option>
@@ -2486,25 +2516,33 @@
                             <div class="management-export-controls">
                                 <div class="export-radio-group">
                                     <label class="export-choice">
-                                        <input type="radio" name="managementExportFormat" value="pdf" checked>
+                                        <input type="radio" name="managementExportFormat" value="pdf" checked onchange="updateManagementGoogleSheetControls()">
                                         <span class="custom-radio"></span>
                                         <span>PDF</span>
                                     </label>
                                     <label class="export-choice">
-                                        <input type="radio" name="managementExportFormat" value="excel">
+                                        <input type="radio" name="managementExportFormat" value="excel" onchange="updateManagementGoogleSheetControls()">
                                         <span class="custom-radio"></span>
                                         <span>Excel</span>
                                     </label>
                                     <label class="export-choice">
-                                        <input type="radio" name="managementExportFormat" value="google_sheet">
+                                        <input type="radio" name="managementExportFormat" value="google_sheet" onchange="updateManagementGoogleSheetControls()">
                                         <span class="custom-radio"></span>
                                         <span>Google Sheet</span>
                                     </label>
                                 </div>
                                 <div class="export-email-inline">
-                                    <input type="email" id="managementGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Enter email address" aria-label="Google Sheet email">
+                                    <input type="email" id="managementGoogleSheetEmail" class="export-email-field" value="datawebsankul@gmail.com" readonly aria-label="Websankul Google Sheet email">
+                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheetMail('datawebsankul@gmail.com')" title="Open email for Websankul">Open</button>
+                                    <button type="button" id="generateWebsankulGoogleSheetBtn" class="generate-report-btn google-sheet-only-control" onclick="generateManagementGoogleSheetForEmail('datawebsankul@gmail.com')">Generate</button>
+                                    <input type="email" id="managementGoogleSheetEmailHousivity" class="export-email-field" value="datahousivity@gmail.com" readonly aria-label="Housivity Google Sheet email">
+                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheetMail('datahousivity@gmail.com')" title="Open email for Housivity">Open</button>
+                                    <button type="button" id="generateHousivityGoogleSheetBtn" class="generate-report-btn google-sheet-only-control" onclick="generateManagementGoogleSheetForEmail('datahousivity@gmail.com')">Generate</button>
+                                    <input type="email" id="managementCustomGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Enter report email" aria-label="Custom Google Sheet report email">
+                                    <button type="button" class="generate-report-btn google-sheet-only-control" onclick="openCustomManagementGoogleSheetMail()" title="Open email for custom recipient">Open</button>
+                                    <button type="button" class="generate-report-btn google-sheet-only-control" onclick="generateCustomManagementGoogleSheet()">Generate</button>
                                 </div>
-                                <button type="button" class="generate-report-btn" onclick="generateManagementExportReport()">Generate</button>
+                                <button type="button" id="generateManagementExportBtn" class="generate-report-btn" onclick="generateManagementExportReport()">Generate</button>
                             </div>
                         </div>
                         </div>
@@ -2663,6 +2701,7 @@
                             <label class="report-option"><input type="radio" name="departmentSelectionMode" value="all" checked> All Department</label>
                             <label class="report-option"><input type="radio" name="departmentSelectionMode" value="few"> Few Department</label>
                         </div>
+                        <input type="search" id="dailyReportDepartmentSearch" class="daily-report-search" placeholder="Search department..." aria-label="Search department">
                         <ul id="dailyReportDepartmentList" class="daily-report-box-list"></ul>
                     </div>
 
@@ -2674,6 +2713,7 @@
                             <label class="report-option"><input type="radio" name="employeeSelectionMode" value="all" checked> All Employee</label>
                             <label class="report-option"><input type="radio" name="employeeSelectionMode" value="few"> Few Employee</label>
                         </div>
+                        <input type="search" id="dailyReportEmployeeSearch" class="daily-report-search" placeholder="Search employee..." aria-label="Search employee">
                         <ul id="dailyReportEmployeeList" class="daily-report-box-list"></ul>
                     </div>
                 </div>
@@ -2714,8 +2754,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
-        function initializeReportDateField() {
-            const reportDateInput = document.getElementById('reportFillDate');
+        function initializeReportDateField(inputId = 'reportFillDate') {
+            const reportDateInput = document.getElementById(inputId);
             if (!reportDateInput) return;
 
             if (window.flatpickr && reportDateInput._flatpickr) {
@@ -2879,17 +2919,22 @@
         }
 
         function updateAutomaticLeaveDays() {
-            const fullLeave = document.getElementById('fullLeaveDate')?._flatpickr;
-            const firstHalf = document.getElementById('firstHalfDate')?._flatpickr;
-            const secondHalf = document.getElementById('secondHalfDate')?._flatpickr;
-            const totalDaysInput = document.getElementById('totalLeaveDays');
-            if (!totalDaysInput) return;
+            [
+                ['fullLeaveDate', 'firstHalfDate', 'secondHalfDate', 'totalLeaveDays'],
+                ['tlLeaveFullDate', 'tlLeaveFirstHalf', 'tlLeaveSecondHalf', 'tlLeaveDays']
+            ].forEach(([fullId, firstId, secondId, totalId]) => {
+                const fullLeave = document.getElementById(fullId)?._flatpickr;
+                const firstHalf = document.getElementById(firstId)?._flatpickr;
+                const secondHalf = document.getElementById(secondId)?._flatpickr;
+                const totalDaysInput = document.getElementById(totalId);
+                if (!totalDaysInput) return;
 
-            const fullDays = fullLeave ? fullLeave.selectedDates.length : 0;
-            const firstHalfDays = firstHalf ? firstHalf.selectedDates.length : 0;
-            const secondHalfDays = secondHalf ? secondHalf.selectedDates.length : 0;
-            const totalDays = fullDays + ((firstHalfDays + secondHalfDays) * 0.5);
-            totalDaysInput.textContent = totalDays ? String(totalDays) : '0';
+                const fullDays = fullLeave ? fullLeave.selectedDates.length : 0;
+                const firstHalfDays = firstHalf ? firstHalf.selectedDates.length : 0;
+                const secondHalfDays = secondHalf ? secondHalf.selectedDates.length : 0;
+                const totalDays = fullDays + ((firstHalfDays + secondHalfDays) * 0.5);
+                totalDaysInput.textContent = totalDays ? String(totalDays) : '0';
+            });
         }
 
         function addTopTableScrollbars() {
@@ -3601,10 +3646,9 @@
             });
 
             if (!isAllMode) {
-                const checkedCount = checkboxes.filter((checkbox) => checkbox.checked).length;
-                if (checkedCount === 0 && checkboxes.length > 0) {
-                    checkboxes[0].checked = true;
-                }
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = false;
+                });
             }
 
             updateDailyReportSelectionSummary();
@@ -3654,6 +3698,51 @@
             return email || 'websankulhr@gmail.com';
         }
 
+        const CONFIGURED_GOOGLE_SHEET_RECIPIENTS = [
+            'datawebsankul@gmail.com',
+            'datahousivity@gmail.com'
+        ];
+        const GOOGLE_SHEET_COMPANY_BY_EMAIL = {
+            'datawebsankul@gmail.com': 'WEBSANKUL',
+            'datahousivity@gmail.com': 'HOUSIVITY'
+        };
+
+        function getConfiguredGoogleSheetRecipients() {
+            return CONFIGURED_GOOGLE_SHEET_RECIPIENTS.slice();
+        }
+
+        function getGoogleSheetCompanyForEmail(email) {
+            return GOOGLE_SHEET_COMPANY_BY_EMAIL[String(email || '').trim().toLowerCase()] || '';
+        }
+
+        function updateManagementGoogleSheetControls() {
+            const isGoogleSheet = getSelectedManagementExportFormat() === 'google_sheet';
+            document.querySelectorAll('.google-sheet-only-control').forEach((button) => {
+                button.style.display = isGoogleSheet ? 'inline-flex' : 'none';
+            });
+            const commonButton = document.getElementById('generateManagementExportBtn');
+            if (commonButton) commonButton.style.display = isGoogleSheet ? 'none' : 'inline-flex';
+        }
+
+        function openConfiguredGoogleSheetMail(email) {
+            const recipients = email ? [email] : getConfiguredGoogleSheetRecipients();
+            const mailtoUrl = `mailto:${recipients.join(',')}`;
+            window.open(mailtoUrl, '_blank');
+        }
+
+        function getCustomManagementGoogleSheetEmail() {
+            return String(document.getElementById('managementCustomGoogleSheetEmail')?.value || '').trim();
+        }
+
+        function openCustomManagementGoogleSheetMail() {
+            const email = getCustomManagementGoogleSheetEmail();
+            if (!isValidEmail(email)) {
+                showExportNotice('Please enter a valid email address before opening the Google Sheet email.');
+                return;
+            }
+            openConfiguredGoogleSheetMail(email);
+        }
+
         function isValidEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
         }
@@ -3701,9 +3790,10 @@
         }
 
         function openGoogleSheetMail(email, fileName, csvContent) {
+            const recipients = Array.isArray(email) ? email : [email];
             const subject = encodeURIComponent(`${fileName} - Google Sheet Report`);
             const body = encodeURIComponent(`Please import this CSV report into Google Sheets.\n\n${csvContent.slice(0, 12000)}`);
-            const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+            const mailtoUrl = `mailto:${recipients.join(',')}?subject=${subject}&body=${body}`;
             window.open(mailtoUrl, '_blank');
         }
 
@@ -3782,20 +3872,11 @@
             }
         }
 
-        function exportManagementToGoogleSheet() {
-            const filteredLeaves = getManagementExportData();
-            if (!filteredLeaves.length) {
-                showExportNotice('No records match the current selected company, department, employee, and date filters.');
-                return;
-            }
-
-            const email = getExportEmailAddress('#managementGoogleSheetEmail');
-            if (!isValidEmail(email)) {
-                showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
-                return;
-            }
-
-            const rows = filteredLeaves.map((leave) => ({
+        function getManagementGoogleSheetRows(companyName) {
+            const filteredLeaves = getManagementExportData().filter((leave) => {
+                return !companyName || String(leave.companyName || '').trim().toUpperCase() === companyName;
+            });
+            return filteredLeaves.map((leave) => ({
                 'Report Date': leave.reportFillDate || '',
                 'Company': leave.companyName || '',
                 'Department': leave.departmentName || '',
@@ -3808,12 +3889,103 @@
                 'Status': leave.status || '',
                 'Action By': leave.actionBy || ''
             }));
+        }
 
-            const fileName = 'approved_leave_report.csv';
-            const csvContent = buildCsvContentFromRows(rows, 'Approved Leave Report');
-            downloadCsvBlob(fileName, csvContent);
+        function generateManagementGoogleSheetForEmail(email) {
+            const companyName = getGoogleSheetCompanyForEmail(email);
+            const rows = getManagementGoogleSheetRows(companyName);
+            if (!rows.length) {
+                showExportNotice(`No approved ${companyName || ''} company records match the current selected filters.`);
+                return;
+            }
+            if (!isValidEmail(email)) {
+                showExportNotice('Configured Google Sheet recipient email is invalid.');
+                return;
+            }
+
+            const storageKey = `managementGoogleSheetRows:${email}`;
+            let previousRows = [];
+            try {
+                previousRows = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                if (!Array.isArray(previousRows)) previousRows = [];
+                previousRows = previousRows.filter((row) => {
+                    return String(row.Company || '').trim().toUpperCase() === companyName;
+                });
+            } catch (error) {
+                console.error('Unable to read saved Google Sheet rows.', error);
+            }
+            const combinedRows = previousRows.concat(rows);
+            localStorage.setItem(storageKey, JSON.stringify(combinedRows));
+
+            const csvContent = buildCsvContentFromRows(combinedRows, 'Approved Leave Report');
+            downloadCsvBlob('approved_leave_report.csv', csvContent);
             openGoogleSheetMail(email, 'Approved Leave Report', csvContent);
-            showExportNotice('Google Sheet report generated. The file has been downloaded and a mail draft has been opened for ' + email + '.');
+            showExportNotice(`${companyName} company report generated for ${email}. New data was appended to its separate saved report.`);
+        }
+
+        function generateCustomManagementGoogleSheet() {
+            const email = getCustomManagementGoogleSheetEmail();
+            if (!isValidEmail(email)) {
+                showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
+                return;
+            }
+
+            const rows = getManagementGoogleSheetRows();
+            if (!rows.length) {
+                showExportNotice('No records match the current selected company, department, employee, and date filters.');
+                return;
+            }
+
+            const storageKey = `managementGoogleSheetRows:custom:${email.toLowerCase()}`;
+            let previousRows = [];
+            try {
+                previousRows = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                if (!Array.isArray(previousRows)) previousRows = [];
+            } catch (error) {
+                console.error('Unable to read saved custom Google Sheet rows.', error);
+            }
+
+            const combinedRows = previousRows.concat(rows);
+            localStorage.setItem(storageKey, JSON.stringify(combinedRows));
+            const csvContent = buildCsvContentFromRows(combinedRows, 'Leave Report');
+            downloadCsvBlob('leave_report.csv', csvContent);
+            openGoogleSheetMail(email, 'Leave Report', csvContent);
+            showExportNotice(`Google Sheet report generated for ${email}. New data was appended to its saved report.`);
+        }
+
+        function exportManagementToGoogleSheet() {
+            const recipients = getConfiguredGoogleSheetRecipients();
+            if (recipients.some((email) => !isValidEmail(email))) {
+                showExportNotice('Configured Google Sheet recipient email is invalid.');
+                return;
+            }
+
+            let generatedCount = 0;
+            recipients.forEach((email) => {
+                const companyName = getGoogleSheetCompanyForEmail(email);
+                const rows = getManagementGoogleSheetRows(companyName);
+                if (!rows.length) return;
+                const storageKey = `managementGoogleSheetRows:${email}`;
+                let previousRows = [];
+                try {
+                    previousRows = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    if (!Array.isArray(previousRows)) previousRows = [];
+                    previousRows = previousRows.filter((row) => {
+                        return String(row.Company || '').trim().toUpperCase() === companyName;
+                    });
+                } catch (error) {
+                    console.error('Unable to read saved Google Sheet rows.', error);
+                }
+                const combinedRows = previousRows.concat(rows);
+                localStorage.setItem(storageKey, JSON.stringify(combinedRows));
+                openGoogleSheetMail(email, `${companyName} Approved Leave Report`, buildCsvContentFromRows(combinedRows, 'Approved Leave Report'));
+                generatedCount += 1;
+            });
+            if (!generatedCount) {
+                showExportNotice('No approved Websankul or Housivity company records match the current selected filters.');
+                return;
+            }
+            showExportNotice('Separate company reports generated: Websankul data was sent only to datawebsankul@gmail.com and Housivity data only to datahousivity@gmail.com.');
         }
 
         function exportManagementToPdf() {
@@ -3865,7 +4037,7 @@
                     doc.setDrawColor(148, 163, 184);
                     doc.setTextColor(255, 255, 255);
                     doc.rect(x, margin + 9, column.width, headerHeight, 'FD');
-                    doc.text(column.title, x + 1.5, margin + 15, { maxWidth: column.width - 3 });
+                    doc.text(column.title, x + column.width / 2, margin + 15, { align: 'center', maxWidth: column.width - 3 });
                     x += column.width;
                 });
                 return margin + 9 + headerHeight;
@@ -3899,13 +4071,52 @@
                     doc.setTextColor(15, 23, 42);
                     doc.rect(x, y, column.width, rowHeight, 'FD');
                     doc.setFontSize(6.5);
-                    doc.text(lines, x + 1.5, y + rowPadding + lineHeight, { baseline: 'top', maxWidth: column.width - 3 });
+                    doc.text(lines, x + column.width / 2, y + rowPadding + lineHeight, { align: 'center', baseline: 'top', maxWidth: column.width - 3 });
                     x += column.width;
                 });
                 y += rowHeight;
             });
 
             doc.save(fileName);
+        }
+
+        function formatExportWorksheet(worksheet, columnWidths = []) {
+            if (!worksheet || !window.XLSX) return worksheet;
+            const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:A1');
+            const borderStyle = {
+                top: { style: 'thin', color: { rgb: 'B7C5D8' } },
+                bottom: { style: 'thin', color: { rgb: 'B7C5D8' } },
+                left: { style: 'thin', color: { rgb: 'B7C5D8' } },
+                right: { style: 'thin', color: { rgb: 'B7C5D8' } }
+            };
+            for (let row = range.s.r; row <= range.e.r; row += 1) {
+                for (let column = range.s.c; column <= range.e.c; column += 1) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: row, c: column });
+                    const cell = worksheet[cellAddress];
+                    if (!cell) continue;
+                    cell.s = cell.s || {};
+                    cell.s.border = borderStyle;
+                    cell.s.alignment = {
+                        ...(cell.s.alignment || {}),
+                        horizontal: 'center',
+                        vertical: 'center',
+                        wrapText: true
+                    };
+                    cell.s.font = { ...(cell.s.font || {}), name: 'Calibri', size: 10 };
+                    if (row === range.s.r) {
+                        cell.s.fill = { fgColor: { rgb: '2F4B7C' } };
+                        cell.s.font.bold = true;
+                        cell.s.font.color = { rgb: 'FFFFFF' };
+                    }
+                }
+            }
+            if (columnWidths.length) {
+                worksheet['!cols'] = columnWidths.map((width) => ({ wch: width }));
+            }
+            worksheet['!rows'] = Array.from({ length: range.e.r + 1 }, (_, index) => (
+                index === 0 ? { hpt: 24 } : { hpt: 30 }
+            ));
+            return worksheet;
         }
 
         function exportManagementToExcel() {
@@ -3929,7 +4140,7 @@
                 'Action By': leave.actionBy || ''
             }));
 
-            const ws = XLSX.utils.json_to_sheet(rows);
+            const ws = formatExportWorksheet(XLSX.utils.json_to_sheet(rows), [14, 18, 18, 22, 22, 18, 18, 32, 10, 14, 18]);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Approved Leave Report');
             XLSX.writeFile(wb, 'approved_leave_report.xlsx');
@@ -3971,7 +4182,7 @@
                     'Action By': leave.actionBy || ''
                 }));
 
-                const ws = XLSX.utils.json_to_sheet(rows);
+                const ws = formatExportWorksheet(XLSX.utils.json_to_sheet(rows), [14, 18, 18, 22, 22, 18, 18, 32, 10, 14, 18]);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, reportType || 'Daily Report');
                 XLSX.writeFile(wb, `${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.xlsx`);
@@ -3979,9 +4190,9 @@
             }
 
             if (normalizedFormat === 'google_sheet') {
-                const email = getExportEmailAddress('#dailyReportGoogleSheetEmail');
-                if (!isValidEmail(email)) {
-                    showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
+                const recipients = getConfiguredGoogleSheetRecipients();
+                if (recipients.some((email) => !isValidEmail(email))) {
+                    showExportNotice('Configured Google Sheet recipient email is invalid.');
                     return;
                 }
 
@@ -4002,8 +4213,8 @@
                 const fileName = `${(reportType || 'daily-report').toLowerCase().replace(/\s+/g, '-')}.csv`;
                 const csvContent = buildCsvContentFromRows(rows, reportType || 'Report');
                 downloadCsvBlob(fileName, csvContent);
-                openGoogleSheetMail(email, reportType || 'Daily Report', csvContent);
-                showExportNotice('Google Sheet report generated. The file has been downloaded and a mail draft has been opened for ' + email + '.');
+                openGoogleSheetMail(recipients, reportType || 'Daily Report', csvContent);
+                showExportNotice('Google Sheet report generated. The file has been downloaded and a mail draft has been opened for both configured recipients.');
                 return;
             }
 
@@ -4075,6 +4286,9 @@
             const selectedCompanies = getSelectedCheckboxValues('dailyReportCompanyList');
             const selectedDepartments = getSelectedCheckboxValues('dailyReportDepartmentList');
             const selectedEmployees = getSelectedCheckboxValues('dailyReportEmployeeList');
+            const companyFew = document.querySelector('input[name="companySelectionMode"][value="few"]:checked');
+            const departmentFew = document.querySelector('input[name="departmentSelectionMode"][value="few"]:checked');
+            const employeeFew = document.querySelector('input[name="employeeSelectionMode"][value="few"]:checked');
 
             const dailyDateValue = normalizeDateValue(datePicker ? datePicker.value : '');
             const dailyDate = dailyDateValue ? parseReportDate(dailyDateValue) : null;
@@ -4122,6 +4336,9 @@
                 }
 
                 if (currentReportOwner !== 'tl') {
+                    if (companyFew && !selectedCompanies.length) return false;
+                    if (departmentFew && !selectedDepartments.length) return false;
+                    if (employeeFew && !selectedEmployees.length) return false;
                     if (selectedCompanies.length && !(leave.companyName && selectedCompanies.includes(leave.companyName))) return false;
                     if (selectedDepartments.length && !(leave.departmentName && selectedDepartments.includes(leave.departmentName))) return false;
                     if (selectedEmployees.length && !(leave.employeeFullName && selectedEmployees.includes(leave.employeeFullName))) return false;
@@ -4176,7 +4393,7 @@
                 periodicEndPicker.value = localToday.toISOString().slice(0, 10);
             }
 
-            function buildList(listEl, values, labelKey) {
+            function buildList(listEl, values, searchId) {
                 listEl.innerHTML = '';
                 if (!values.length) {
                     listEl.innerHTML = '<li>No data available</li>';
@@ -4198,6 +4415,13 @@
                     item.appendChild(label);
                     listEl.appendChild(item);
                 });
+                const searchInput = document.getElementById(searchId);
+                if (searchInput) searchInput.oninput = () => {
+                    const query = searchInput.value.trim().toLowerCase();
+                    listEl.querySelectorAll('li').forEach((item) => {
+                        item.classList.toggle('hidden', !!query && !item.textContent.toLowerCase().includes(query));
+                    });
+                };
             }
 
             if (companyList) {
@@ -4207,12 +4431,12 @@
 
             if (departmentList) {
                 const departments = Array.from(new Set(leaves.map(leave => leave.departmentName).filter(Boolean))).sort();
-                buildList(departmentList, departments, 'department');
+                buildList(departmentList, departments, 'dailyReportDepartmentSearch');
             }
 
             if (employeeList) {
                 const employees = Array.from(new Set(leaves.map(leave => leave.employeeFullName).filter(Boolean))).sort();
-                buildList(employeeList, employees, 'employee');
+                buildList(employeeList, employees, 'dailyReportEmployeeSearch');
             }
 
             document.querySelectorAll('input[name="companySelectionMode"]').forEach((radio) => {
@@ -4432,7 +4656,7 @@
                     showExportNotice('Excel export is currently unavailable.');
                     return;
                 }
-                const worksheet = XLSX.utils.json_to_sheet(rows);
+                const worksheet = formatExportWorksheet(XLSX.utils.json_to_sheet(rows), [24, 24, 24, 20, 18, 18, 18, 35]);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, 'Action History');
                 XLSX.writeFile(workbook, 'action_history.xlsx');
@@ -4455,7 +4679,7 @@
                 doc.setTextColor(255, 255, 255);
                 columns.forEach((column, index) => {
                     doc.rect(x, y, widths[index], rowHeight, 'FD');
-                    doc.text(column, x + 2, y + 6);
+                    doc.text(column, x + widths[index] / 2, y + 6, { align: 'center', maxWidth: widths[index] - 4 });
                     x += widths[index];
                 });
                 doc.setTextColor(15, 23, 42);
@@ -4475,7 +4699,7 @@
                 columns.forEach((column, index) => {
                     const text = String(row[column] || '-').replace(/\r?\n/g, ' ').slice(0, 52);
                     doc.rect(x, y, widths[index], rowHeight, 'S');
-                    doc.text(text, x + 2, y + 6);
+                    doc.text(text, x + widths[index] / 2, y + 6, { align: 'center', maxWidth: widths[index] - 4 });
                     x += widths[index];
                 });
                 y += rowHeight;
@@ -4499,9 +4723,9 @@
             return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
-        function toggleDeleteHistoryList(forceOpen) {
-            const toggle = document.getElementById('managementDeleteHistoryToggle');
-            const content = document.getElementById('managementDeleteHistoryContent');
+        function toggleDeleteHistoryList(forceOpen, panelPrefix = 'management') {
+            const toggle = document.getElementById(`${panelPrefix}DeleteHistoryToggle`);
+            const content = document.getElementById(`${panelPrefix}DeleteHistoryContent`);
             if (!toggle || !content) return;
 
             const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : content.classList.contains('hidden');
@@ -4510,23 +4734,53 @@
             toggle.setAttribute('aria-expanded', String(shouldOpen));
         }
 
-        function renderDeleteHistory() {
-            const container = document.getElementById('managementDeleteHistoryList');
+        function normalizeDeleteHistoryIdentity(value) {
+            return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+        }
+
+        function getVisibleDeleteHistoryEntries(panelPrefix, historyEntries) {
+            if (panelPrefix === 'management') return historyEntries;
+
+            const loggedInEmail = normalizeDeleteHistoryIdentity(userData?.email || userIdentifier);
+            const loggedInName = normalizeDeleteHistoryIdentity(getLoggedInUserDisplayName() || currentUserName);
+            const isEmployee = panelPrefix === 'employee' && isRole('Employee');
+            const isTl = panelPrefix === 'tl' && (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader'));
+            if (!isEmployee && !isTl) return [];
+
+            const departments = new Set(getUserDepartments().map(normalizeDepartmentName));
+            return historyEntries.filter((entry) => {
+                const entryEmail = normalizeDeleteHistoryIdentity(entry.employeeEmail);
+                const entryName = normalizeDeleteHistoryIdentity(entry.employeeName);
+                const isOwnRequest = (loggedInEmail && entryEmail === loggedInEmail)
+                    || (loggedInName && entryName === loggedInName);
+                if (isOwnRequest) return true;
+                const assignedApproverEmails = Array.isArray(entry.assignedTlEmails)
+                    ? entry.assignedTlEmails
+                    : (entry.assignedTlEmail ? [entry.assignedTlEmail] : []);
+                const isAssignedApprover = isTl && assignedApproverEmails
+                    .map(normalizeDeleteHistoryIdentity)
+                    .includes(loggedInEmail);
+                if (isAssignedApprover) return true;
+                return isTl && departments.has(normalizeDepartmentName(entry.department));
+            });
+        }
+
+        function renderDeleteHistory(panelPrefix = 'management') {
+            const container = document.getElementById(`${panelPrefix}DeleteHistoryList`);
             if (!container) return;
 
-            const allHistoryEntries = getDeleteHistory()
-                .filter((entry) => entry.status === 'Approved')
+            const allHistoryEntries = getVisibleDeleteHistoryEntries(panelPrefix, getDeleteHistory())
                 .slice()
                 .sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
-            const deletedHistoryCount = document.getElementById('mgmtDeletedHistoryCountBadge');
-            if (deletedHistoryCount) deletedHistoryCount.innerText = allHistoryEntries.length;
+            const deletedHistoryCount = document.getElementById(`${panelPrefix}DeletedHistoryCountBadge`);
 
-            const companyFilter = document.getElementById('deleteHistoryCompanyFilter');
-            const departmentFilter = document.getElementById('deleteHistoryDepartmentFilter');
-            const actionByFilter = document.getElementById('deleteHistoryActionByFilter');
-            const reportDateFilter = document.getElementById('deleteHistoryReportDateFilter')?.value || '';
-            const monthFilter = document.getElementById('deleteHistoryMonthFilter')?.value || 'all';
-            const searchQuery = (document.getElementById('deleteHistorySearchName')?.value || '').trim().toLowerCase();
+            const getElement = (suffix) => document.getElementById(`${panelPrefix}DeleteHistory${suffix}`);
+            const companyFilter = getElement('CompanyFilter');
+            const departmentFilter = getElement('DepartmentFilter');
+            const actionByFilter = getElement('ActionByFilter');
+            const reportDateFilter = getElement('ReportDateFilter')?.value || '';
+            const monthFilter = getElement('MonthFilter')?.value || 'all';
+            const searchQuery = (getElement('SearchName')?.value || '').trim().toLowerCase();
             const uniqueValues = (key) => [...new Set(allHistoryEntries.map((entry) => entry[key]).filter(Boolean))].sort();
             const updateOptions = (select, values, allLabel) => {
                 if (!select) return;
@@ -4553,6 +4807,8 @@
                 }
                 return true;
             });
+
+            if (deletedHistoryCount) deletedHistoryCount.innerText = filteredHistoryEntries.length;
 
             if (!filteredHistoryEntries.length) {
                 container.innerHTML = '<div style="padding: 14px 16px; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; background: rgba(15, 23, 42, 0.55); color: #cbd5e1;">No deleted leave requests yet.</div>';
@@ -4603,6 +4859,76 @@
             }).join('');
         }
 
+        function cloneDeleteHistoryPanel(panelPrefix, targetPanelId) {
+            const source = document.getElementById('managementDeleteHistoryToggle')?.closest('.history-section');
+            const target = document.getElementById(targetPanelId);
+            if (!source || !target || document.getElementById(`${panelPrefix}DeleteHistoryToggle`)) return;
+
+            const clone = source.cloneNode(true);
+            clone.querySelectorAll('[id]').forEach((element) => {
+                element.id = element.id.replace(/^management/, panelPrefix);
+            });
+            clone.querySelectorAll('[for]').forEach((element) => {
+                element.htmlFor = element.htmlFor.replace(/^management/, panelPrefix);
+            });
+            target.appendChild(clone);
+            clone.querySelector(`#${panelPrefix}DeleteHistoryToggle`)?.addEventListener('click', () => toggleDeleteHistoryList(undefined, panelPrefix));
+            clone.querySelector(`#${panelPrefix}DeleteHistoryToggle`)?.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleDeleteHistoryList(undefined, panelPrefix);
+                }
+            });
+            ['ReportDateFilter', 'CompanyFilter', 'DepartmentFilter', 'ActionByFilter', 'MonthFilter']
+                .forEach((suffix) => clone.querySelector(`#${panelPrefix}DeleteHistory${suffix}`)?.addEventListener('change', () => renderDeleteHistory(panelPrefix)));
+            clone.querySelector(`#${panelPrefix}DeleteHistorySearchName`)?.addEventListener('input', () => renderDeleteHistory(panelPrefix));
+            renderDeleteHistory(panelPrefix);
+        }
+
+        function initializeFilterClearButtons() {
+            const filterGroups = new Set();
+            document.querySelectorAll('.month-filter-box').forEach((filterBox) => {
+                const group = filterBox.closest('div[style*="display: flex"]');
+                if (group) filterGroups.add(group);
+            });
+
+            filterGroups.forEach((group) => {
+                if (group.querySelector(':scope > .clear-filters-btn')) return;
+
+                const controls = Array.from(group.querySelectorAll('input, select')).filter((control) => {
+                    const id = String(control.id || '');
+                    return id && !id.includes('Export') && !id.includes('GoogleSheetEmail');
+                });
+                if (!controls.length) return;
+
+                const clearButton = document.createElement('button');
+                clearButton.type = 'button';
+                clearButton.className = 'generate-report-btn clear-filters-btn';
+                clearButton.innerHTML = '<i class="fa-solid fa-rotate-left" style="margin-right: 6px;"></i>Clear';
+                clearButton.addEventListener('click', () => {
+                    controls.forEach((control) => {
+                        if (control.tagName === 'SELECT') {
+                            control.value = control.options[0]?.value || '';
+                            control.dispatchEvent(new Event('change', { bubbles: true }));
+                        } else if (control.type === 'checkbox' || control.type === 'radio') {
+                            control.checked = control.defaultChecked;
+                            control.dispatchEvent(new Event('change', { bubbles: true }));
+                        } else {
+                            control.value = '';
+                            control.dispatchEvent(new Event('input', { bubbles: true }));
+                            control.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                });
+                group.appendChild(clearButton);
+            });
+        }
+
+        cloneDeleteHistoryPanel('employee', 'employeePanel');
+        cloneDeleteHistoryPanel('tl', 'tlPanel');
+        initializeFilterClearButtons();
+        updateManagementGoogleSheetControls();
+
         document.getElementById('managementDeleteHistoryToggle')?.addEventListener('click', () => {
             toggleDeleteHistoryList();
         });
@@ -4614,9 +4940,9 @@
             }
         });
 
-        ['deleteHistoryReportDateFilter', 'deleteHistoryCompanyFilter', 'deleteHistoryDepartmentFilter', 'deleteHistoryActionByFilter', 'deleteHistoryMonthFilter']
-            .forEach((id) => document.getElementById(id)?.addEventListener('change', renderDeleteHistory));
-        document.getElementById('deleteHistorySearchName')?.addEventListener('input', renderDeleteHistory);
+        ['ReportDateFilter', 'CompanyFilter', 'DepartmentFilter', 'ActionByFilter', 'MonthFilter']
+            .forEach((suffix) => document.getElementById(`managementDeleteHistory${suffix}`)?.addEventListener('change', () => renderDeleteHistory('management')));
+        document.getElementById('managementDeleteHistorySearchName')?.addEventListener('input', () => renderDeleteHistory('management'));
 
         window.toggleDeleteHistoryAcknowledged = function(checkbox) {
             if (!checkbox) return;
@@ -4627,11 +4953,13 @@
 
             targetEntry.acknowledged = !!checkbox.checked;
             persistDeleteHistory(historyEntries);
-            renderDeleteHistory();
+            renderDeleteHistory('management');
+            renderDeleteHistory('employee');
+            renderDeleteHistory('tl');
         };
 
         function recordDeleteHistoryEntry(leaveToDelete) {
-            if (!leaveToDelete || leaveToDelete.status !== 'Approved') return;
+            if (!leaveToDelete) return;
 
             const historyEntries = getDeleteHistory();
             const newEntry = {
@@ -4648,6 +4976,9 @@
                 leaveReason: leaveToDelete.leaveReason || '',
                 actionBy: leaveToDelete.actionBy || '',
                 employeeEmail: leaveToDelete.employeeEmail || '',
+                assignedTlEmails: Array.isArray(leaveToDelete.assignedTlEmails)
+                    ? leaveToDelete.assignedTlEmails.map((email) => String(email || '').trim().toLowerCase()).filter(Boolean)
+                    : [],
                 details: {
                     'Report Date': leaveToDelete.reportFillDate || '',
                     'Company': leaveToDelete.companyName || '',
@@ -4661,6 +4992,9 @@
                     'Status': leaveToDelete.status || 'Pending',
                     'Action By': leaveToDelete.actionBy || '',
                     'Employee Email': leaveToDelete.employeeEmail || '',
+                    'Assigned Team Leaders': Array.isArray(leaveToDelete.assignedTlEmails)
+                        ? leaveToDelete.assignedTlEmails.join(', ')
+                        : '',
                     'Submitted At': leaveToDelete.timestamp || ''
                 },
                 deletedBy: currentUserName || 'Unknown',
@@ -4671,6 +5005,8 @@
             historyEntries.unshift(newEntry);
             persistDeleteHistory(historyEntries.slice(0, 30));
             renderDeleteHistory();
+            renderDeleteHistory('employee');
+            renderDeleteHistory('tl');
         }
 
         const firebaseConfig = {
@@ -4707,6 +5043,8 @@
             container.innerHTML = '<span style="color:#94a3b8;">Loading Team Leaders...</span>';
             try {
                 const snapshot = await db.ref(MANAGEMENT_USERS_KEY).once('value');
+                const currentEmail = String(userData?.email || userIdentifier || '').trim().toLowerCase();
+                const currentName = normalizeDeleteHistoryIdentity(getLoggedInUserDisplayName() || currentUserName);
                 const tls = Object.values(snapshot.val() || {})
                     .filter((user) => user && ['TL', 'TeamLeader', 'Team Leader'].includes(user.role))
                     .filter((user) => getAccountStatusLabel(user) === 'Active')
@@ -4715,6 +5053,11 @@
                         email: String(user.email || '').trim().toLowerCase()
                     }))
                     .filter((user) => user.email)
+                    .filter((user) => {
+                        const sameEmail = currentEmail && user.email === currentEmail;
+                        const sameName = currentName && normalizeDeleteHistoryIdentity(user.name) === currentName;
+                        return !sameEmail && !sameName;
+                    })
                     .sort((a, b) => a.name.localeCompare(b.name));
                 container.innerHTML = tls.length ? tls.map((tl) => `
                     <label style="display:flex;align-items:center;gap:8px;color:#e2e8f0;cursor:pointer;">
@@ -4854,19 +5197,19 @@
                     showExportNotice('Excel export is currently unavailable.');
                     return;
                 }
-                const worksheet = XLSX.utils.json_to_sheet(rows);
+                const worksheet = formatExportWorksheet(XLSX.utils.json_to_sheet(rows), [22, 28, 12, 20, 16]);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, 'Accounts');
                 XLSX.writeFile(workbook, `${fileName}.xlsx`);
             } else if (format === 'google_sheet') {
-                const email = getExportEmailAddress('#accountsGoogleSheetEmail');
-                if (!isValidEmail(email)) {
-                    showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
+                const recipients = getConfiguredGoogleSheetRecipients();
+                if (recipients.some((email) => !isValidEmail(email))) {
+                    showExportNotice('Configured Google Sheet recipient email is invalid.');
                     return;
                 }
                 downloadCsvBlob(`${fileName}.csv`, csvContent);
-                openGoogleSheetMail(email, fileName, csvContent);
-                showExportNotice(`Google Sheet report generated. The CSV file has been downloaded and a mail draft has been opened for ${email}.`);
+                openGoogleSheetMail(recipients, fileName, csvContent);
+                showExportNotice('Google Sheet report generated. The CSV file has been downloaded and a mail draft has been opened for both configured recipients.');
             } else {
                 if (!window.jspdf || !window.jspdf.jsPDF) {
                     showExportNotice('PDF export is currently unavailable.');
@@ -4885,8 +5228,8 @@
                     doc.setTextColor(255, 255, 255);
                     let x = 14;
                     columns.forEach((column, index) => {
-                        doc.rect(x, y - 5, widths[index], 8, 'F');
-                        doc.text(column, x + 2, y);
+                        doc.rect(x, y - 5, widths[index], 8, 'FD');
+                        doc.text(column, x + widths[index] / 2, y, { align: 'center', maxWidth: widths[index] - 4 });
                         x += widths[index];
                     });
                     doc.setTextColor(15, 23, 42);
@@ -4901,7 +5244,9 @@
                     }
                     let x = 14;
                     columns.forEach((column, index) => {
-                        doc.text(String(row[column] || '-').slice(0, 42), x + 2, y);
+                        doc.setDrawColor(203, 213, 225);
+                        doc.rect(x, y - 5, widths[index], 8, 'S');
+                        doc.text(String(row[column] || '-').slice(0, 42), x + widths[index] / 2, y, { align: 'center', maxWidth: widths[index] - 4 });
                         x += widths[index];
                     });
                     y += 7;
@@ -5015,6 +5360,8 @@
             populateManagementFilterOptions();
             populateDailyReportLists();
             renderDeleteHistory();
+            renderDeleteHistory('employee');
+            renderDeleteHistory('tl');
             const defaultPanel = isRole('Management')
                 ? 'management'
                 : (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader'))
@@ -5344,6 +5691,18 @@
         function getManagementReviewedState(leave) {
             if (!leave) return false;
             return !!leave.managementReviewed;
+        }
+
+        function canCurrentTlActOnRequest(leave) {
+            if (!leave || !(isRole('TL') || isRole('TeamLeader') || isRole('Team Leader'))) return false;
+            const currentTlEmail = String(userIdentifier || '').trim().toLowerCase();
+            const assignedTlEmails = Array.isArray(leave.assignedTlEmails)
+                ? leave.assignedTlEmails.map((email) => String(email || '').trim().toLowerCase())
+                : [];
+            if (currentTlEmail && assignedTlEmails.includes(currentTlEmail)) return true;
+
+            const allowedDepartments = getUserDepartments().map(normalizeDepartmentName);
+            return allowedDepartments.includes(normalizeDepartmentName(leave.departmentName));
         }
 
         function setReviewedState(leave, panel, isReviewed) {
@@ -5736,9 +6095,8 @@
             }
 
             const leave = allLeaves[leaveIndex];
-            const allowedDepartments = getUserDepartments().map((department) => String(department).trim().toUpperCase());
-            if (allowedDepartments.length && !allowedDepartments.includes(String(leave.departmentName || '').trim().toUpperCase())) {
-                alert('❌ You can edit requests only from your department.');
+            if (!canCurrentTlActOnRequest(leave)) {
+                alert('❌ You can edit only requests assigned to you or from your department.');
                 return;
             }
 
@@ -6130,7 +6488,7 @@
                 'Reviewed': leave.managementReviewed ? 'Yes' : (leave.reviewed ? 'Yes' : 'No')
             }));
 
-            const worksheet = XLSX.utils.json_to_sheet(rows);
+            const worksheet = formatExportWorksheet(XLSX.utils.json_to_sheet(rows), [14, 18, 18, 22, 22, 18, 18, 32, 10, 14, 18, 12]);
             const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:A1');
             const headerFill = '2F4B7C';
             const borderStyle = { top: { style: 'thin', color: { rgb: 'B7C5D8' } }, bottom: { style: 'thin', color: { rgb: 'B7C5D8' } }, left: { style: 'thin', color: { rgb: 'B7C5D8' } }, right: { style: 'thin', color: { rgb: 'B7C5D8' } } };
@@ -6187,6 +6545,8 @@
             if (shouldOpen) {
                 document.getElementById('tlLeaveName').value = getLoggedInUserDisplayName() || currentUserName;
                 document.getElementById('tlLeaveReportDate').value = getTodaysDateString();
+                initializeReportDateField('tlLeaveReportDate');
+                initializeLeaveDatePickers();
                 document.getElementById('tlLeaveRulesView').classList.remove('hidden');
                 document.getElementById('tlLeaveEntryView').classList.add('hidden');
                 populateTlOwnLeaveFormDepartments();
@@ -6198,9 +6558,10 @@
             const select = document.getElementById('tlLeaveDepartment');
             if (!select) return;
             const departments = getUserDepartments();
-            select.innerHTML = departments.length
-                ? departments.map((department) => `<option value="${escapeDeleteHistoryText(department)}">${escapeDeleteHistoryText(department)}</option>`).join('')
-                : '<option value="" disabled selected>No department assigned</option>';
+            const currentDepartment = departments[0] || '';
+            if (currentDepartment && Array.from(select.options).some((option) => option.value === currentDepartment)) {
+                select.value = currentDepartment;
+            }
         }
 
         function renderTlOwnLeaveHistory() {
@@ -6212,8 +6573,13 @@
             const tbody = document.getElementById('tlOwnLeaveHistoryBody');
             if (!container || !tbody) return;
             const email = String(userIdentifier || '').trim().toLowerCase();
-            const allLeaves = getStoredLeaves();
-            const ownLeaves = allLeaves.filter((leave) => String(leave.employeeEmail || '').trim().toLowerCase() === email);
+            const name = normalizeDeleteHistoryIdentity(getLoggedInUserDisplayName() || currentUserName || userData?.name);
+            const allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || getStoredLeaves();
+            const ownLeaves = allLeaves.filter((leave) => {
+                const leaveEmail = String(leave.employeeEmail || '').trim().toLowerCase();
+                const leaveName = normalizeDeleteHistoryIdentity(leave.employeeFullName);
+                return (email && leaveEmail === email) || (name && leaveName === name);
+            });
             const read = (id) => (document.getElementById(id)?.value || '');
             const month = read('tlOwnMonthFilter') || 'all';
             const reportDate = read('tlOwnReportDateFilter');
@@ -6236,10 +6602,10 @@
             updateOptions('tlOwnDepartmentFilter', [...new Set(ownLeaves.map((leave) => leave.departmentName).filter(Boolean))].sort(), 'All Departments');
             const filtered = ownLeaves.filter((leave) => {
                 const reportParts = String(leave.reportFillDate || '').split('/');
-                return (month === 'all' || reportParts[1] === month)
+                return (month === 'all' || (reportParts.length === 3 && reportParts[1] === month))
                     && (!reportDate || normalizeDateValue(leave.reportFillDate) === reportDate)
-                    && (company === 'all' || leave.companyName === company)
-                    && (department === 'all' || leave.departmentName === department)
+                    && (company === 'all' || (leave.companyName || '') === company)
+                    && (department === 'all' || (leave.departmentName || '') === department)
                     && (!full || String(leave.fullLeaveDate || '').toLowerCase().includes(full))
                     && (!first || String(leave.firstHalfDate || '').toLowerCase().includes(first))
                     && (!second || String(leave.secondHalfDate || '').toLowerCase().includes(second))
@@ -6317,7 +6683,7 @@
                 alert('⚠️ Leave dates must use dd/mm/yyyy format.');
                 return;
             }
-            const days = Number(document.getElementById('tlLeaveDays').value);
+            const days = Number(document.getElementById('tlLeaveDays').textContent);
             if (!Number.isFinite(days) || days < 0) {
                 alert('⚠️ Days must be a valid number.');
                 return;
@@ -6332,6 +6698,11 @@
                 .filter(Boolean);
             if (!approverEmails.length) {
                 alert('⚠️ Please select at least one Team Leader.');
+                return;
+            }
+            const currentEmail = String(userData?.email || userIdentifier || '').trim().toLowerCase();
+            if (currentEmail && approverEmails.includes(currentEmail)) {
+                alert('⚠️ You cannot select yourself as the approver for your own leave request.');
                 return;
             }
             const leave = {
@@ -6365,6 +6736,7 @@
             });
             addManagementNotification(`New leave request submitted by ${leave.employeeFullName} for the ${department} department. Status: Pending.`, notificationDetails);
             document.getElementById('tlLeaveRequestForm').reset();
+            clearLeaveDatePickers();
             toggleTlLeaveForm(false);
             populateTlOwnLeaveFormDepartments();
             renderTlOwnLeaveHistory();

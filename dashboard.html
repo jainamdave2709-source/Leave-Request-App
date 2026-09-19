@@ -536,6 +536,10 @@
             color: #f8fafc;
             font-size: 12px;
         }
+        .notif-message {
+            white-space: pre-line;
+            line-height: 1.55;
+        }
 
         .notif-time {
             font-size: 10px;
@@ -3430,11 +3434,20 @@
 
         function getShortLeaveNotificationSummary(leave) {
             const parts = [];
-            if (leave.fullLeaveDate) parts.push(`Full: ${leave.fullLeaveDate}`);
-            if (leave.firstHalfDate) parts.push(`First Half: ${leave.firstHalfDate}`);
-            if (leave.secondHalfDate) parts.push(`Second Half: ${leave.secondHalfDate}`);
-            parts.push(`Days: ${getLeaveDaysValue(leave)}`);
+            if (leave.fullLeaveDate) parts.push(`Full Leave: ${leave.fullLeaveDate}`);
+            if (leave.firstHalfDate) parts.push(`First Half Leave: ${leave.firstHalfDate}`);
+            if (leave.secondHalfDate) parts.push(`Second Half Leave: ${leave.secondHalfDate}`);
+            parts.push(`Total Days: ${getLeaveDaysValue(leave)}`);
             return parts.join(' | ');
+        }
+
+        function getNotificationLeaveLines(leave) {
+            const lines = [];
+            if (leave.fullLeaveDate) lines.push(`Full Leave: ${leave.fullLeaveDate}`);
+            if (leave.firstHalfDate) lines.push(`First Half Leave: ${leave.firstHalfDate}`);
+            if (leave.secondHalfDate) lines.push(`Second Half Leave: ${leave.secondHalfDate}`);
+            lines.push(`Total Days: ${getLeaveDaysValue(leave)}`);
+            return lines.join('\n');
         }
 
         function calculateLeaveDaysFromDates(leave) {
@@ -3508,6 +3521,7 @@
                 title.className = 'notif-title';
                 title.textContent = notification.title || 'Notification';
                 const message = document.createElement('span');
+                message.className = 'notif-message';
                 message.textContent = notification.message || '';
                 const time = document.createElement('span');
                 time.className = 'notif-time';
@@ -6169,9 +6183,10 @@
                         ? 'rejected'
                         : newStatus.toLowerCase();
                 const notificationDetails = { title: newStatus === 'Approved' ? 'Approved' : newStatus === 'Rejected' ? 'Rejected' : 'Updated', type: newStatus === 'Approved' ? 'approved' : newStatus === 'Rejected' ? 'rejected' : 'edited', leaveId };
-                const shortSummary = getShortLeaveNotificationSummary(allLeaves[leaveIndex]);
-                addNotification(targetEmpIdentifier, `Leave ${statusMessage} by ${currentUserName}. ${shortSummary}.`, notificationDetails);
-                addManagementNotification(`${employeeName}'s leave ${statusMessage} by ${currentUserName}. ${shortSummary}.`, notificationDetails);
+                const leaveLines = getNotificationLeaveLines(allLeaves[leaveIndex]);
+                const statusLabel = newStatus === 'Approved' ? 'Approved' : newStatus === 'Rejected' ? 'Rejected' : 'Updated';
+                addNotification(targetEmpIdentifier, `${statusLabel}: ${currentUserName}\n${leaveLines}`, notificationDetails);
+                addManagementNotification(`${statusLabel}: ${employeeName}\nAction By: ${currentUserName}\n${leaveLines}`, notificationDetails);
 
                 loadTlApprovals();
                 loadManagementRequests();
@@ -6348,16 +6363,16 @@
                 type: leaveRemark ? 'remarks' : 'edited',
                 leaveId: currentTlEditLeaveId
             };
-            const shortSummary = getShortLeaveNotificationSummary(updatedLeave);
-            const removedSummary = rejectedLeave ? ` Removed: ${getShortLeaveNotificationSummary(rejectedLeave)}.` : '';
+            const shortSummary = getNotificationLeaveLines(updatedLeave);
+            const removedSummary = rejectedLeave ? `\nRejected Removed Dates:\n${getNotificationLeaveLines(rejectedLeave)}` : '';
             if (updatedLeave.employeeEmail) {
                 addNotification(updatedLeave.employeeEmail, leaveRemark
-                    ? `Remark added by ${currentUserName}. ${shortSummary}. Remark: "${leaveRemark}"`
-                    : `Leave updated by ${currentUserName}. ${shortSummary}.${removedSummary}`, editNotification);
+                    ? `Remark Added: ${currentUserName}\n${shortSummary}\nRemark: ${leaveRemark}`
+                    : `Edited: ${currentUserName}\n${shortSummary}${removedSummary}`, editNotification);
             }
             addManagementNotification(leaveRemark
-                ? `Remark added for ${updatedLeave.employeeFullName || 'employee'} by ${currentUserName}. ${shortSummary}. Remark: "${leaveRemark}"`
-                : `${updatedLeave.employeeFullName || 'Employee'}'s leave updated by ${currentUserName}. ${shortSummary}.${removedSummary}`, editNotification);
+                ? `Remark Added: ${updatedLeave.employeeFullName || 'Employee'}\nAction By: ${currentUserName}\n${shortSummary}\nRemark: ${leaveRemark}`
+                : `Edited: ${updatedLeave.employeeFullName || 'Employee'}\nAction By: ${currentUserName}\n${shortSummary}${removedSummary}`, editNotification);
             closeTlEditModal();
             loadTlApprovals();
             loadManagementRequests();

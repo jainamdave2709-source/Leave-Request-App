@@ -3466,7 +3466,9 @@
         }
 
         function getEffectiveLeaveStatus(leave) {
-            return leave?.source === 'TL_EDIT_REMOVED_DATE' ? 'Rejected' : (leave?.status || 'Pending');
+            const isRemovedDuringEdit = leave?.source === 'TL_EDIT_REMOVED_DATE'
+                || (leave?.parentRequestId && leave?.rejectedAt);
+            return isRemovedDuringEdit ? 'Rejected' : (leave?.status || 'Pending');
         }
 
         function getRemovedLeaveDates(previousValue, nextValue) {
@@ -5841,7 +5843,7 @@
                     <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
-                        <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
+                        <span class="status-badge ${badgeClass}">${getEffectiveLeaveStatus(leave)}</span>
                         ${actionByName}
                     </td>
                     <td class="reason-cell">${escapeDeleteHistoryText(leave.tlRemark || leave.remark || '-')}</td>
@@ -5944,7 +5946,7 @@
 
             // Apply TL status quick-filter if set
             if (typeof tlStatusFilter !== 'undefined' && tlStatusFilter !== 'all') {
-                filteredLeaves = filteredLeaves.filter(l => (l.status || 'Pending') === tlStatusFilter);
+                filteredLeaves = filteredLeaves.filter(l => getEffectiveLeaveStatus(l) === tlStatusFilter);
             }
 
             // Compute Pending / Approved / Rejected totals (days) for TL view (respecting department + month filters)
@@ -5959,9 +5961,10 @@
                 }
                 if (!matchesMonth) return;
                 const days = parseFloat(leave.totalLeaveDays) || 0;
-                if ((leave.status || 'Pending') === 'Pending') pendingDays += days;
-                else if (leave.status === 'Approved') approvedDays += days;
-                else if (leave.status === 'Rejected') rejectedDays += days;
+                const status = getEffectiveLeaveStatus(leave);
+                if (status === 'Pending') pendingDays += days;
+                else if (status === 'Approved') approvedDays += days;
+                else if (status === 'Rejected') rejectedDays += days;
             });
 
             // Update TL stat badges
@@ -5976,8 +5979,9 @@
 
             filteredLeaves.forEach((leave) => {
                 let badgeClass = 'status-pending';
-                if (leave.status === 'Approved') badgeClass = 'status-approved';
-                else if (leave.status === 'Rejected') badgeClass = 'status-rejected';
+                const status = getEffectiveLeaveStatus(leave);
+                if (status === 'Approved') badgeClass = 'status-approved';
+                else if (status === 'Rejected') badgeClass = 'status-rejected';
 
                 let actionByName = leave.actionBy ? `<span class="action-by-text">By: ${leave.actionBy}</span>` : '';
 
@@ -5999,7 +6003,7 @@
                     <td class="reason-cell">${leave.leaveReason || '-'}</td>
                     <td>${leave.totalLeaveDays || '0'}</td>
                     <td>
-                        <span class="status-badge ${badgeClass}">${leave.status || 'Pending'}</span>
+                        <span class="status-badge ${badgeClass}">${status}</span>
                         ${actionByName}
                     </td>
                     <td class="reason-cell">${escapeDeleteHistoryText(leave.tlRemark || leave.remark || '-')}</td>

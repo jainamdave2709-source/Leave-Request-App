@@ -6329,7 +6329,6 @@
             const rejectedLeaveDays = removedFullLeave.length
                 + ((removedFirstHalf.length + removedSecondHalf.length) * 0.5);
             let rejectedLeave = null;
-            allLeaves[leaveIndex] = updatedLeave;
             if (rejectedLeaveDays > 0) {
                 rejectedLeave = {
                     ...previousLeave,
@@ -6353,19 +6352,9 @@
                     rejectedLeaveDays,
                     rejectedAt: new Date().toISOString()
                 };
-                allLeaves.unshift(rejectedLeave);
             }
-            allLeaves[leaveIndex] = {
-                ...allLeaves[leaveIndex],
-                status: 'Approved',
-                tlReviewed: true,
-                reviewed: true,
-                reviewedBy: currentUserName,
-                reviewedAt: new Date().toISOString()
-            };
-            allLeaves[leaveIndex].status = 'Approved';
-            allLeaves[leaveIndex].tlReviewed = true;
-            allLeaves[leaveIndex].reviewed = true;
+            allLeaves.splice(leaveIndex, 1, updatedLeave);
+            if (rejectedLeave) allLeaves.unshift(rejectedLeave);
             persistStoredLeaves(allLeaves);
             localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(allLeaves));
             syncLeaveChangeToGoogleSheet(updatedLeave);

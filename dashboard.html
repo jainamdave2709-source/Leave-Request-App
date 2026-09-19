@@ -6355,6 +6355,14 @@
                 };
                 allLeaves.unshift(rejectedLeave);
             }
+            allLeaves[leaveIndex] = {
+                ...allLeaves[leaveIndex],
+                status: 'Approved',
+                tlReviewed: true,
+                reviewed: true,
+                reviewedBy: currentUserName,
+                reviewedAt: new Date().toISOString()
+            };
             allLeaves[leaveIndex].status = 'Approved';
             allLeaves[leaveIndex].tlReviewed = true;
             allLeaves[leaveIndex].reviewed = true;

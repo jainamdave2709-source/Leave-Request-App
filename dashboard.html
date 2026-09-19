@@ -5736,7 +5736,13 @@
             const actionByFilter = (document.getElementById('employeeActionByFilter')?.value || '').trim().toLowerCase();
             const allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
 
-            const myLeaves = allLeaves.filter(l => l.employeeEmail === userIdentifier || l.employeeFullName.toLowerCase() === userData.name.toLowerCase());
+            const currentEmail = String(userIdentifier || '').trim().toLowerCase();
+            const currentName = String(userData?.name || getLoggedInUserDisplayName() || '').trim().toLowerCase();
+            const myLeaves = allLeaves.filter((leave) => {
+                const leaveEmail = String(leave.employeeEmail || '').trim().toLowerCase();
+                const leaveName = String(leave.employeeFullName || '').trim().toLowerCase();
+                return (currentEmail && leaveEmail === currentEmail) || (currentName && leaveName === currentName);
+            });
 
             tbody.innerHTML = '';
 
@@ -6328,6 +6334,7 @@
                 rejectedLeave = {
                     ...previousLeave,
                     id: Date.now() + Math.floor(Math.random() * 1000),
+                    parentRequestId: previousLeave.id,
                     fullLeaveDate: removedFullLeave.join(', '),
                     firstHalfDate: removedFirstHalf.join(', '),
                     secondHalfDate: removedSecondHalf.join(', '),
@@ -6364,15 +6371,18 @@
                 leaveId: currentTlEditLeaveId
             };
             const shortSummary = getNotificationLeaveLines(updatedLeave);
-            const removedSummary = rejectedLeave ? `\nRejected Removed Dates:\n${getNotificationLeaveLines(rejectedLeave)}` : '';
+            const approvedSummary = `Approved:\n${shortSummary}`;
+            const rejectedSummary = rejectedLeave
+                ? `\nRejected:\n${getNotificationLeaveLines(rejectedLeave)}`
+                : '';
             if (updatedLeave.employeeEmail) {
                 addNotification(updatedLeave.employeeEmail, leaveRemark
-                    ? `Remark Added: ${currentUserName}\n${shortSummary}\nRemark: ${leaveRemark}`
-                    : `Edited: ${currentUserName}\n${shortSummary}${removedSummary}`, editNotification);
+                    ? `Remark Added: ${currentUserName}\n${approvedSummary}${rejectedSummary}\nRemark: ${leaveRemark}`
+                    : `Edited: ${currentUserName}\n${approvedSummary}${rejectedSummary}`, editNotification);
             }
             addManagementNotification(leaveRemark
-                ? `Remark Added: ${updatedLeave.employeeFullName || 'Employee'}\nAction By: ${currentUserName}\n${shortSummary}\nRemark: ${leaveRemark}`
-                : `Edited: ${updatedLeave.employeeFullName || 'Employee'}\nAction By: ${currentUserName}\n${shortSummary}${removedSummary}`, editNotification);
+                ? `Remark Added: ${updatedLeave.employeeFullName || 'Employee'}\nAction By: ${currentUserName}\n${approvedSummary}${rejectedSummary}\nRemark: ${leaveRemark}`
+                : `Edited: ${updatedLeave.employeeFullName || 'Employee'}\nAction By: ${currentUserName}\n${approvedSummary}${rejectedSummary}`, editNotification);
             closeTlEditModal();
             loadTlApprovals();
             loadManagementRequests();

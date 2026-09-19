@@ -3465,6 +3465,10 @@
             return calculatedDays > 0 ? String(calculatedDays) : '0';
         }
 
+        function getEffectiveLeaveStatus(leave) {
+            return leave?.source === 'TL_EDIT_REMOVED_DATE' ? 'Rejected' : (leave?.status || 'Pending');
+        }
+
         function getRemovedLeaveDates(previousValue, nextValue) {
             const nextDates = new Set(String(nextValue || '')
                 .split(',')
@@ -5790,7 +5794,7 @@
                 filteredLeaves = filteredLeaves.filter(leave => String(leave.totalLeaveDays ?? '') === daysFilter);
             }
             if (statusFilter !== 'all') {
-                filteredLeaves = filteredLeaves.filter(leave => (leave.status || 'Pending') === statusFilter);
+                filteredLeaves = filteredLeaves.filter(leave => getEffectiveLeaveStatus(leave) === statusFilter);
             }
             if (actionByFilter) {
                 filteredLeaves = filteredLeaves.filter(leave => String(leave.actionBy || '').toLowerCase().includes(actionByFilter));
@@ -5801,9 +5805,10 @@
             let rejectedDays = 0;
             filteredLeaves.forEach(leave => {
                 const days = parseFloat(leave.totalLeaveDays) || 0;
-                if (leave.status === 'Pending') pendingDays += days;
-                else if (leave.status === 'Approved') approvedDays += days;
-                else if (leave.status === 'Rejected') rejectedDays += days;
+                const status = getEffectiveLeaveStatus(leave);
+                if (status === 'Pending') pendingDays += days;
+                else if (status === 'Approved') approvedDays += days;
+                else if (status === 'Rejected') rejectedDays += days;
             });
 
             document.getElementById('pendingLeavesCount').innerText = pendingDays;
@@ -5817,8 +5822,9 @@
 
             filteredLeaves.forEach(leave => {
                 let badgeClass = 'status-pending';
-                if (leave.status === 'Approved') badgeClass = 'status-approved';
-                else if (leave.status === 'Rejected') badgeClass = 'status-rejected';
+                const status = getEffectiveLeaveStatus(leave);
+                if (status === 'Approved') badgeClass = 'status-approved';
+                else if (status === 'Rejected') badgeClass = 'status-rejected';
 
                 let actionByName = leave.actionBy ? `<span class="action-by-text">By: ${leave.actionBy}</span>` : '';
 
@@ -6786,7 +6792,7 @@
                     && (!first || String(leave.firstHalfDate || '').toLowerCase().includes(first))
                     && (!second || String(leave.secondHalfDate || '').toLowerCase().includes(second))
                     && (!days || String(leave.totalLeaveDays ?? '') === days)
-                    && (status === 'all' || (leave.status || 'Pending') === status)
+                    && (status === 'all' || getEffectiveLeaveStatus(leave) === status)
                     && (!actionBy || String(leave.actionBy || '').toLowerCase().includes(actionBy));
             });
             if (document.getElementById('tlOwnLeaveHistoryToggle')?.getAttribute('aria-expanded') !== 'true') {
@@ -6802,7 +6808,7 @@
                     ${renderLeaveDateCells(leave.secondHalfDate)}
                     <td class="reason-cell">${escapeDeleteHistoryText(leave.leaveReason || '-')}</td>
                     <td>${escapeDeleteHistoryText(leave.totalLeaveDays || '0')}</td>
-                    <td><span class="status-badge ${badgeClass}">${escapeDeleteHistoryText(leave.status || 'Pending')}</span>${leave.actionBy ? `<span class="action-by-text">By: ${escapeDeleteHistoryText(leave.actionBy)}</span>` : ''}</td>
+                    <td><span class="status-badge ${badgeClass}">${escapeDeleteHistoryText(status)}</span>${leave.actionBy ? `<span class="action-by-text">By: ${escapeDeleteHistoryText(leave.actionBy)}</span>` : ''}</td>
                     <td class="reason-cell">${escapeDeleteHistoryText(leave.tlRemark || leave.remark || '-')}</td>
                 </tr>`;
             }).join('') : '<tr><td colspan="14" class="no-data">No leave history found for this period.</td></tr>';

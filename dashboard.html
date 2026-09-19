@@ -2519,11 +2519,13 @@
                                         <input type="radio" name="managementExportFormat" value="pdf" checked onchange="updateManagementGoogleSheetControls()">
                                         <span class="custom-radio"></span>
                                         <span>PDF</span>
+                                        <button type="button" class="generate-report-btn format-generate-btn" data-export-format="pdf" onclick="generateManagementExportReport()">Generate</button>
                                     </label>
                                     <label class="export-choice">
                                         <input type="radio" name="managementExportFormat" value="excel" onchange="updateManagementGoogleSheetControls()">
                                         <span class="custom-radio"></span>
                                         <span>Excel</span>
+                                        <button type="button" class="generate-report-btn format-generate-btn" data-export-format="excel" onclick="generateManagementExportReport()">Generate</button>
                                     </label>
                                     <label class="export-choice">
                                         <input type="radio" name="managementExportFormat" value="google_sheet" onchange="updateManagementGoogleSheetControls()">
@@ -2533,14 +2535,11 @@
                                 </div>
                                 <div class="export-email-inline">
                                     <input type="email" id="managementGoogleSheetEmail" class="export-email-field" value="datawebsankul@gmail.com" readonly aria-label="Websankul Google Sheet email">
-                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheetMail('datawebsankul@gmail.com')" title="Open email for Websankul">Open</button>
-                                    <button type="button" id="generateWebsankulGoogleSheetBtn" class="generate-report-btn google-sheet-only-control" onclick="generateManagementGoogleSheetForEmail('datawebsankul@gmail.com')">Generate</button>
+                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheet('websankul')" title="Open Websankul Google Sheet">Open</button>
                                     <input type="email" id="managementGoogleSheetEmailHousivity" class="export-email-field" value="datahousivity@gmail.com" readonly aria-label="Housivity Google Sheet email">
-                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheetMail('datahousivity@gmail.com')" title="Open email for Housivity">Open</button>
-                                    <button type="button" id="generateHousivityGoogleSheetBtn" class="generate-report-btn google-sheet-only-control" onclick="generateManagementGoogleSheetForEmail('datahousivity@gmail.com')">Generate</button>
+                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheet('housivity')" title="Open Housivity Google Sheet">Open</button>
                                     <input type="email" id="managementCustomGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Enter report email" aria-label="Custom Google Sheet report email">
-                                    <button type="button" class="generate-report-btn google-sheet-only-control" onclick="openCustomManagementGoogleSheetMail()" title="Open email for custom recipient">Open</button>
-                                    <button type="button" class="generate-report-btn google-sheet-only-control" onclick="generateCustomManagementGoogleSheet()">Generate</button>
+                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheet('common')" title="Open common Google Sheet">Open</button>
                                 </div>
                                 <button type="button" id="generateManagementExportBtn" class="generate-report-btn" onclick="generateManagementExportReport()">Generate</button>
                             </div>
@@ -3706,6 +3705,16 @@
             'datawebsankul@gmail.com': 'WEBSANKUL',
             'datahousivity@gmail.com': 'HOUSIVITY'
         };
+        const CONFIGURED_GOOGLE_SHEET_LINKS = {
+            websankul: 'https://docs.google.com/spreadsheets/d/1Bn53z9PohaadygZvv5dy9N4fN2yXs4cbM5EZW1h1Gxo/edit?gid=0#gid=0',
+            housivity: 'https://docs.google.com/spreadsheets/d/1R2GHdLjn-dyxK-RMS2G80kcVp4PazGkOmCy-Ssf3jZY/edit?gid=0#gid=0',
+            common: 'https://docs.google.com/spreadsheets/d/1XPT2E70nC5kNDIlN14ZLSAB3-kS0u77VHBDhkDWArvg/edit?gid=0#gid=0'
+        };
+        const CONFIGURED_GOOGLE_SHEET_ENDPOINTS = {
+            websankul: 'https://script.google.com/macros/s/AKfycbyZKWyRnfaADxlJLXJfE0mUymBuycOdJL-hlvoc7X5b-GTJO4Gn-m7R3j8bUuDLcprsVw/exec',
+            housivity: 'https://script.google.com/macros/s/AKfycbxPZ0OtX2alwfUTjKu2EiVmIQS34vpIlIi_sbCMggRZjsIMhDK-d9NJ_c3Q57y95-ac/exec',
+            common: 'https://script.google.com/macros/s/AKfycbxJ8PqyJX-NyiCv40b36RMo4bAhUE3xiBOwtPf0p1HMKRgHbB8ZiPQ2xqfzLN2OS5BpHw/exec'
+        };
 
         function getConfiguredGoogleSheetRecipients() {
             return CONFIGURED_GOOGLE_SHEET_RECIPIENTS.slice();
@@ -3715,13 +3724,161 @@
             return GOOGLE_SHEET_COMPANY_BY_EMAIL[String(email || '').trim().toLowerCase()] || '';
         }
 
+        function openConfiguredGoogleSheet(type) {
+            const sheetUrl = CONFIGURED_GOOGLE_SHEET_LINKS[type];
+            if (!sheetUrl) {
+                showExportNotice('Google Sheet link is not configured.');
+                return;
+            }
+            window.open(sheetUrl, '_blank', 'noopener');
+        }
+
+        async function appendRowsToGoogleSheet(type, rows, email, companyName) {
+            const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS[type];
+            if (!endpoint) throw new Error('Google Sheet endpoint is not configured.');
+            const payload = {
+                action: 'appendLeaveReport',
+                reportType: 'Approved Leave Report',
+                company: companyName || 'ALL',
+                recipient: email || '',
+                generatedAt: new Date().toISOString(),
+                rows,
+                records: rows
+            };
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload),
+                redirect: 'follow'
+            });
+            if (!response.ok && response.type !== 'opaque') {
+                throw new Error(`Google Sheet request failed with status ${response.status}.`);
+            }
+            return response;
+        }
+
+        function getGoogleSheetDateParts(value) {
+            const dates = String(value || '')
+                .split(',')
+                .map((date) => date.trim())
+                .filter(Boolean);
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const months = [];
+            const years = [];
+            dates.forEach((date) => {
+                const parts = date.split('/');
+                const monthIndex = Number(parts[1]) - 1;
+                if (parts.length === 3 && monthNames[monthIndex]) {
+                    const monthName = monthNames[monthIndex];
+                    if (!months.includes(monthName)) months.push(monthName);
+                    if (!years.includes(parts[2])) years.push(parts[2]);
+                } else {
+                    if (!months.length) months.push('');
+                    if (!years.length) years.push('');
+                }
+            });
+            return {
+                dates: dates.map((date) => date.split('/')[0]).join(', '),
+                months: months.join(', '),
+                years: years.join(', ')
+            };
+        }
+
+        function buildGoogleSheetRowsFromLeave(leave) {
+            const dateGroups = [
+                { type: 'Full Leave', value: leave.fullLeaveDate },
+                { type: 'First Half', value: leave.firstHalfDate },
+                { type: 'Second Half', value: leave.secondHalfDate }
+            ];
+            const rows = [];
+            dateGroups.forEach((group) => {
+                String(group.value || '').split(',').map((date) => date.trim()).filter(Boolean).forEach((date, index) => {
+                    const parts = date.split('/');
+                    const monthNames = [
+                        'January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'
+                    ];
+                    const monthName = parts.length === 3 ? monthNames[Number(parts[1]) - 1] || '' : '';
+                    const year = parts.length === 3 ? parts[2] : '';
+                    rows.push({
+                        ...buildGoogleSheetBaseRow(leave),
+                        'Request ID': `${leave.id}-${group.type.replace(/\s+/g, '-').toUpperCase()}-${index + 1}`,
+                        'Leave Type': group.type,
+                        [`${group.type} - Date`]: parts[0] || '',
+                        [`${group.type} - Month`]: monthName,
+                        [`${group.type} - Year`]: year
+                    });
+                });
+            });
+            return rows;
+        }
+
+        function buildGoogleSheetBaseRow(leave) {
+            return {
+                'Request ID': leave.id || '',
+                'Report Date': leave.reportFillDate || '',
+                'Company': leave.companyName || '',
+                'Department': leave.departmentName || '',
+                'Employee Name': leave.employeeFullName || '',
+                'Employee Email': leave.employeeEmail || '',
+                'Reason': leave.leaveReason || '',
+                'Days': leave.totalLeaveDays || '',
+                'Status': leave.status || 'Pending',
+                'Action By': leave.actionBy || '',
+                'Updated At': leave.reviewedAt || leave.updatedAt || new Date().toISOString()
+            };
+        }
+
+        function syncLeaveChangeToGoogleSheet(leave) {
+            if (!leave || !leave.companyName || !leave.id) return;
+            const normalizedCompany = String(leave.companyName).trim().toUpperCase();
+            const type = normalizedCompany === 'WEBSANKUL'
+                ? 'websankul'
+                : normalizedCompany === 'HOUSIVITY'
+                    ? 'housivity'
+                    : 'common';
+            const email = type === 'websankul'
+                ? 'datawebsankul@gmail.com'
+                : type === 'housivity'
+                    ? 'datahousivity@gmail.com'
+                    : getCustomManagementGoogleSheetEmail();
+            const payloadRows = leave.status === 'Approved'
+                ? buildGoogleSheetRowsFromLeave(leave)
+                : [];
+            const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS[type];
+            if (!endpoint) return;
+            fetch(endpoint, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: leave.status === 'Approved' ? 'upsertApprovedLeaveRows' : 'removeLeaveReport',
+                    requestId: leave.id,
+                    company: normalizedCompany,
+                    recipient: email,
+                    rows: payloadRows,
+                    records: payloadRows,
+                    updatedAt: new Date().toISOString()
+                })
+            })
+            .catch((error) => console.error('Automatic Google Sheet sync failed.', error));
+        }
+
         function updateManagementGoogleSheetControls() {
-            const isGoogleSheet = getSelectedManagementExportFormat() === 'google_sheet';
+            const selectedFormat = getSelectedManagementExportFormat();
+            const isGoogleSheet = selectedFormat === 'google_sheet';
             document.querySelectorAll('.google-sheet-only-control').forEach((button) => {
                 button.style.display = isGoogleSheet ? 'inline-flex' : 'none';
             });
+            document.querySelectorAll('.format-generate-btn').forEach((button) => {
+                button.style.display = button.dataset.exportFormat === selectedFormat ? 'inline-flex' : 'none';
+            });
             const commonButton = document.getElementById('generateManagementExportBtn');
-            if (commonButton) commonButton.style.display = isGoogleSheet ? 'none' : 'inline-flex';
+            if (commonButton) commonButton.style.display = 'none';
         }
 
         function openConfiguredGoogleSheetMail(email) {
@@ -3891,7 +4048,7 @@
             }));
         }
 
-        function generateManagementGoogleSheetForEmail(email) {
+        async function generateManagementGoogleSheetForEmail(email) {
             const companyName = getGoogleSheetCompanyForEmail(email);
             const rows = getManagementGoogleSheetRows(companyName);
             if (!rows.length) {
@@ -3903,27 +4060,17 @@
                 return;
             }
 
-            const storageKey = `managementGoogleSheetRows:${email}`;
-            let previousRows = [];
             try {
-                previousRows = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                if (!Array.isArray(previousRows)) previousRows = [];
-                previousRows = previousRows.filter((row) => {
-                    return String(row.Company || '').trim().toUpperCase() === companyName;
-                });
+                await appendRowsToGoogleSheet(companyName === 'WEBSANKUL' ? 'websankul' : 'housivity', rows, email, companyName);
             } catch (error) {
-                console.error('Unable to read saved Google Sheet rows.', error);
+                console.error('Unable to append Google Sheet rows.', error);
+                showExportNotice(`Google Sheet save failed for ${email}. ${error.message}`);
+                return;
             }
-            const combinedRows = previousRows.concat(rows);
-            localStorage.setItem(storageKey, JSON.stringify(combinedRows));
-
-            const csvContent = buildCsvContentFromRows(combinedRows, 'Approved Leave Report');
-            downloadCsvBlob('approved_leave_report.csv', csvContent);
-            openGoogleSheetMail(email, 'Approved Leave Report', csvContent);
-            showExportNotice(`${companyName} company report generated for ${email}. New data was appended to its separate saved report.`);
+            showExportNotice(`${companyName} company report was saved to Google Sheet for ${email}.`);
         }
 
-        function generateCustomManagementGoogleSheet() {
+        async function generateCustomManagementGoogleSheet() {
             const email = getCustomManagementGoogleSheetEmail();
             if (!isValidEmail(email)) {
                 showExportNotice('Please enter a valid email address before generating the Google Sheet report.');
@@ -3936,24 +4083,17 @@
                 return;
             }
 
-            const storageKey = `managementGoogleSheetRows:custom:${email.toLowerCase()}`;
-            let previousRows = [];
             try {
-                previousRows = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                if (!Array.isArray(previousRows)) previousRows = [];
+                await appendRowsToGoogleSheet('common', rows, email, 'ALL');
             } catch (error) {
-                console.error('Unable to read saved custom Google Sheet rows.', error);
+                console.error('Unable to append custom Google Sheet rows.', error);
+                showExportNotice(`Google Sheet save failed for ${email}. ${error.message}`);
+                return;
             }
-
-            const combinedRows = previousRows.concat(rows);
-            localStorage.setItem(storageKey, JSON.stringify(combinedRows));
-            const csvContent = buildCsvContentFromRows(combinedRows, 'Leave Report');
-            downloadCsvBlob('leave_report.csv', csvContent);
-            openGoogleSheetMail(email, 'Leave Report', csvContent);
-            showExportNotice(`Google Sheet report generated for ${email}. New data was appended to its saved report.`);
+            showExportNotice(`Common report was saved to Google Sheet for ${email}.`);
         }
 
-        function exportManagementToGoogleSheet() {
+        async function exportManagementToGoogleSheet() {
             const recipients = getConfiguredGoogleSheetRecipients();
             if (recipients.some((email) => !isValidEmail(email))) {
                 showExportNotice('Configured Google Sheet recipient email is invalid.');
@@ -3961,31 +4101,24 @@
             }
 
             let generatedCount = 0;
-            recipients.forEach((email) => {
+            for (const email of recipients) {
                 const companyName = getGoogleSheetCompanyForEmail(email);
                 const rows = getManagementGoogleSheetRows(companyName);
-                if (!rows.length) return;
-                const storageKey = `managementGoogleSheetRows:${email}`;
-                let previousRows = [];
+                if (!rows.length) continue;
                 try {
-                    previousRows = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                    if (!Array.isArray(previousRows)) previousRows = [];
-                    previousRows = previousRows.filter((row) => {
-                        return String(row.Company || '').trim().toUpperCase() === companyName;
-                    });
+                    await appendRowsToGoogleSheet(companyName === 'WEBSANKUL' ? 'websankul' : 'housivity', rows, email, companyName);
                 } catch (error) {
-                    console.error('Unable to read saved Google Sheet rows.', error);
+                    console.error(`Unable to append ${companyName} Google Sheet rows.`, error);
+                    showExportNotice(`Google Sheet save failed for ${email}. ${error.message}`);
+                    continue;
                 }
-                const combinedRows = previousRows.concat(rows);
-                localStorage.setItem(storageKey, JSON.stringify(combinedRows));
-                openGoogleSheetMail(email, `${companyName} Approved Leave Report`, buildCsvContentFromRows(combinedRows, 'Approved Leave Report'));
                 generatedCount += 1;
-            });
+            }
             if (!generatedCount) {
                 showExportNotice('No approved Websankul or Housivity company records match the current selected filters.');
                 return;
             }
-            showExportNotice('Separate company reports generated: Websankul data was sent only to datawebsankul@gmail.com and Housivity data only to datahousivity@gmail.com.');
+            showExportNotice('Separate company reports were saved to their configured Google Sheets.');
         }
 
         function exportManagementToPdf() {
@@ -6016,6 +6149,7 @@
                 allLeaves[leaveIndex].reviewedBy = currentUserName;
                 allLeaves[leaveIndex].reviewedAt = new Date().toISOString();
                 persistStoredLeaves(allLeaves);
+                syncLeaveChangeToGoogleSheet(allLeaves[leaveIndex]);
                    
                 recordActionHistory(newStatus, allLeaves[leaveIndex]);
                 const targetEmpIdentifier = allLeaves[leaveIndex].employeeEmail;
@@ -6185,6 +6319,8 @@
                 allLeaves.unshift(rejectedLeave);
             }
             persistStoredLeaves(allLeaves);
+            syncLeaveChangeToGoogleSheet(updatedLeave);
+            if (rejectedLeave) syncLeaveChangeToGoogleSheet(rejectedLeave);
             const leaveRemark = updatedLeave.tlRemark;
             recordActionHistory(leaveRemark ? 'Remark Added' : 'Edited', updatedLeave, { remark: leaveRemark });
             if (rejectedLeave) {

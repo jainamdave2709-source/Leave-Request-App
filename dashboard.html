@@ -6331,7 +6331,11 @@
                 };
                 allLeaves.unshift(rejectedLeave);
             }
+            allLeaves[leaveIndex].status = 'Approved';
+            allLeaves[leaveIndex].tlReviewed = true;
+            allLeaves[leaveIndex].reviewed = true;
             persistStoredLeaves(allLeaves);
+            localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(allLeaves));
             syncLeaveChangeToGoogleSheet(updatedLeave);
             if (rejectedLeave) syncLeaveChangeToGoogleSheet(rejectedLeave);
             const leaveRemark = updatedLeave.tlRemark;

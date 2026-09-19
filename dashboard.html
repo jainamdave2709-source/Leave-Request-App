@@ -6335,6 +6335,7 @@
                     ...previousLeave,
                     id: Date.now() + Math.floor(Math.random() * 1000),
                     parentRequestId: previousLeave.id,
+                    source: 'TL_EDIT_REMOVED_DATE',
                     fullLeaveDate: removedFullLeave.join(', '),
                     firstHalfDate: removedFirstHalf.join(', '),
                     secondHalfDate: removedSecondHalf.join(', '),
@@ -6349,7 +6350,8 @@
                     rejectedFullLeaveDate: removedFullLeave.join(', '),
                     rejectedFirstHalfDate: removedFirstHalf.join(', '),
                     rejectedSecondHalfDate: removedSecondHalf.join(', '),
-                    rejectedLeaveDays
+                    rejectedLeaveDays,
+                    rejectedAt: new Date().toISOString()
                 };
                 allLeaves.unshift(rejectedLeave);
             }

@@ -3428,6 +3428,15 @@
             return `Full Leave: ${leave.fullLeaveDate || '-'} | First Half: ${leave.firstHalfDate || '-'} | Second Half: ${leave.secondHalfDate || '-'} | Days: ${getLeaveDaysValue(leave)}`;
         }
 
+        function getShortLeaveNotificationSummary(leave) {
+            const parts = [];
+            if (leave.fullLeaveDate) parts.push(`Full: ${leave.fullLeaveDate}`);
+            if (leave.firstHalfDate) parts.push(`First Half: ${leave.firstHalfDate}`);
+            if (leave.secondHalfDate) parts.push(`Second Half: ${leave.secondHalfDate}`);
+            parts.push(`Days: ${getLeaveDaysValue(leave)}`);
+            return parts.join(' | ');
+        }
+
         function calculateLeaveDaysFromDates(leave) {
             const countDates = (value) => String(value || '')
                 .split(',')
@@ -6160,11 +6169,9 @@
                         ? 'rejected'
                         : newStatus.toLowerCase();
                 const notificationDetails = { title: newStatus === 'Approved' ? 'Approved' : newStatus === 'Rejected' ? 'Rejected' : 'Updated', type: newStatus === 'Approved' ? 'approved' : newStatus === 'Rejected' ? 'rejected' : 'edited', leaveId };
-                const leaveSummary = getLeaveNotificationSummary(allLeaves[leaveIndex]);
-                const decisionDays = getLeaveDecisionDaysSummary(allLeaves[leaveIndex]);
-                const decisionSummary = getLeaveDecisionNotificationSummary(allLeaves[leaveIndex]);
-                addNotification(targetEmpIdentifier, `Your leave request was ${statusMessage} by ${currentUserName}. ${decisionSummary}. ${leaveSummary}. ${decisionDays}.`, notificationDetails);
-                addManagementNotification(`Leave request from ${employeeName} (${allLeaves[leaveIndex].departmentName || 'No department'}) was ${statusMessage} by ${currentUserName}. ${decisionSummary}. ${leaveSummary}. ${decisionDays}.`, notificationDetails);
+                const shortSummary = getShortLeaveNotificationSummary(allLeaves[leaveIndex]);
+                addNotification(targetEmpIdentifier, `Leave ${statusMessage} by ${currentUserName}. ${shortSummary}.`, notificationDetails);
+                addManagementNotification(`${employeeName}'s leave ${statusMessage} by ${currentUserName}. ${shortSummary}.`, notificationDetails);
 
                 loadTlApprovals();
                 loadManagementRequests();
@@ -6287,7 +6294,13 @@
                 firstHalfDate: document.getElementById('tlEditFirstHalf').value.trim(),
                 secondHalfDate: document.getElementById('tlEditSecondHalf').value.trim(),
                 totalLeaveDays: parsedDays,
-                tlRemark: document.getElementById('tlEditRemark').value.trim()
+                tlRemark: document.getElementById('tlEditRemark').value.trim(),
+                status: 'Approved',
+                actionBy: currentUserName,
+                tlReviewed: true,
+                reviewed: true,
+                reviewedBy: currentUserName,
+                reviewedAt: new Date().toISOString()
             };
             const removedFullLeave = getRemovedLeaveDates(previousLeave.fullLeaveDate, updatedLeave.fullLeaveDate);
             const removedFirstHalf = getRemovedLeaveDates(previousLeave.firstHalfDate, updatedLeave.firstHalfDate);
@@ -6331,17 +6344,16 @@
                 type: leaveRemark ? 'remarks' : 'edited',
                 leaveId: currentTlEditLeaveId
             };
-            const decisionSummary = getLeaveDecisionNotificationSummary(updatedLeave);
-            const decisionDays = getLeaveDecisionDaysSummary(updatedLeave);
-            const rejectedSummary = rejectedLeave ? getRejectedLeaveSummary(rejectedLeave) : '';
+            const shortSummary = getShortLeaveNotificationSummary(updatedLeave);
+            const removedSummary = rejectedLeave ? ` Removed: ${getShortLeaveNotificationSummary(rejectedLeave)}.` : '';
             if (updatedLeave.employeeEmail) {
                 addNotification(updatedLeave.employeeEmail, leaveRemark
-                    ? `A remark was added by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''} Remark: "${leaveRemark}"`
-                    : `Your leave request was updated by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''}`, editNotification);
+                    ? `Remark added by ${currentUserName}. ${shortSummary}. Remark: "${leaveRemark}"`
+                    : `Leave updated by ${currentUserName}. ${shortSummary}.${removedSummary}`, editNotification);
             }
             addManagementNotification(leaveRemark
-                ? `A remark was added to the leave request from ${updatedLeave.employeeFullName || 'an employee'} by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''} Remark: "${leaveRemark}"`
-                : `Leave request from ${updatedLeave.employeeFullName || 'an employee'} was updated by ${currentUserName}. ${decisionSummary}. ${getLeaveNotificationSummary(updatedLeave)}. ${decisionDays}. ${rejectedSummary} ${rejectedLeave ? `Rejected Total: ${rejectedLeave.totalLeaveDays}.` : ''}`, editNotification);
+                ? `Remark added for ${updatedLeave.employeeFullName || 'employee'} by ${currentUserName}. ${shortSummary}. Remark: "${leaveRemark}"`
+                : `${updatedLeave.employeeFullName || 'Employee'}'s leave updated by ${currentUserName}. ${shortSummary}.${removedSummary}`, editNotification);
             closeTlEditModal();
             loadTlApprovals();
             loadManagementRequests();

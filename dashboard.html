@@ -3897,6 +3897,15 @@
             .catch((error) => console.error('Automatic Google Sheet sync failed.', error));
         }
 
+        function syncDeletedLeaveToGoogleSheet(deleteEntry) {
+            if (!deleteEntry || !deleteEntry.company || !deleteEntry.requestId) return;
+            syncLeaveChangeToGoogleSheet({
+                id: deleteEntry.requestId,
+                companyName: deleteEntry.company,
+                status: 'Rejected'
+            });
+        }
+
         function updateManagementGoogleSheetControls() {
             const selectedFormat = getSelectedManagementExportFormat();
             const isGoogleSheet = selectedFormat === 'google_sheet';
@@ -4871,14 +4880,27 @@
 
         function getDeleteHistory() {
             try {
-                return JSON.parse(localStorage.getItem(DELETE_HISTORY_KEY)) || [];
+                const entries = JSON.parse(localStorage.getItem(DELETE_HISTORY_KEY));
+                return Array.isArray(entries) ? entries.filter((entry) => entry && typeof entry === 'object') : [];
             } catch (error) {
                 return [];
             }
         }
 
         function persistDeleteHistory(historyEntries) {
-            localStorage.setItem(DELETE_HISTORY_KEY, JSON.stringify(historyEntries));
+            const cleanEntries = Array.isArray(historyEntries)
+                ? historyEntries.filter((entry) => entry && typeof entry === 'object')
+                : [];
+            localStorage.setItem(DELETE_HISTORY_KEY, JSON.stringify(cleanEntries));
+            try {
+                if (db && db.ref) {
+                    db.ref(FIREBASE_DELETE_HISTORY_KEY).set(cleanEntries).catch((error) => {
+                        console.error('Delete history sync failed.', error);
+                    });
+                }
+            } catch (error) {
+                console.error('Delete history sync failed.', error);
+            }
         }
 
         function escapeDeleteHistoryText(value) {
@@ -5016,6 +5038,7 @@
                             <input type="checkbox" data-delete-history-id="${entry.id}" ${acknowledged ? 'checked' : ''} onchange="toggleDeleteHistoryAcknowledged(this)">
                             <span>I have seen this deletion</span>
                         </label>
+                        ${panelPrefix === 'tl' ? `<button type="button" class="action-btn btn-delete" style="margin-top: 12px;" onclick="permanentlyDeleteHistoryEntry('${escapeDeleteHistoryText(entry.id)}')"><i class="fa-solid fa-trash"></i> Permanently Delete</button>` : ''}
                     </div>
                 `;
             }).join('');
@@ -5120,12 +5143,55 @@
             renderDeleteHistory('tl');
         };
 
+        window.permanentlyDeleteHistoryEntry = function(encodedEntryId) {
+            if (!isRole('TL') && !isRole('TeamLeader') && !isRole('Team Leader')) return;
+            const entryId = String(encodedEntryId || '');
+            if (!entryId || !confirm('Permanently delete this Delete History record?')) return;
+
+            const historyEntries = getDeleteHistory();
+            const targetEntry = historyEntries.find((entry) => entry.id === entryId);
+            if (!targetEntry) return;
+
+            persistDeleteHistory(historyEntries.filter((entry) => entry.id !== entryId));
+            renderDeleteHistory('management');
+            renderDeleteHistory('employee');
+            renderDeleteHistory('tl');
+            alert('✅ Delete History record permanently deleted.');
+        };
+
+        async function syncDeleteHistoryFromFirebase() {
+            try {
+                if (!db || !db.ref) return;
+                const snapshot = await db.ref(FIREBASE_DELETE_HISTORY_KEY).once('value');
+                const firebaseEntries = snapshot.val();
+                const localEntries = getDeleteHistory();
+                if (Array.isArray(firebaseEntries)) {
+                    const entriesById = new Map();
+                    [...localEntries, ...firebaseEntries].forEach((entry) => {
+                        if (entry && entry.id) entriesById.set(String(entry.id), entry);
+                    });
+                    const mergedEntries = Array.from(entriesById.values());
+                    localStorage.setItem(DELETE_HISTORY_KEY, JSON.stringify(mergedEntries));
+                    if (mergedEntries.length !== firebaseEntries.length) {
+                        await db.ref(FIREBASE_DELETE_HISTORY_KEY).set(mergedEntries);
+                    }
+                    return;
+                }
+                if (localEntries.length) {
+                    await db.ref(FIREBASE_DELETE_HISTORY_KEY).set(localEntries);
+                }
+            } catch (error) {
+                console.error('Delete history load failed.', error);
+            }
+        }
+
         function recordDeleteHistoryEntry(leaveToDelete) {
             if (!leaveToDelete) return;
 
             const historyEntries = getDeleteHistory();
             const newEntry = {
                 id: `delete-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+                requestId: leaveToDelete.id,
                 employeeName: leaveToDelete.employeeFullName || leaveToDelete.employeeName || 'Unknown',
                 company: leaveToDelete.companyName || '',
                 department: leaveToDelete.departmentName || 'N/A',
@@ -5184,6 +5250,7 @@
         const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
         const db = firebase.database(firebaseApp);
         const FIREBASE_LEAVES_KEY = 'officeLeaveRequests';
+        const FIREBASE_DELETE_HISTORY_KEY = 'deletedLeaveHistory';
         const MANAGEMENT_USERS_KEY = 'users';
 
         function getUserRecordKey(email) {
@@ -5523,6 +5590,7 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             await syncGlobalLeavesFromFirebase();
+            await syncDeleteHistoryFromFirebase();
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
                 await loadFullUserDepartmentAccess();
             }
@@ -6419,6 +6487,10 @@
                 return;
             }
             recordDeleteHistoryEntry(leaveToDelete);
+            syncDeletedLeaveToGoogleSheet({
+                requestId: leaveToDelete.id,
+                company: leaveToDelete.companyName
+            });
             recordActionHistory('Deleted', leaveToDelete);
             allLeaves = allLeaves.filter(l => l.id !== leaveId);
             persistStoredLeaves(allLeaves);

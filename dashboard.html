@@ -2540,10 +2540,6 @@
                                 <div class="export-email-inline">
                                     <input type="email" id="managementGoogleSheetEmail" class="export-email-field" value="datawebsankul@gmail.com" readonly aria-label="Websankul Google Sheet email">
                                     <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheet('websankul')" title="Open Websankul Google Sheet">Open</button>
-                                    <input type="email" id="managementGoogleSheetEmailHousivity" class="export-email-field" value="datahousivity@gmail.com" readonly aria-label="Housivity Google Sheet email">
-                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheet('housivity')" title="Open Housivity Google Sheet">Open</button>
-                                    <input type="email" id="managementCustomGoogleSheetEmail" class="export-email-field" value="websankulhr@gmail.com" placeholder="Enter report email" aria-label="Custom Google Sheet report email">
-                                    <button type="button" class="generate-report-btn" onclick="openConfiguredGoogleSheet('common')" title="Open common Google Sheet">Open</button>
                                 </div>
                                 <button type="button" id="generateManagementExportBtn" class="generate-report-btn" onclick="generateManagementExportReport()">Generate</button>
                             </div>
@@ -3727,22 +3723,16 @@
         }
 
         const CONFIGURED_GOOGLE_SHEET_RECIPIENTS = [
-            'datawebsankul@gmail.com',
-            'datahousivity@gmail.com'
+            'datawebsankul@gmail.com'
         ];
         const GOOGLE_SHEET_COMPANY_BY_EMAIL = {
-            'datawebsankul@gmail.com': 'WEBSANKUL',
-            'datahousivity@gmail.com': 'HOUSIVITY'
+            'datawebsankul@gmail.com': 'WEBSANKUL'
         };
         const CONFIGURED_GOOGLE_SHEET_LINKS = {
-            websankul: 'https://docs.google.com/spreadsheets/d/1Bn53z9PohaadygZvv5dy9N4fN2yXs4cbM5EZW1h1Gxo/edit?gid=0#gid=0',
-            housivity: 'https://docs.google.com/spreadsheets/d/1R2GHdLjn-dyxK-RMS2G80kcVp4PazGkOmCy-Ssf3jZY/edit?gid=0#gid=0',
-            common: 'https://docs.google.com/spreadsheets/d/1XPT2E70nC5kNDIlN14ZLSAB3-kS0u77VHBDhkDWArvg/edit?gid=0#gid=0'
+            websankul: 'https://docs.google.com/spreadsheets/d/1Bn53z9PohaadygZvv5dy9N4fN2yXs4cbM5EZW1h1Gxo/edit?gid=0#gid=0'
         };
         const CONFIGURED_GOOGLE_SHEET_ENDPOINTS = {
-            websankul: 'https://script.google.com/macros/s/AKfycbyZKWyRnfaADxlJLXJfE0mUymBuycOdJL-hlvoc7X5b-GTJO4Gn-m7R3j8bUuDLcprsVw/exec',
-            housivity: 'https://script.google.com/macros/s/AKfycbxPZ0OtX2alwfUTjKu2EiVmIQS34vpIlIi_sbCMggRZjsIMhDK-d9NJ_c3Q57y95-ac/exec',
-            common: 'https://script.google.com/macros/s/AKfycbxJ8PqyJX-NyiCv40b36RMo4bAhUE3xiBOwtPf0p1HMKRgHbB8ZiPQ2xqfzLN2OS5BpHw/exec'
+            websankul: 'https://script.google.com/macros/s/AKfycbyZKWyRnfaADxlJLXJfE0mUymBuycOdJL-hlvoc7X5b-GTJO4Gn-m7R3j8bUuDLcprsVw/exec'
         };
 
         function getConfiguredGoogleSheetRecipients() {
@@ -3865,32 +3855,29 @@
         function syncLeaveChangeToGoogleSheet(leave) {
             if (!leave || !leave.companyName || !leave.id) return;
             const normalizedCompany = String(leave.companyName).trim().toUpperCase();
-            const type = normalizedCompany === 'WEBSANKUL'
-                ? 'websankul'
-                : normalizedCompany === 'HOUSIVITY'
-                    ? 'housivity'
-                    : 'common';
-            const email = type === 'websankul'
-                ? 'datawebsankul@gmail.com'
-                : type === 'housivity'
-                    ? 'datahousivity@gmail.com'
-                    : getCustomManagementGoogleSheetEmail();
+            if (normalizedCompany !== 'WEBSANKUL') return;
+            const type = 'websankul';
+            const email = 'datawebsankul@gmail.com';
             const payloadRows = leave.status === 'Approved'
                 ? buildGoogleSheetRowsFromLeave(leave)
                 : [];
             const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS[type];
             if (!endpoint) return;
+            const isApproved = leave.status === 'Approved';
+            const requestId = String(leave.id);
             fetch(endpoint, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
-                    action: leave.status === 'Approved' ? 'upsertApprovedLeaveRows' : 'removeLeaveReport',
-                    requestId: leave.id,
+                    action: isApproved ? 'appendLeaveReport' : 'removeLeaveReport',
+                    requestId,
+                    baseRequestId: requestId,
+                    requestIds: [requestId],
                     company: normalizedCompany,
                     recipient: email,
-                    rows: payloadRows,
-                    records: payloadRows,
+                    rows: isApproved ? payloadRows : [],
+                    records: isApproved ? payloadRows : [],
                     updatedAt: new Date().toISOString()
                 })
             })
@@ -3900,7 +3887,7 @@
         function syncDeletedLeaveToGoogleSheet(deleteEntry) {
             if (!deleteEntry || !deleteEntry.company || !deleteEntry.requestId) return;
             syncLeaveChangeToGoogleSheet({
-                id: deleteEntry.requestId,
+                id: String(deleteEntry.requestId),
                 companyName: deleteEntry.company,
                 status: 'Rejected'
             });
@@ -4090,7 +4077,7 @@
             const companyName = getGoogleSheetCompanyForEmail(email);
             const rows = getManagementGoogleSheetRows(companyName);
             if (!rows.length) {
-                showExportNotice(`No approved ${companyName || ''} company records match the current selected filters.`);
+                showExportNotice('No approved Websankul company records match the current selected filters.');
                 return;
             }
             if (!isValidEmail(email)) {
@@ -4099,13 +4086,13 @@
             }
 
             try {
-                await appendRowsToGoogleSheet(companyName === 'WEBSANKUL' ? 'websankul' : 'housivity', rows, email, companyName);
+                await appendRowsToGoogleSheet('websankul', rows, email, 'WEBSANKUL');
             } catch (error) {
                 console.error('Unable to append Google Sheet rows.', error);
                 showExportNotice(`Google Sheet save failed for ${email}. ${error.message}`);
                 return;
             }
-            showExportNotice(`${companyName} company report was saved to Google Sheet for ${email}.`);
+            showExportNotice(`Websankul company report was saved to Google Sheet for ${email}.`);
         }
 
         async function generateCustomManagementGoogleSheet() {
@@ -4153,10 +4140,10 @@
                 generatedCount += 1;
             }
             if (!generatedCount) {
-                showExportNotice('No approved Websankul or Housivity company records match the current selected filters.');
+                showExportNotice('No approved Websankul company records match the current selected filters.');
                 return;
             }
-            showExportNotice('Separate company reports were saved to their configured Google Sheets.');
+            showExportNotice('Websankul report was saved to the configured Google Sheet.');
         }
 
         function exportManagementToPdf() {

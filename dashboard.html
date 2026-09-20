@@ -3906,15 +3906,87 @@
         }
 
         function syncLeaveChangeToGoogleSheet(leave) {
-            return;
+            if (!leave || !leave.id) return;
+
+            const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS.websankul;
+            if (!endpoint) return;
+
+            const isApproved = getEffectiveLeaveStatus(leave) === 'Approved';
+            const requestId = String(leave.id);
+            const rows = isApproved ? buildGoogleSheetRowsFromLeave({
+                ...leave,
+                status: 'Approved'
+            }) : [];
+
+            fetch(endpoint, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: isApproved ? 'upsertApprovedLeaveRows' : 'removeLeaveReport',
+                    requestId,
+                    baseRequestId: requestId,
+                    requestIds: [requestId],
+                    rows,
+                    records: rows,
+                    updatedAt: new Date().toISOString()
+                })
+            }).catch((error) => {
+                console.error('Automatic Google Sheet sync failed.', error);
+            });
         }
 
         function syncDeletedLeaveToGoogleSheet(deleteEntry) {
-            return;
+            if (!deleteEntry || !deleteEntry.requestId) return;
+
+            const requestId = String(deleteEntry.requestId);
+            const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS.websankul;
+            if (!endpoint) return;
+
+            fetch(endpoint, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'removeLeaveReport',
+                    requestId,
+                    baseRequestId: requestId,
+                    requestIds: [requestId],
+                    updatedAt: new Date().toISOString()
+                })
+            }).catch((error) => {
+                console.error('Automatic Google Sheet deletion failed.', error);
+            });
         }
 
         function syncApprovedLeavesToGoogleSheet(leaves) {
-            return;
+            if (!Array.isArray(leaves)) return;
+
+            const approvedRows = leaves
+                .filter((leave) => getEffectiveLeaveStatus(leave) === 'Approved')
+                .flatMap((leave) => buildGoogleSheetRowsFromLeave({
+                    ...leave,
+                    status: 'Approved'
+                }));
+
+            if (!approvedRows.length) return;
+
+            const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS.websankul;
+            if (!endpoint) return;
+
+            fetch(endpoint, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'upsertApprovedLeaveRows',
+                    rows: approvedRows,
+                    records: approvedRows,
+                    updatedAt: new Date().toISOString()
+                })
+            }).catch((error) => {
+                console.error('Automatic approved leave sync failed.', error);
+            });
         }
 
         function updateManagementGoogleSheetControls() {
@@ -4139,10 +4211,20 @@
                 return;
             }
 
+            const rows = getStoredLeaves()
+                .filter((leave) => getEffectiveLeaveStatus(leave) === 'Approved')
+                .flatMap((leave) => buildGoogleSheetRowsFromLeave({
+                    ...leave,
+                    status: 'Approved'
+                }));
+
+            if (!rows.length) {
+                showExportNotice('No approved leave records are available.');
+                return;
+            }
+
             let generatedCount = 0;
             for (const email of recipients) {
-                const rows = getManagementGoogleSheetRows();
-                if (!rows.length) continue;
                 try {
                     await appendRowsToGoogleSheet('websankul', rows, email, 'ALL');
                 } catch (error) {

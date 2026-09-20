@@ -5185,6 +5185,22 @@
             }
         }
 
+        function subscribeToDeleteHistoryUpdates() {
+            if (!db || !db.ref) return;
+            db.ref(FIREBASE_DELETE_HISTORY_KEY).on('value', (snapshot) => {
+                const firebaseEntries = snapshot.val();
+                if (!Array.isArray(firebaseEntries)) return;
+                const cleanEntries = firebaseEntries.filter((entry) => entry && typeof entry === 'object');
+                localStorage.setItem(DELETE_HISTORY_KEY, JSON.stringify(cleanEntries));
+                renderDeleteHistory('management');
+                renderDeleteHistory('employee');
+                renderDeleteHistory('tl');
+                if (isRole('Employee')) loadLeaveHistory();
+            }, (error) => {
+                console.error('Live delete history updates failed.', error);
+            });
+        }
+
         function recordDeleteHistoryEntry(leaveToDelete) {
             if (!leaveToDelete) return;
 
@@ -5591,6 +5607,7 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await syncGlobalLeavesFromFirebase();
             await syncDeleteHistoryFromFirebase();
+            subscribeToDeleteHistoryUpdates();
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
                 await loadFullUserDepartmentAccess();
             }
@@ -5816,11 +5833,17 @@
             const daysFilter = document.getElementById('employeeDaysFilter')?.value || '';
             const statusFilter = document.getElementById('employeeStatusFilter')?.value || 'all';
             const actionByFilter = (document.getElementById('employeeActionByFilter')?.value || '').trim().toLowerCase();
-            const allLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
+            const allLeaves = getStoredLeaves();
+            const deletedRequestIds = new Set(
+                getDeleteHistory()
+                    .map((entry) => String(entry.requestId || ''))
+                    .filter(Boolean)
+            );
 
             const currentEmail = String(userIdentifier || '').trim().toLowerCase();
             const currentName = String(userData?.name || getLoggedInUserDisplayName() || '').trim().toLowerCase();
             const myLeaves = allLeaves.filter((leave) => {
+                if (deletedRequestIds.has(String(leave.id || ''))) return false;
                 const leaveEmail = String(leave.employeeEmail || '').trim().toLowerCase();
                 const leaveName = String(leave.employeeFullName || '').trim().toLowerCase();
                 return (currentEmail && leaveEmail === currentEmail) || (currentName && leaveName === currentName);

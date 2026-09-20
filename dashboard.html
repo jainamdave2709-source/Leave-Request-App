@@ -5455,17 +5455,23 @@
 
         function getStoredLeaves() {
             try {
-                return JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY)) || [];
+                const storedLeaves = JSON.parse(localStorage.getItem(GLOBAL_LEAVES_KEY));
+                return Array.isArray(storedLeaves)
+                    ? storedLeaves.filter((leave) => leave && typeof leave === 'object')
+                    : [];
             } catch (e) {
                 return [];
             }
         }
 
         function persistStoredLeaves(allLeaves) {
-            localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(allLeaves));
+            const cleanLeaves = Array.isArray(allLeaves)
+                ? allLeaves.filter((leave) => leave && typeof leave === 'object')
+                : [];
+            localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(cleanLeaves));
             try {
                 if (db && db.ref) {
-                    db.ref(FIREBASE_LEAVES_KEY).set(allLeaves).catch(() => {});
+                    db.ref(FIREBASE_LEAVES_KEY).set(cleanLeaves).catch(() => {});
                 }
             } catch (e) {
                 console.warn('Firebase save failed:', e);
@@ -5479,8 +5485,9 @@
                 const firebaseLeaves = snapshot.val();
 
                 if (Array.isArray(firebaseLeaves) && firebaseLeaves.length > 0) {
-                    localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(firebaseLeaves));
-                    return firebaseLeaves;
+                    const cleanLeaves = firebaseLeaves.filter((leave) => leave && typeof leave === 'object');
+                    localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(cleanLeaves));
+                    return cleanLeaves;
                 }
 
                 const localLeaves = getStoredLeaves();
@@ -5499,7 +5506,8 @@
             db.ref(FIREBASE_LEAVES_KEY).on('value', (snapshot) => {
                 const firebaseLeaves = snapshot.val();
                 if (!Array.isArray(firebaseLeaves)) return;
-                localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(firebaseLeaves));
+                const cleanLeaves = firebaseLeaves.filter((leave) => leave && typeof leave === 'object');
+                localStorage.setItem(GLOBAL_LEAVES_KEY, JSON.stringify(cleanLeaves));
                 if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
                     loadTlApprovals();
                     renderTlOwnLeaveHistory();

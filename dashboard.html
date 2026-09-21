@@ -818,6 +818,22 @@
             border-color: #cbd5e1 !important;
         }
 
+        body.light-theme .flatpickr-calendar .flatpickr-day:not(.selected):not(.startRange):not(.endRange) {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        body.light-theme .flatpickr-calendar .flatpickr-day.today:not(.selected):not(.startRange):not(.endRange) {
+            border-color: #cbd5e1 !important;
+            box-shadow: none !important;
+        }
+
+        body.light-theme .flatpickr-calendar .flatpickr-day.selected,
+        body.light-theme .flatpickr-calendar .flatpickr-day.startRange,
+        body.light-theme .flatpickr-calendar .flatpickr-day.endRange {
+            border-radius: 50% !important;
+        }
+
         body.light-theme .report-dropdown-item:hover,
         body.light-theme .management-submenu button:hover {
             background: #e2e8f0 !important;
@@ -1756,15 +1772,52 @@
         }
 
         @media (max-width: 520px) {
+            html,
+            body {
+                width: 100%;
+                min-width: 320px;
+                overflow-x: hidden;
+            }
+
+            body {
+                font-size: 13px;
+            }
+
+            .main-content {
+                padding: 10px 10px 22px;
+            }
+
             .top-bar {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 14px;
+                padding: 14px;
+                margin-bottom: 12px;
+                border-radius: 14px;
             }
 
             .topbar-right {
                 width: 100%;
                 justify-content: space-between;
+            }
+
+            .topbar-user-area,
+            .user-info {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .user-info h3,
+            .user-info p {
+                overflow-wrap: anywhere;
+            }
+
+            .user-info h3 {
+                font-size: 16px;
+            }
+
+            .user-info p {
+                font-size: 11px;
             }
 
             .topbar-right .topbar-user-area {
@@ -1801,10 +1854,91 @@
                 margin: 0 -8px;
                 width: calc(100% + 16px);
                 -webkit-overflow-scrolling: touch;
+                border-radius: 10px;
             }
 
             .leave-table {
                 min-width: 980px;
+                font-size: 11px;
+            }
+
+            .panel-section {
+                padding: 14px 10px;
+                border-radius: 14px;
+            }
+
+            .panel-section h3 {
+                font-size: 17px;
+                line-height: 1.35;
+            }
+
+            .clickable-card,
+            .history-section,
+            .rules-view {
+                padding: 14px;
+                border-radius: 13px;
+            }
+
+            .clickable-card h4 {
+                font-size: 14px !important;
+            }
+
+            .clickable-card p {
+                font-size: 11px !important;
+                line-height: 1.45;
+            }
+
+            .stat-card {
+                padding: 14px;
+                border-radius: 13px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea,
+            .form-group .assigned-tl-display,
+            .submit-leave-btn,
+            .back-btn,
+            .rules-agree-btn {
+                width: 100% !important;
+                max-width: 100%;
+                min-height: 44px;
+            }
+
+            .form-group textarea {
+                min-height: 100px;
+            }
+
+            .flatpickr-calendar {
+                width: min(94vw, 320px) !important;
+                max-width: calc(100vw - 20px);
+            }
+
+            .flatpickr-calendar .flatpickr-days,
+            .flatpickr-calendar .dayContainer {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: none !important;
+            }
+
+            .flatpickr-calendar .flatpickr-day {
+                max-width: none;
+                height: 36px;
+                line-height: 36px;
+            }
+
+            .filter-bar {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+
+            .filter-bar > *,
+            .filter-bar input,
+            .filter-bar select,
+            .filter-bar button {
+                width: 100% !important;
+                max-width: 100% !important;
             }
 
             .action-btn-group {

@@ -5688,10 +5688,16 @@
         function getDeleteHistory() {
             try {
                 const entries = JSON.parse(localStorage.getItem(DELETE_HISTORY_KEY));
-                return Array.isArray(entries) ? entries.filter((entry) => entry && typeof entry === 'object') : [];
+                const normalizedEntries = Array.isArray(entries) ? entries : Object.values(entries || {});
+                return normalizedEntries.filter((entry) => entry && typeof entry === 'object');
             } catch (error) {
                 return [];
             }
+        }
+
+        function updateManagementDeletedHistoryCounter() {
+            const counter = document.getElementById('managementDeletedHistoryCountBadge');
+            if (counter) counter.innerText = String(getDeleteHistory().length);
         }
 
         function persistDeleteHistory(historyEntries) {
@@ -5757,6 +5763,7 @@
         }
 
         function renderDeleteHistory(panelPrefix = 'management') {
+            if (panelPrefix === 'management') updateManagementDeletedHistoryCounter();
             const container = document.getElementById(`${panelPrefix}DeleteHistoryList`);
             if (!container) return;
 
@@ -5976,16 +5983,20 @@
                 const snapshot = await db.ref(FIREBASE_DELETE_HISTORY_KEY).once('value');
                 const firebaseEntries = snapshot.val();
                 const localEntries = getDeleteHistory();
-                if (Array.isArray(firebaseEntries)) {
+                if (firebaseEntries && typeof firebaseEntries === 'object') {
+                    const normalizedFirebaseEntries = Array.isArray(firebaseEntries)
+                        ? firebaseEntries
+                        : Object.values(firebaseEntries);
                     const entriesById = new Map();
-                    [...localEntries, ...firebaseEntries].forEach((entry) => {
+                    [...localEntries, ...normalizedFirebaseEntries].forEach((entry) => {
                         if (entry && entry.id) entriesById.set(String(entry.id), entry);
                     });
                     const mergedEntries = Array.from(entriesById.values());
                     localStorage.setItem(DELETE_HISTORY_KEY, JSON.stringify(mergedEntries));
-                    if (mergedEntries.length !== firebaseEntries.length) {
+                    if (mergedEntries.length !== normalizedFirebaseEntries.length) {
                         await db.ref(FIREBASE_DELETE_HISTORY_KEY).set(mergedEntries);
                     }
+                    updateManagementDeletedHistoryCounter();
                     return;
                 }
                 if (localEntries.length) {
@@ -6000,9 +6011,11 @@
             if (!db || !db.ref) return;
             db.ref(FIREBASE_DELETE_HISTORY_KEY).on('value', (snapshot) => {
                 const firebaseEntries = snapshot.val();
-                if (!Array.isArray(firebaseEntries)) return;
-                const cleanEntries = firebaseEntries.filter((entry) => entry && typeof entry === 'object');
+                if (!firebaseEntries || typeof firebaseEntries !== 'object') return;
+                const cleanEntries = (Array.isArray(firebaseEntries) ? firebaseEntries : Object.values(firebaseEntries))
+                    .filter((entry) => entry && typeof entry === 'object');
                 localStorage.setItem(DELETE_HISTORY_KEY, JSON.stringify(cleanEntries));
+                updateManagementDeletedHistoryCounter();
                 renderDeleteHistory('management');
                 renderDeleteHistory('employee');
                 renderDeleteHistory('tl');
@@ -6059,6 +6072,7 @@
 
             historyEntries.unshift(newEntry);
             persistDeleteHistory(historyEntries.slice(0, 30));
+            updateManagementDeletedHistoryCounter();
             renderDeleteHistory();
             renderDeleteHistory('employee');
             renderDeleteHistory('tl');
@@ -6955,7 +6969,6 @@
             const departmentFilter = document.getElementById('managementDepartmentFilter').value;
             const actionByFilter = document.getElementById('managementActionByFilter').value;
             const allLeaves = getStoredLeaves();
-            syncApprovedLeavesToGoogleSheet(allLeaves);
 
             populateManagementFilterOptions();
             tbody.innerHTML = '';

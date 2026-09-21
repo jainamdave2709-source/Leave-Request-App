@@ -7533,7 +7533,8 @@
                 container.classList.add('hidden');
             }
             tbody.innerHTML = filtered.length ? filtered.map((leave) => {
-                const badgeClass = leave.status === 'Approved' ? 'status-approved' : leave.status === 'Rejected' ? 'status-rejected' : 'status-pending';
+                const effectiveStatus = getEffectiveLeaveStatus(leave);
+                const badgeClass = effectiveStatus === 'Approved' ? 'status-approved' : effectiveStatus === 'Rejected' ? 'status-rejected' : 'status-pending';
                 return `<tr data-leave-row-id="${escapeDeleteHistoryText(leave.id)}">
                     <td>${escapeDeleteHistoryText(leave.reportFillDate || '-')}</td><td>${escapeDeleteHistoryText(leave.companyName || '-')}</td>
                     <td>${escapeDeleteHistoryText(leave.departmentName || '-')}</td><td>${escapeDeleteHistoryText(leave.employeeFullName || '-')}</td>
@@ -7542,7 +7543,7 @@
                     ${renderLeaveDateCells(leave.secondHalfDate)}
                     <td class="reason-cell">${escapeDeleteHistoryText(leave.leaveReason || '-')}</td>
                     <td>${escapeDeleteHistoryText(leave.totalLeaveDays || '0')}</td>
-                    <td><span class="status-badge ${badgeClass}">${escapeDeleteHistoryText(status)}</span>${leave.actionBy ? `<span class="action-by-text">By: ${escapeDeleteHistoryText(leave.actionBy)}</span>` : ''}</td>
+                    <td><span class="status-badge ${badgeClass}">${escapeDeleteHistoryText(effectiveStatus)}</span>${leave.actionBy ? `<span class="action-by-text">By: ${escapeDeleteHistoryText(leave.actionBy)}</span>` : ''}</td>
                     <td class="reason-cell">${escapeDeleteHistoryText(leave.tlRemark || leave.remark || '-')}</td>
                 </tr>`;
             }).join('') : '<tr><td colspan="14" class="no-data">No leave history found for this period.</td></tr>';

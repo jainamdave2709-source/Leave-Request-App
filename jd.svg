@@ -1,0 +1,31 @@
+<svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="200" height="200" rx="42" fill="#F3F4F6"/>
+  <rect x="10" y="10" width="200" height="200" rx="42" fill="url(#paint0_linear_1_2)" opacity="0.15"/>
+
+  <g filter="url(#shadow)">
+    <rect x="58" y="48" width="104" height="88" rx="18" fill="#FFFFFF"/>
+    <path d="M83 81.5C89.7 74.5 95.2 69.5 104.2 69.5C112.3 69.5 116.3 72 123.3 81.5L138.5 100.4C144.9 108.1 147.8 116.4 147.8 124.6C147.8 141.7 135.4 155 117.4 155H96.1C76.3 155 62.5 141.6 62.5 123.7C62.5 115.6 66 107 72.8 99.7L83 87.2V81.5Z" fill="#D9F4E7"/>
+    <path d="M80 85.6L96.6 71.7C101.7 67.2 109.5 65.7 116 68.5L143.7 82.5C150.7 85.8 155.7 92.7 155.7 100.2V117.1C155.7 131.1 144 142.6 130.4 142.6H89.8C76.5 142.6 65.7 131.7 65.7 118.3V109.2C65.7 101.4 70.7 94.7 78.2 91.4L80 85.6Z" fill="#E5F7EC"/>
+    <path d="M79.2 96.8L92.9 85.4C99.2 80.5 108.9 80.1 115.6 84.6L136.8 99.7C141.5 103 145.1 107.8 147.1 113.8L154.8 138.8H72.8L79.2 96.8Z" fill="#87D8A9" opacity="0.8"/>
+    <path d="M91.2 74.7C96.5 71 103.8 69.2 110.8 69.2C118.4 69.2 125.1 71.2 129.6 75.5L121.1 95.5H78.4L91.2 74.7Z" fill="#3BCF93"/>
+    <path d="M81.9 89.1H117.9C121.9 89.1 124.9 92.2 124.9 96.2C124.9 100.2 121.9 103.3 117.9 103.3H81.9C77.9 103.3 74.9 100.2 74.9 96.2C74.9 92.2 77.9 89.1 81.9 89.1Z" fill="#D9F4E7"/>
+    <path d="M86 110.2H118.5C122.7 110.2 126.1 113.7 126.1 117.9C126.1 122.1 122.7 125.5 118.5 125.5H86C81.8 125.5 78.4 122.1 78.4 117.9C78.4 113.7 81.8 110.2 86 110.2Z" fill="#C9F1D9"/>
+    <path d="M97 68.4L117 68.4C120 68.4 122 70.4 122 73.4V78.4H97V68.4Z" fill="#3BB28A"/>
+  </g>
+
+  <text x="110" y="155" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700" fill="#1F2937">JD</text>
+  <text x="110" y="186" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="500" fill="#4B5563" letter-spacing="0.5">Logo</text>
+
+  <defs>
+    <linearGradient id="paint0_linear_1_2" x1="10" y1="10" x2="210" y2="210" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D7F5E5"/>
+      <stop offset="1" stop-color="#E2ECFF"/>
+    </linearGradient>
+  </defs>
+</svg>

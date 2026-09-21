@@ -568,6 +568,69 @@
             position: relative;
             z-index: 1;
         }
+
+        .theme-toggle-btn {
+            margin-left: auto;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: rgba(15, 23, 42, 0.7);
+            color: #f8fafc;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .panel-theme-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        body.light-theme {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        body.light-theme .sidebar {
+            background: rgba(255, 255, 255, 0.92);
+            border-right-color: rgba(15, 23, 42, 0.12);
+        }
+
+        body.light-theme .panel-section {
+            background: rgba(255, 255, 255, 0.92);
+            border-color: rgba(15, 23, 42, 0.12);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+        }
+
+        body.light-theme .panel-section h3,
+        body.light-theme .panel-section h4,
+        body.light-theme .panel-section label,
+        body.light-theme .panel-section th,
+        body.light-theme .panel-section td {
+            color: #1e293b;
+        }
+
+        body.light-theme .panel-section p,
+        body.light-theme .panel-section .stat-card-title {
+            color: #475569 !important;
+        }
+
+        body.light-theme input,
+        body.light-theme select,
+        body.light-theme textarea {
+            background-color: #ffffff;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: #e2e8f0;
+            color: #1e293b;
+            border-color: #94a3b8;
+        }
         
         .stats-row {
             display: flex;
@@ -1723,7 +1786,10 @@
         <!-- Employee Panel -->
         <div id="employeePanel" class="panel-section hidden">
             <div id="employeeCardView">
-                <h3><i class="fa-solid fa-user-pen" style="color: #38bdf8; margin-right: 8px;"></i>Employee Panel</h3>
+                <div class="panel-theme-header">
+                    <h3><i class="fa-solid fa-user-pen" style="color: #38bdf8; margin-right: 8px;"></i>Employee Panel</h3>
+                    <button type="button" class="theme-toggle-btn" onclick="toggleTheme()">☀ White / ☾ Dark</button>
+                </div>
                 <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Manage your leave applications and view history below.</p>
                 
                 <div class="stats-row">
@@ -2001,7 +2067,10 @@
 
         <!-- Team Leader Panel -->
         <div id="tlPanel" class="panel-section hidden">
-            <h3><i class="fa-solid fa-user-check" style="color: #10b981; margin-right: 8px;"></i>Team Leave Approvals</h3>
+            <div class="panel-theme-header">
+                <h3><i class="fa-solid fa-user-check" style="color: #10b981; margin-right: 8px;"></i>Team Leave Approvals</h3>
+                <button type="button" class="theme-toggle-btn" onclick="toggleTheme()">☀ White / ☾ Dark</button>
+            </div>
             <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Review and approve/reject leave requests from your department members.</p>
             
             <!-- TL Counter & Search/Filter Section -->
@@ -2276,7 +2345,10 @@
 
         <!-- Management Panel -->
         <div id="managementPanel" class="panel-section hidden">
-            <h3><i class="fa-solid fa-shield-halved" style="color: #f59e0b; margin-right: 8px;"></i>Management Control Panel</h3>
+            <div class="panel-theme-header">
+                <h3><i class="fa-solid fa-shield-halved" style="color: #f59e0b; margin-right: 8px;"></i>Management Control Panel</h3>
+                <button type="button" class="theme-toggle-btn" onclick="toggleTheme()">☀ White / ☾ Dark</button>
+            </div>
             <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Overall data and reports for all office staff and team leaders.</p>
 
             <div id="managementMainView">
@@ -3682,6 +3754,22 @@
             }
             return trimmed;
         }
+
+        function applyTheme(theme) {
+            const isLight = theme === 'light';
+            document.body.classList.toggle('light-theme', isLight);
+            localStorage.setItem('dashboardTheme', isLight ? 'light' : 'dark');
+            document.querySelectorAll('.theme-toggle-btn').forEach((button) => {
+                button.textContent = isLight ? '☾ Dark' : '☀ White';
+                button.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to white theme');
+            });
+        }
+
+        function toggleTheme() {
+            applyTheme(document.body.classList.contains('light-theme') ? 'dark' : 'light');
+        }
+
+        applyTheme(localStorage.getItem('dashboardTheme') || 'dark');
 
         window.currentManagementExportFormat = 'pdf';
 

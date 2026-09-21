@@ -4597,6 +4597,11 @@
                     row[`${group.type} - Year`] = dates.length ? monthGroup.year : '';
                 });
 
+                const fullDayCount = (monthGroup.values['Full Leave'] || []).length;
+                const halfDayCount = (monthGroup.values['First Half'] || []).length
+                    + (monthGroup.values['Second Half'] || []).length;
+                row.Days = String(fullDayCount + (halfDayCount * 0.5));
+
                 return row;
             });
         }
@@ -5793,7 +5798,7 @@
                 return true;
             });
 
-            if (deletedHistoryCount) deletedHistoryCount.innerText = filteredHistoryEntries.length;
+            if (deletedHistoryCount) deletedHistoryCount.innerText = allHistoryEntries.length;
 
             if (!filteredHistoryEntries.length) {
                 container.innerHTML = '<div style="padding: 14px 16px; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; background: rgba(15, 23, 42, 0.55); color: #cbd5e1;">No deleted leave requests yet.</div>';

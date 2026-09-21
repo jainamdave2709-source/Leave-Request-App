@@ -758,6 +758,14 @@
             border-color: #94a3b8 !important;
         }
 
+        body.light-theme .leave-year-select,
+        body.light-theme .leave-year-select option,
+        body.light-theme .flatpickr-monthDropdown-months,
+        body.light-theme .flatpickr-current-month input.cur-year {
+            background: #ffffff !important;
+            color: #111827 !important;
+        }
+
         body.light-theme .management-submenu,
         body.light-theme .report-dropdown-item,
         body.light-theme .notification-dropdown,
@@ -781,6 +789,33 @@
         body.light-theme .top-bar,
         body.light-theme .top-bar * {
             color: #111827;
+        }
+
+        body.light-theme .delete-history-toggle,
+        body.light-theme .delete-history-list > div,
+        body.light-theme .delete-history-list > div > div {
+            background: #ffffff !important;
+            color: #111827 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        body.light-theme .delete-history-list > div *,
+        body.light-theme .delete-history-toggle *,
+        body.light-theme .history-header *,
+        body.light-theme .month-filter-box *,
+        body.light-theme select,
+        body.light-theme select option {
+            color: #111827 !important;
+        }
+
+        body.light-theme .delete-history-list > div span,
+        body.light-theme .delete-history-list > div strong,
+        body.light-theme .delete-history-list > div label {
+            color: #111827 !important;
+        }
+
+        body.light-theme .delete-history-list input[type="checkbox"] {
+            accent-color: #4f46e5;
         }
         
         .stats-row {
@@ -5080,7 +5115,7 @@
                 return;
             }
             container.innerHTML = entries.map((entry) => `
-                <div style="padding: 12px 16px; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 12px; background: rgba(15, 23, 42, 0.55); color: #e2e8f0; margin-top: 10px;">
+            <div class="delete-history-entry" style="padding: 12px 16px; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 12px; background: rgba(15, 23, 42, 0.55); color: #e2e8f0; margin-top: 10px;">
                     <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
                         <strong>${escapeDeleteHistoryText(entry.action)}: ${escapeDeleteHistoryText(entry.employeeName)}</strong>
                         <span style="color:#a78bfa; font-size:12px;">${new Date(entry.actionAt).toLocaleString()}</span>
@@ -5307,7 +5342,7 @@
             container.innerHTML = filteredHistoryEntries.map((entry) => {
                 const acknowledged = !!entry.acknowledged;
                 return `
-                    <div style="padding: 14px 16px; border: 1px solid ${acknowledged ? 'rgba(16, 185, 129, 0.4)' : 'rgba(148, 163, 184, 0.18)'}; border-radius: 12px; background: ${acknowledged ? 'rgba(16, 185, 129, 0.08)' : 'rgba(15, 23, 42, 0.55)'}; color: #e2e8f0;">
+                    <div class="delete-history-entry" style="padding: 14px 16px; border: 1px solid ${acknowledged ? 'rgba(16, 185, 129, 0.4)' : 'rgba(148, 163, 184, 0.18)'}; border-radius: 12px; background: ${acknowledged ? 'rgba(16, 185, 129, 0.08)' : 'rgba(15, 23, 42, 0.55)'}; color: #e2e8f0;">
                         <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center;">
                             <div>
                                 <strong>${escapeDeleteHistoryText(entry.employeeName || 'Unknown')}</strong>

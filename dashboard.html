@@ -4181,6 +4181,7 @@
         }
 
         function getPendingLeaveNotificationsForCurrentRole() {
+            const readPendingIds = new Set(JSON.parse(localStorage.getItem('readPendingNotificationIds') || '[]'));
             const leaves = getStoredLeaves();
             const currentEmail = String(userIdentifier || '').trim().toLowerCase();
             const currentName = normalizeDeleteHistoryIdentity(getLoggedInUserDisplayName() || currentUserName || userData?.name);
@@ -4208,7 +4209,8 @@
                     title: 'Submitted',
                     type: 'submitted',
                     leaveId: leave.id,
-                    read: false,
+                    read: readPendingIds.has(`pending_${leave.id}_${normalizeDepartmentName(leave.departmentName)}`),
+                    createdAt: leave.timestamp || new Date().toISOString(),
                     time: leave.timestamp
                         ? new Date(leave.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : ''
@@ -4251,8 +4253,14 @@
                     return unique;
                 }, []);
             notifications.sort((a, b) => {
-                const bTime = new Date(b.createdAt || 0).getTime() || Number(b.id) || 0;
-                const aTime = new Date(a.createdAt || 0).getTime() || Number(a.id) || 0;
+                const getNotificationTimestamp = (notification) => {
+                    const createdAt = new Date(notification.createdAt || 0).getTime();
+                    if (Number.isFinite(createdAt) && createdAt > 0) return createdAt;
+                    const numericId = Number.parseInt(String(notification.id || ''), 10);
+                    return Number.isFinite(numericId) ? numericId : 0;
+                };
+                const bTime = getNotificationTimestamp(b);
+                const aTime = getNotificationTimestamp(a);
                 return bTime - aTime;
             });
             const unreadCount = notifications.filter(n => !n.read).length;
@@ -4261,31 +4269,49 @@
             renderNotificationItems(listContainer, notifications);
         }
 
+        async function markNotificationKeysAsRead(keys) {
+            const uniqueKeys = Array.from(new Set(keys.filter(Boolean)));
+            uniqueKeys.forEach((key) => {
+                const localNotifications = JSON.parse(localStorage.getItem(key) || '[]')
+                    .map((notification) => ({ ...notification, read: true }));
+                localStorage.setItem(key, JSON.stringify(localNotifications));
+            });
+
+            const pendingNotifications = getPendingLeaveNotificationsForCurrentRole();
+            const readPendingIds = new Set(JSON.parse(localStorage.getItem('readPendingNotificationIds') || '[]'));
+            pendingNotifications.forEach((notification) => readPendingIds.add(String(notification.id)));
+            localStorage.setItem('readPendingNotificationIds', JSON.stringify(Array.from(readPendingIds)));
+
+            if (!db || !db.ref) return;
+            await Promise.all(uniqueKeys.map(async (key) => {
+                try {
+                    const snapshot = await db.ref(`sharedNotifications/${getSharedNotificationKey(key)}`).once('value');
+                    const remoteNotifications = snapshot.val() || {};
+                    const updates = {};
+                    Object.keys(remoteNotifications).forEach((childKey) => {
+                        updates[`${childKey}/read`] = true;
+                    });
+                    if (Object.keys(updates).length) {
+                        await db.ref(`sharedNotifications/${getSharedNotificationKey(key)}`).update(updates);
+                    }
+                } catch (error) {
+                    console.warn(`Mark all notifications read failed for ${key}:`, error);
+                }
+            }));
+        }
+
         window.setInterval(() => {
             if (userIdentifier) loadNotifications();
         }, 5000);
 
-        document.getElementById('markAllReadBtn').addEventListener('click', () => {
+        document.getElementById('markAllReadBtn').addEventListener('click', async () => {
+            const notificationKeys = [getNotificationKey()];
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
-                getDepartmentNotificationKeys().forEach(deptKey => {
-                    let deptNotifs = JSON.parse(localStorage.getItem(deptKey)) || [];
-                    deptNotifs = deptNotifs.map(n => ({ ...n, read: true }));
-                    localStorage.setItem(deptKey, JSON.stringify(deptNotifs));
-                });
-
-                let personalNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
-                personalNotifs = personalNotifs.map(n => ({ ...n, read: true }));
-                localStorage.setItem(getNotificationKey(), JSON.stringify(personalNotifs));
+                notificationKeys.push(...getDepartmentNotificationKeys());
             } else if (isRole('Management') || isRole('MANAGEMENT')) {
-                const managementNotifs = (JSON.parse(localStorage.getItem('management_notifications')) || []).map(n => ({ ...n, read: true }));
-                const personalNotifs = (JSON.parse(localStorage.getItem(getNotificationKey())) || []).map(n => ({ ...n, read: true }));
-                localStorage.setItem('management_notifications', JSON.stringify(managementNotifs));
-                localStorage.setItem(getNotificationKey(), JSON.stringify(personalNotifs));
-            } else {
-                let userNotifs = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
-                userNotifs = userNotifs.map(n => ({ ...n, read: true }));
-                localStorage.setItem(getNotificationKey(), JSON.stringify(userNotifs));
+                notificationKeys.push('management_notifications');
             }
+            await markNotificationKeysAsRead(notificationKeys);
             loadNotifications();
         });
 

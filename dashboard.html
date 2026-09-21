@@ -569,17 +569,43 @@
             z-index: 1;
         }
 
-        .theme-toggle-btn {
+        .theme-switcher {
             margin-left: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 5px;
+            min-width: 112px;
+        }
+
+        .theme-switcher-label {
+            color: #cbd5e1;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .theme-switcher-options {
+            display: flex;
+            gap: 5px;
+        }
+
+        .theme-option-btn {
             border: 1px solid rgba(148, 163, 184, 0.45);
             background: rgba(15, 23, 42, 0.7);
             color: #f8fafc;
-            border-radius: 999px;
-            padding: 8px 14px;
+            border-radius: 7px;
+            padding: 5px 9px;
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .theme-option-btn.active {
+            background: #4f46e5;
+            border-color: #818cf8;
+            color: #ffffff;
         }
 
         .panel-theme-header {
@@ -626,10 +652,20 @@
             border-color: #cbd5e1;
         }
 
-        body.light-theme .theme-toggle-btn {
+        body.light-theme .theme-switcher-label {
+            color: #475569;
+        }
+
+        body.light-theme .theme-option-btn {
             background: #e2e8f0;
             color: #1e293b;
             border-color: #94a3b8;
+        }
+
+        body.light-theme .theme-option-btn.active {
+            background: #4f46e5;
+            border-color: #4f46e5;
+            color: #ffffff;
         }
         
         .stats-row {
@@ -1788,7 +1824,13 @@
             <div id="employeeCardView">
                 <div class="panel-theme-header">
                     <h3><i class="fa-solid fa-user-pen" style="color: #38bdf8; margin-right: 8px;"></i>Employee Panel</h3>
-                    <button type="button" class="theme-toggle-btn" onclick="toggleTheme()">☀ White / ☾ Dark</button>
+                    <div class="theme-switcher" aria-label="Theme">
+                        <span class="theme-switcher-label">Theme</span>
+                        <div class="theme-switcher-options">
+                            <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">White</button>
+                            <button type="button" class="theme-option-btn" data-theme-option="dark" onclick="applyTheme('dark')">Black</button>
+                        </div>
+                    </div>
                 </div>
                 <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Manage your leave applications and view history below.</p>
                 
@@ -2069,7 +2111,13 @@
         <div id="tlPanel" class="panel-section hidden">
             <div class="panel-theme-header">
                 <h3><i class="fa-solid fa-user-check" style="color: #10b981; margin-right: 8px;"></i>Team Leave Approvals</h3>
-                <button type="button" class="theme-toggle-btn" onclick="toggleTheme()">☀ White / ☾ Dark</button>
+                <div class="theme-switcher" aria-label="Theme">
+                    <span class="theme-switcher-label">Theme</span>
+                    <div class="theme-switcher-options">
+                        <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">White</button>
+                        <button type="button" class="theme-option-btn" data-theme-option="dark" onclick="applyTheme('dark')">Black</button>
+                    </div>
+                </div>
             </div>
             <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Review and approve/reject leave requests from your department members.</p>
             
@@ -2347,7 +2395,13 @@
         <div id="managementPanel" class="panel-section hidden">
             <div class="panel-theme-header">
                 <h3><i class="fa-solid fa-shield-halved" style="color: #f59e0b; margin-right: 8px;"></i>Management Control Panel</h3>
-                <button type="button" class="theme-toggle-btn" onclick="toggleTheme()">☀ White / ☾ Dark</button>
+                <div class="theme-switcher" aria-label="Theme">
+                    <span class="theme-switcher-label">Theme</span>
+                    <div class="theme-switcher-options">
+                        <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">White</button>
+                        <button type="button" class="theme-option-btn" data-theme-option="dark" onclick="applyTheme('dark')">Black</button>
+                    </div>
+                </div>
             </div>
             <p style="color: #94a3b8; font-size: 13px; margin: 8px 0 20px 0;">Overall data and reports for all office staff and team leaders.</p>
 
@@ -3759,9 +3813,10 @@
             const isLight = theme === 'light';
             document.body.classList.toggle('light-theme', isLight);
             localStorage.setItem('dashboardTheme', isLight ? 'light' : 'dark');
-            document.querySelectorAll('.theme-toggle-btn').forEach((button) => {
-                button.textContent = isLight ? '☾ Dark' : '☀ White';
-                button.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to white theme');
+            document.querySelectorAll('.theme-option-btn').forEach((button) => {
+                const isActive = button.dataset.themeOption === (isLight ? 'light' : 'dark');
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-pressed', String(isActive));
             });
         }
 

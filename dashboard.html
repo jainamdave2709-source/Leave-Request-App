@@ -3942,32 +3942,43 @@
             return `notifications_${userIdentifier}`;
         }
 
-        function addNotification(targetUserIdentifier, message, details = {}) {
-            let userNotifs = JSON.parse(localStorage.getItem(`notifications_${targetUserIdentifier}`)) || [];
-            userNotifs.unshift({
-                id: Date.now(),
-                message: message,
-                title: details.title || 'Notification',
-                type: details.type || 'info',
-                leaveId: details.leaveId || null,
-                read: false,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
-            localStorage.setItem(`notifications_${targetUserIdentifier}`, JSON.stringify(userNotifs));
-        }
-
-        function addSharedNotification(storageKey, message, details = {}) {
-            const notifications = JSON.parse(localStorage.getItem(storageKey)) || [];
-            notifications.unshift({
-                id: Date.now(),
+        function buildNotification(message, details = {}) {
+            return {
+                id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
                 message,
                 title: details.title || 'Notification',
                 type: details.type || 'info',
                 leaveId: details.leaveId || null,
                 read: false,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                createdAt: new Date().toISOString()
+            };
+        }
+
+        function saveNotificationLocally(storageKey, notification) {
+            const notifications = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            notifications.unshift(notification);
+            localStorage.setItem(storageKey, JSON.stringify(notifications.slice(0, 200)));
+        }
+
+        function saveSharedNotification(storageKey, notification) {
+            if (!db || !db.ref) return;
+            db.ref(`sharedNotifications/${storageKey}`).push(notification).catch((error) => {
+                console.warn('Shared notification save failed:', error);
             });
-            localStorage.setItem(storageKey, JSON.stringify(notifications));
+        }
+
+        function addNotification(targetUserIdentifier, message, details = {}) {
+            const storageKey = `notifications_${targetUserIdentifier}`;
+            const notification = buildNotification(message, details);
+            saveNotificationLocally(storageKey, notification);
+            saveSharedNotification(storageKey, notification);
+        }
+
+        function addSharedNotification(storageKey, message, details = {}) {
+            const notification = buildNotification(message, details);
+            saveNotificationLocally(storageKey, notification);
+            saveSharedNotification(storageKey, notification);
         }
 
         function addManagementNotification(message, details = {}) {
@@ -4161,20 +4172,45 @@
             return dates.length ? dates.join(' | ') : 'Date: -';
         }
 
-        function loadNotifications() {
+        async function loadNotifications() {
             const listContainer = document.getElementById('notificationListContainer');
             const badgeCount = document.getElementById('notificationBadgeCount');
             if (!listContainer || !badgeCount) return;
-            let notifications = JSON.parse(localStorage.getItem(getNotificationKey())) || [];
+            const notificationKeys = [getNotificationKey()];
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
-                getDepartmentNotificationKeys().forEach(key => {
-                    notifications = notifications.concat(JSON.parse(localStorage.getItem(key)) || []);
-                });
+                notificationKeys.push(...getDepartmentNotificationKeys());
             }
             if (isRole('Management') || isRole('MANAGEMENT')) {
-                notifications = notifications.concat(JSON.parse(localStorage.getItem('management_notifications')) || []);
+                notificationKeys.push('management_notifications');
             }
-            notifications.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
+            let notifications = [];
+            const uniqueKeys = Array.from(new Set(notificationKeys));
+            uniqueKeys.forEach((key) => {
+                notifications = notifications.concat(JSON.parse(localStorage.getItem(key) || '[]'));
+            });
+            if (db && db.ref) {
+                const remoteResults = await Promise.all(uniqueKeys.map(async (key) => {
+                    try {
+                        const snapshot = await db.ref(`sharedNotifications/${key}`).once('value');
+                        return Object.values(snapshot.val() || {});
+                    } catch (error) {
+                        console.warn(`Notification load failed for ${key}:`, error);
+                        return [];
+                    }
+                }));
+                notifications = notifications.concat(remoteResults.flat());
+            }
+            notifications = notifications
+                .filter((notification) => notification && notification.id)
+                .reduce((unique, notification) => {
+                    if (!unique.some((item) => String(item.id) === String(notification.id))) unique.push(notification);
+                    return unique;
+                }, []);
+            notifications.sort((a, b) => {
+                const bTime = new Date(b.createdAt || 0).getTime() || Number(b.id) || 0;
+                const aTime = new Date(a.createdAt || 0).getTime() || Number(a.id) || 0;
+                return bTime - aTime;
+            });
             const unreadCount = notifications.filter(n => !n.read).length;
             badgeCount.innerText = unreadCount;
             badgeCount.classList.toggle('hidden', unreadCount === 0);
@@ -7906,17 +7942,11 @@
             addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review. ${notificationDateText}`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
             const deptNotifsKey = `dept_notifications_${normalizeDepartmentName(selectedDept)}`;
-            let deptNotifs = JSON.parse(localStorage.getItem(deptNotifsKey)) || [];
-            deptNotifs.unshift({
-                id: Date.now(),
-                message: `New leave request from ${fullName} (${selectedDept}) is waiting for your review. ${notificationDateText}`,
-                title: 'Submitted',
-                type: 'submitted',
-                leaveId: newLeave.id,
-                read: false,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
-            localStorage.setItem(deptNotifsKey, JSON.stringify(deptNotifs));
+            addSharedNotification(
+                deptNotifsKey,
+                `New leave request from ${fullName} (${selectedDept}) is waiting for your review. ${notificationDateText}`,
+                { title: 'Submitted', type: 'submitted', leaveId: newLeave.id }
+            );
             addManagementNotification(`New leave request submitted by ${fullName} for the ${selectedDept} department. Status: Pending. ${notificationDateText}`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
             alert('✅ Your leave request was submitted successfully. The department Team Leader has been notified.');

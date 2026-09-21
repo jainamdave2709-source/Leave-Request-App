@@ -3961,9 +3961,17 @@
             localStorage.setItem(storageKey, JSON.stringify(notifications.slice(0, 200)));
         }
 
+        function getSharedNotificationKey(storageKey) {
+            return String(storageKey || '').split('').map((character) => {
+                return '.#$[]/'.includes(character)
+                    ? `_${character.charCodeAt(0).toString(16)}_`
+                    : character;
+            }).join('');
+        }
+
         function saveSharedNotification(storageKey, notification) {
             if (!db || !db.ref) return;
-            db.ref(`sharedNotifications/${storageKey}`).push(notification).catch((error) => {
+            db.ref(`sharedNotifications/${getSharedNotificationKey(storageKey)}`).push(notification).catch((error) => {
                 console.warn('Shared notification save failed:', error);
             });
         }
@@ -4172,6 +4180,41 @@
             return dates.length ? dates.join(' | ') : 'Date: -';
         }
 
+        function getPendingLeaveNotificationsForCurrentRole() {
+            const leaves = getStoredLeaves();
+            const currentEmail = String(userIdentifier || '').trim().toLowerCase();
+            const currentName = normalizeDeleteHistoryIdentity(getLoggedInUserDisplayName() || currentUserName || userData?.name);
+            const isTl = isRole('TL') || isRole('TeamLeader') || isRole('Team Leader');
+            const isManagement = isRole('Management') || isRole('MANAGEMENT');
+            if (!isTl && !isManagement) return [];
+
+            const departments = getDepartmentNotificationKeys()
+                .map((key) => key.replace(/^dept_notifications_/, ''))
+                .map((department) => normalizeDepartmentName(department));
+
+            return leaves
+                .filter((leave) => getEffectiveLeaveStatus(leave) === 'Pending')
+                .filter((leave) => {
+                    const leaveEmail = String(leave.employeeEmail || '').trim().toLowerCase();
+                    const leaveName = normalizeDeleteHistoryIdentity(leave.employeeFullName);
+                    const isOwnLeave = (currentEmail && leaveEmail === currentEmail)
+                        || (currentName && leaveName === currentName);
+                    if (isManagement) return true;
+                    return !isOwnLeave && departments.includes(normalizeDepartmentName(leave.departmentName));
+                })
+                .map((leave) => ({
+                    id: `pending_${leave.id}_${normalizeDepartmentName(leave.departmentName)}`,
+                    message: `New leave request from ${leave.employeeFullName || 'Employee'} (${leave.departmentName || '-'}) is waiting for your review. ${getNotificationDateText(leave)} | Total Days: ${getLeaveDaysValue(leave)}`,
+                    title: 'Submitted',
+                    type: 'submitted',
+                    leaveId: leave.id,
+                    read: false,
+                    time: leave.timestamp
+                        ? new Date(leave.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : ''
+                }));
+        }
+
         async function loadNotifications() {
             const listContainer = document.getElementById('notificationListContainer');
             const badgeCount = document.getElementById('notificationBadgeCount');
@@ -4191,7 +4234,7 @@
             if (db && db.ref) {
                 const remoteResults = await Promise.all(uniqueKeys.map(async (key) => {
                     try {
-                        const snapshot = await db.ref(`sharedNotifications/${key}`).once('value');
+                        const snapshot = await db.ref(`sharedNotifications/${getSharedNotificationKey(key)}`).once('value');
                         return Object.values(snapshot.val() || {});
                     } catch (error) {
                         console.warn(`Notification load failed for ${key}:`, error);
@@ -4200,6 +4243,7 @@
                 }));
                 notifications = notifications.concat(remoteResults.flat());
             }
+            notifications = notifications.concat(getPendingLeaveNotificationsForCurrentRole());
             notifications = notifications
                 .filter((notification) => notification && notification.id)
                 .reduce((unique, notification) => {

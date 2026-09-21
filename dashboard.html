@@ -175,6 +175,30 @@
             cursor: pointer;
         }
 
+        .flatpickr-calendar .flatpickr-day.selected,
+        .flatpickr-calendar .flatpickr-day.startRange,
+        .flatpickr-calendar .flatpickr-day.endRange,
+        .flatpickr-calendar .flatpickr-day.selected:hover {
+            background: #4338ca;
+            border-color: #3730a3;
+            color: #ffffff;
+        }
+
+        .flatpickr-calendar .flatpickr-day:hover {
+            background: #6366f1;
+            border-color: #4f46e5;
+            color: #ffffff;
+        }
+
+        body.light-theme .flatpickr-calendar .flatpickr-day.selected,
+        body.light-theme .flatpickr-calendar .flatpickr-day.startRange,
+        body.light-theme .flatpickr-calendar .flatpickr-day.endRange,
+        body.light-theme .flatpickr-calendar .flatpickr-day.selected:hover {
+            background: #4338ca !important;
+            border-color: #3730a3 !important;
+            color: #ffffff !important;
+        }
+
         .leave-year-select {
             width: 82px;
             margin-left: 4px;
@@ -185,6 +209,22 @@
             color: #f8fafc;
             font: inherit;
             font-size: 12px;
+        }
+
+        .assigned-tl-display {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        body.light-theme .assigned-tl-display {
+            background: #ffffff !important;
+            border-color: #94a3b8 !important;
+            color: #111827 !important;
         }
 
         .leave-calendar-clear {
@@ -2274,6 +2314,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="employeeTeamLeader">TEAM LEADER</label>
+                        <div id="employeeTeamLeader" class="assigned-tl-display" aria-live="polite">Department select કર્યા પછી Team Leader અહીં દેખાશે</div>
+                    </div>
+
+                    <div class="form-group">
                         <label for="employeeFullName">EMPLOYEE NAME *</label>
                         <input type="text" id="employeeFullName" placeholder="તમારું પૂરું નામ લખો (દા.ત. Jainam Dave)" required>
                     </div>
@@ -3303,6 +3348,55 @@
             employeeNameInput.style.background = 'rgba(15, 23, 42, 0.95)';
         }
 
+        let employeeTeamLeaderUsers = null;
+
+        async function updateEmployeeTeamLeader() {
+            const departmentSelect = document.getElementById('departmentName');
+            const teamLeaderDisplay = document.getElementById('employeeTeamLeader');
+            if (!departmentSelect || !teamLeaderDisplay) return;
+
+            const selectedDepartment = normalizeDepartmentName(departmentSelect.value);
+            if (!selectedDepartment) {
+                teamLeaderDisplay.textContent = 'Department select કર્યા પછી Team Leader અહીં દેખાશે';
+                return;
+            }
+
+            teamLeaderDisplay.textContent = 'Team Leader શોધી રહ્યા છીએ...';
+            try {
+                if (!employeeTeamLeaderUsers) {
+                    const snapshot = await db.ref('users').once('value');
+                    employeeTeamLeaderUsers = Object.values(snapshot.val() || {});
+                }
+
+                const teamLeaders = employeeTeamLeaderUsers.filter((user) => {
+                    if (!user || !['tl', 'teamleader'].includes(normalizeRole(user.role))) return false;
+                    const departments = [];
+                    const collect = (value) => {
+                        if (Array.isArray(value)) {
+                            value.forEach(collect);
+                        } else if (value && typeof value === 'object') {
+                            Object.values(value).forEach(collect);
+                        } else if (value !== null && value !== undefined) {
+                            departments.push(String(value));
+                        }
+                    };
+                    ['department', 'dept', 'departments', 'assignedDepartments', 'tlDepartments', 'managedDepartments']
+                        .forEach((key) => collect(user[key]));
+                    return departments.some((department) => normalizeDepartmentName(department) === selectedDepartment);
+                });
+
+                const names = Array.from(new Set(teamLeaders.map((user) => (
+                    user.name || user.fullName || user.displayName || user.username || user.email
+                )).filter(Boolean)));
+                teamLeaderDisplay.textContent = names.length
+                    ? names.join(', ')
+                    : 'આ department માટે Team Leader મળ્યા નથી';
+            } catch (error) {
+                console.warn('Team Leader lookup failed:', error);
+                teamLeaderDisplay.textContent = 'Team Leader માહિતી ઉપલબ્ધ નથી';
+            }
+        }
+
         function applyLeaveFormAutoDefaults() {
             const employeeNameInput = document.getElementById('employeeFullName');
             if (employeeNameInput && !employeeNameInput.value.trim()) {
@@ -3348,6 +3442,7 @@
                     companySelect.value = matchedCompany.value;
                 }
             }
+            updateEmployeeTeamLeader();
         }
 
         function normalizeRole(roleValue) {
@@ -3669,6 +3764,7 @@
             document.getElementById('employeeCardView').classList.add('hidden');
             document.getElementById('employeeRulesView').classList.remove('hidden');
             document.getElementById('employeeFormView').classList.add('hidden');
+            document.getElementById('employeeRulesView').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
         document.getElementById('backToCardFromRulesBtn').addEventListener('click', () => {
@@ -3679,7 +3775,10 @@
         document.getElementById('agreeLeaveRulesBtn').addEventListener('click', () => {
             document.getElementById('employeeRulesView').classList.add('hidden');
             document.getElementById('employeeFormView').classList.remove('hidden');
+            document.getElementById('employeeFormView').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+
+        document.getElementById('departmentName').addEventListener('change', updateEmployeeTeamLeader);
 
         document.getElementById('backToCardBtn').addEventListener('click', () => {
             document.getElementById('employeeFormView').classList.add('hidden');
@@ -4070,7 +4169,7 @@
             websankul: 'https://docs.google.com/spreadsheets/d/1iROOadWV0k4gVbgoQy4eiuOqWO2BEo0jXYc6T5qMGjo/edit?gid=0#gid=0'
         };
         const CONFIGURED_GOOGLE_SHEET_ENDPOINTS = {
-            websankul: 'https://script.google.com/macros/s/AKfycbxzGfhGU4tT5nLFqnRFQK2t5vE9LGLeWDKv7UUmtVAqPxREM-2S9vgTnn6WxI0r6UqozQ/exec'
+            websankul: 'https://script.google.com/macros/s/AKfycbwQRSKs5pRqWOU3CXojH-6y25Y-WpQk85N8mL72l6FX8B6X3Xw71ZjTdpsEcpHt2IIb/exec'
         };
         let googleSheetSyncQueue = Promise.resolve();
 
@@ -4312,22 +4411,23 @@
         function syncApprovedLeavesToGoogleSheet(leaves) {
             if (!Array.isArray(leaves)) return;
 
-            const approvedRows = leaves
-                .filter((leave) => getEffectiveLeaveStatus(leave) === 'Approved')
-                .flatMap((leave) => buildGoogleSheetRowsFromLeave({
-                    ...leave,
-                    status: 'Approved'
-                }));
-
-            if (!approvedRows.length) return;
-
             const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS.websankul;
             if (!endpoint) return;
 
+            const approvedLeaves = leaves.filter((leave) => getEffectiveLeaveStatus(leave) === 'Approved');
+            const approvedRows = approvedLeaves.flatMap((leave) => buildGoogleSheetRowsFromLeave({
+                ...leave,
+                status: 'Approved'
+            }));
+            const approvedBaseRequestIds = approvedLeaves
+                .map((leave) => String(leave.id || '').trim())
+                .filter(Boolean);
+
             enqueueGoogleSheetSync(endpoint, {
-                action: 'upsertApprovedLeaveRows',
+                action: 'reconcileApprovedLeaveRows',
                 rows: approvedRows,
                 records: approvedRows,
+                approvedBaseRequestIds,
                 updatedAt: new Date().toISOString()
             }).catch((error) => {
                 console.error('Automatic approved leave sync failed.', error);

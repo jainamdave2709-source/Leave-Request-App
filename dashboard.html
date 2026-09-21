@@ -4031,6 +4031,7 @@
         }
 
         function getEffectiveLeaveStatus(leave) {
+            if (leave?.status === 'Approved') return 'Approved';
             const isRemovedDuringEdit = leave?.source === 'TL_EDIT_REMOVED_DATE'
                 || (leave?.parentRequestId && leave?.rejectedAt);
             return isRemovedDuringEdit ? 'Rejected' : (leave?.status || 'Pending');
@@ -7077,6 +7078,14 @@
             const leaveIndex = allLeaves.findIndex(l => l.id === leaveId);
             if (leaveIndex !== -1) {
                 allLeaves[leaveIndex].status = newStatus;
+                if (newStatus === 'Approved') {
+                    delete allLeaves[leaveIndex].source;
+                    delete allLeaves[leaveIndex].rejectedAt;
+                    delete allLeaves[leaveIndex].rejectedFullLeaveDate;
+                    delete allLeaves[leaveIndex].rejectedFirstHalfDate;
+                    delete allLeaves[leaveIndex].rejectedSecondHalfDate;
+                    delete allLeaves[leaveIndex].rejectedLeaveDays;
+                }
                 allLeaves[leaveIndex].actionBy = currentUserName; 
                 allLeaves[leaveIndex].tlReviewed = true;
                 allLeaves[leaveIndex].reviewed = true;

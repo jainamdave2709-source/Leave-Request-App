@@ -3723,6 +3723,7 @@
         const CONFIGURED_GOOGLE_SHEET_ENDPOINTS = {
             websankul: 'https://script.google.com/macros/s/AKfycbxzGfhGU4tT5nLFqnRFQK2t5vE9LGLeWDKv7UUmtVAqPxREM-2S9vgTnn6WxI0r6UqozQ/exec'
         };
+        let googleSheetSyncQueue = Promise.resolve();
 
         function getConfiguredGoogleSheetRecipients() {
             return CONFIGURED_GOOGLE_SHEET_RECIPIENTS.slice();
@@ -3795,17 +3796,23 @@
                 rows,
                 records: rows
             };
-            const response = await fetch(endpoint, {
+            return enqueueGoogleSheetSync(endpoint, payload);
+        }
+
+        function enqueueGoogleSheetSync(endpoint, payload) {
+            const request = googleSheetSyncQueue.then(() => fetch(endpoint, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload),
                 redirect: 'follow'
+            }));
+
+            googleSheetSyncQueue = request.catch((error) => {
+                console.error('Google Sheet request failed.', error);
             });
-            if (!response.ok && response.type !== 'opaque') {
-                throw new Error(`Google Sheet request failed with status ${response.status}.`);
-            }
-            return response;
+
+            return request;
         }
 
         function getGoogleSheetDateParts(value) {
@@ -3844,48 +3851,52 @@
                 { type: 'First Half', value: leave.firstHalfDate },
                 { type: 'Second Half', value: leave.secondHalfDate }
             ];
-            const rows = [];
-            dateGroups.forEach((group) => {
-                const monthNames = [
-                    'January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'
-                ];
-                const datesByMonth = new Map();
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const months = new Map();
 
+            dateGroups.forEach((group) => {
                 String(group.value || '')
                     .split(',')
                     .map((date) => date.trim())
                     .filter(Boolean)
                     .forEach((date) => {
                         const parts = date.split('/');
+                        if (parts.length !== 3) return;
+
                         const monthNumber = Number(parts[1]);
-                        const monthName = parts.length === 3
-                            ? monthNames[monthNumber - 1] || ''
-                            : '';
-                        const year = parts.length === 3 ? parts[2] : '';
+                        const year = parts[2];
                         const groupKey = `${year}-${String(monthNumber).padStart(2, '0')}`;
-                        const monthGroup = datesByMonth.get(groupKey) || {
-                            dates: [],
-                            monthName,
-                            year
+                        const monthGroup = months.get(groupKey) || {
+                            monthName: monthNames[monthNumber - 1] || '',
+                            year,
+                            values: {}
                         };
-
-                        monthGroup.dates.push(parts[0] || '');
-                        datesByMonth.set(groupKey, monthGroup);
+                        const typeValues = monthGroup.values[group.type] || [];
+                        typeValues.push(parts[0] || '');
+                        monthGroup.values[group.type] = typeValues;
+                        months.set(groupKey, monthGroup);
                     });
-
-                Array.from(datesByMonth.values()).forEach((monthGroup, index) => {
-                    rows.push({
-                        ...buildGoogleSheetBaseRow(leave),
-                        'Request ID': `${leave.id}-${group.type.replace(/\s+/g, '-').toUpperCase()}-${index + 1}`,
-                        'Leave Type': group.type,
-                        [`${group.type} - Date`]: monthGroup.dates.join(', '),
-                        [`${group.type} - Month`]: monthGroup.monthName,
-                        [`${group.type} - Year`]: monthGroup.year
-                    });
-                });
             });
-            return rows;
+
+            return Array.from(months.values()).map((monthGroup, index) => {
+                const row = {
+                    ...buildGoogleSheetBaseRow(leave),
+                    'Request ID': `${leave.id}-MONTH-${index + 1}`,
+                    'Leave Type': 'Monthly Summary'
+                };
+
+                dateGroups.forEach((group) => {
+                    const dates = monthGroup.values[group.type] || [];
+                    row[`${group.type} - Date`] = dates.join(', ');
+                    row[`${group.type} - Month`] = dates.length ? monthGroup.monthName : '';
+                    row[`${group.type} - Year`] = dates.length ? monthGroup.year : '';
+                });
+
+                return row;
+            });
         }
 
         function buildGoogleSheetBaseRow(leave) {
@@ -3918,19 +3929,14 @@
                 status: 'Approved'
             }) : [];
 
-            fetch(endpoint, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: isApproved ? 'upsertApprovedLeaveRows' : 'removeLeaveReport',
-                    requestId,
-                    baseRequestId: requestId,
-                    requestIds: [requestId],
-                    rows,
-                    records: rows,
-                    updatedAt: new Date().toISOString()
-                })
+            enqueueGoogleSheetSync(endpoint, {
+                action: isApproved ? 'upsertApprovedLeaveRows' : 'removeLeaveReport',
+                requestId,
+                baseRequestId: requestId,
+                requestIds: [requestId],
+                rows,
+                records: rows,
+                updatedAt: new Date().toISOString()
             }).catch((error) => {
                 console.error('Automatic Google Sheet sync failed.', error);
             });
@@ -3943,17 +3949,12 @@
             const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS.websankul;
             if (!endpoint) return;
 
-            fetch(endpoint, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'removeLeaveReport',
-                    requestId,
-                    baseRequestId: requestId,
-                    requestIds: [requestId],
-                    updatedAt: new Date().toISOString()
-                })
+            enqueueGoogleSheetSync(endpoint, {
+                action: 'removeLeaveReport',
+                requestId,
+                baseRequestId: requestId,
+                requestIds: [requestId],
+                updatedAt: new Date().toISOString()
             }).catch((error) => {
                 console.error('Automatic Google Sheet deletion failed.', error);
             });
@@ -3974,16 +3975,11 @@
             const endpoint = CONFIGURED_GOOGLE_SHEET_ENDPOINTS.websankul;
             if (!endpoint) return;
 
-            fetch(endpoint, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'upsertApprovedLeaveRows',
-                    rows: approvedRows,
-                    records: approvedRows,
-                    updatedAt: new Date().toISOString()
-                })
+            enqueueGoogleSheetSync(endpoint, {
+                action: 'upsertApprovedLeaveRows',
+                rows: approvedRows,
+                records: approvedRows,
+                updatedAt: new Date().toISOString()
             }).catch((error) => {
                 console.error('Automatic approved leave sync failed.', error);
             });
@@ -6446,6 +6442,16 @@
                 firstHalfDate: document.getElementById('tlEditFirstHalf')?.value || '',
                 secondHalfDate: document.getElementById('tlEditSecondHalf')?.value || ''
             });
+            const editedDates = {
+                fullLeaveDate: document.getElementById('tlEditFullLeave')?.value || '',
+                firstHalfDate: document.getElementById('tlEditFirstHalf')?.value || '',
+                secondHalfDate: document.getElementById('tlEditSecondHalf')?.value || ''
+            };
+            const duplicateDate = findDuplicateLeaveDate(editedDates);
+            if (duplicateDate) {
+                alert(`⚠️ Same date cannot be selected for Full Leave, First Half, or Second Half: ${duplicateDate}`);
+                return;
+            }
 
             const allLeaves = getStoredLeaves();
             const leaveIndex = allLeaves.findIndex((leave) => leave.id === currentTlEditLeaveId);
@@ -7010,6 +7016,15 @@
                 alert('⚠️ Leave dates must use dd/mm/yyyy format.');
                 return;
             }
+            const duplicateDate = findDuplicateLeaveDate({
+                fullLeaveDate: fullLeave,
+                firstHalfDate: firstHalf,
+                secondHalfDate: secondHalf
+            });
+            if (duplicateDate) {
+                alert(`⚠️ Same date cannot be selected for Full Leave, First Half, or Second Half: ${duplicateDate}`);
+                return;
+            }
             const days = Number(document.getElementById('tlLeaveDays').textContent);
             if (!Number.isFinite(days) || days < 0) {
                 alert('⚠️ Days must be a valid number.');
@@ -7079,6 +7094,36 @@
                 if (!dateRegex.test(d)) return false;
             }
             return true;
+        }
+
+        function findDuplicateLeaveDate(values) {
+            const seenDates = new Map();
+            const fields = [
+                ['Full Leave', values.fullLeaveDate],
+                ['First Half', values.firstHalfDate],
+                ['Second Half', values.secondHalfDate]
+            ];
+
+            for (const [fieldName, value] of fields) {
+                const dates = String(value || '')
+                    .split(',')
+                    .map((date) => date.trim())
+                    .filter(Boolean);
+
+                for (const date of dates) {
+                    const normalizedDate = date
+                        .split('/')
+                        .map((part) => part.padStart(2, '0'))
+                        .join('/');
+                    const previousField = seenDates.get(normalizedDate);
+                    if (previousField && previousField !== fieldName) {
+                        return date;
+                    }
+                    seenDates.set(normalizedDate, fieldName);
+                }
+            }
+
+            return '';
         }
 
         function getLeaveDateColumns(value) {
@@ -7156,6 +7201,16 @@
 
             if (!isValidDateString(fullLeaveVal) || !isValidDateString(firstHalfVal) || !isValidDateString(secondHalfVal)) {
                 alert('⚠️ ભૂલ: તારીખ ફરજિયાત dd/mm/yyyy ફોર્મેટમાં જ હોવી જોઈએ!');
+                return;
+            }
+
+            const duplicateDate = findDuplicateLeaveDate({
+                fullLeaveDate: fullLeaveVal,
+                firstHalfDate: firstHalfVal,
+                secondHalfDate: secondHalfVal
+            });
+            if (duplicateDate) {
+                alert(`⚠️ ભૂલ: એક જ તારીખ Full Leave, First Half અને Second Halfમાં ફરીથી પસંદ કરી શકાતી નથી: ${duplicateDate}`);
                 return;
             }
 

@@ -4132,7 +4132,13 @@
 
         function getDepartmentNotificationKeys() {
             const deptKeys = [];
-            const departments = getUserDepartments();
+            const departments = [
+                ...getUserDepartments(),
+                userDept,
+                userData?.department,
+                userData?.dept,
+                ...(Array.isArray(userData?.departments) ? userData.departments : [])
+            ];
 
             departments.forEach(dept => {
                 if (dept && dept.trim()) {
@@ -4145,6 +4151,14 @@
             }
 
             return Array.from(new Set(deptKeys));
+        }
+
+        function getNotificationDateText(leave) {
+            const dates = [];
+            if (leave?.fullLeaveDate) dates.push(`Full: ${leave.fullLeaveDate}`);
+            if (leave?.firstHalfDate) dates.push(`First Half: ${leave.firstHalfDate}`);
+            if (leave?.secondHalfDate) dates.push(`Second Half: ${leave.secondHalfDate}`);
+            return dates.length ? dates.join(' | ') : 'Date: -';
         }
 
         function loadNotifications() {
@@ -5369,7 +5383,7 @@
 
         function recordActionHistory(action, leave, details = {}) {
             const history = getActionHistory();
-            history.unshift({
+            const entry = {
                 id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
                 action,
                 actionAt: new Date().toISOString(),
@@ -5381,8 +5395,59 @@
                 reportDate: leave?.reportFillDate || '',
                 status: leave?.status || 'Pending',
                 remark: details.remark || ''
-            });
+            };
+            history.unshift(entry);
             localStorage.setItem(ACTION_HISTORY_KEY, JSON.stringify(history.slice(0, 200)));
+            if (db && db.ref) {
+                db.ref('managementActionHistory').push(entry).catch((error) => {
+                    console.warn('Shared action history save failed:', error);
+                });
+            }
+        }
+
+        function mergeSharedActionHistory(entries) {
+            const localEntries = getActionHistory();
+            const merged = [...localEntries, ...entries]
+                .filter((entry) => entry && entry.id)
+                .reduce((unique, entry) => {
+                    if (!unique.some((item) => String(item.id) === String(entry.id))) unique.push(entry);
+                    return unique;
+                }, [])
+                .sort((a, b) => new Date(b.actionAt || 0).getTime() - new Date(a.actionAt || 0).getTime())
+                .slice(0, 200);
+            localStorage.setItem(ACTION_HISTORY_KEY, JSON.stringify(merged));
+            renderActionHistory();
+        }
+
+        async function syncSharedActionHistory() {
+            if (!db || !db.ref) return;
+            try {
+                const snapshot = await db.ref('managementActionHistory').once('value');
+                const value = snapshot.val() || {};
+                mergeSharedActionHistory(Object.values(value));
+            } catch (error) {
+                console.warn('Shared action history load failed:', error);
+            }
+        }
+
+        function subscribeToSharedActionHistory() {
+            if (!db || !db.ref) return;
+            db.ref('managementActionHistory').on('value', (snapshot) => {
+                const value = snapshot.val() || {};
+                mergeSharedActionHistory(Object.values(value));
+            }, (error) => {
+                console.warn('Shared action history updates failed:', error);
+            });
+        }
+
+        function seedActionHistoryFromExistingLeaves() {
+            const history = getActionHistory();
+            const knownLeaveIds = new Set(history.map((entry) => String(entry.leaveId)));
+            getStoredLeaves().forEach((leave) => {
+                if (!leave || leave.id === undefined || knownLeaveIds.has(String(leave.id))) return;
+                recordActionHistory('Submitted', leave);
+                knownLeaveIds.add(String(leave.id));
+            });
         }
 
         function toggleActionHistory(forceOpen) {
@@ -6233,6 +6298,9 @@
             await syncGlobalLeavesFromFirebase();
             await syncDeleteHistoryFromFirebase();
             subscribeToDeleteHistoryUpdates();
+            await syncSharedActionHistory();
+            subscribeToSharedActionHistory();
+            seedActionHistoryFromExistingLeaves();
             if (isRole('TL') || isRole('TeamLeader') || isRole('Team Leader')) {
                 await loadFullUserDepartmentAccess();
             }
@@ -7660,7 +7728,7 @@
             approverEmails.forEach((email) => {
                 addNotification(email, `A leave request from ${leave.employeeFullName} was assigned to you for review. ${getLeaveNotificationSummary(leave)}`, notificationDetails);
             });
-            addManagementNotification(`New leave request submitted by ${leave.employeeFullName} for the ${department} department. Status: Pending.`, notificationDetails);
+            addManagementNotification(`New leave request submitted by ${leave.employeeFullName} for the ${department} department. Status: Pending. ${getNotificationDateText(leave)}`, notificationDetails);
             document.getElementById('tlLeaveRequestForm').reset();
             clearLeaveDatePickers();
             toggleTlLeaveForm(false);
@@ -7834,13 +7902,14 @@
             persistStoredLeaves(allLeaves);
             recordActionHistory('Submitted', newLeave);
 
-            addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review.`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
+            const notificationDateText = getNotificationDateText(newLeave);
+            addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review. ${notificationDateText}`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
             const deptNotifsKey = `dept_notifications_${normalizeDepartmentName(selectedDept)}`;
             let deptNotifs = JSON.parse(localStorage.getItem(deptNotifsKey)) || [];
             deptNotifs.unshift({
                 id: Date.now(),
-                message: `New leave request from ${fullName} (${selectedDept}) is waiting for your review.`,
+                message: `New leave request from ${fullName} (${selectedDept}) is waiting for your review. ${notificationDateText}`,
                 title: 'Submitted',
                 type: 'submitted',
                 leaveId: newLeave.id,
@@ -7848,7 +7917,7 @@
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             });
             localStorage.setItem(deptNotifsKey, JSON.stringify(deptNotifs));
-            addManagementNotification(`New leave request submitted by ${fullName} for the ${selectedDept} department. Status: Pending.`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
+            addManagementNotification(`New leave request submitted by ${fullName} for the ${selectedDept} department. Status: Pending. ${notificationDateText}`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
             alert('✅ Your leave request was submitted successfully. The department Team Leader has been notified.');
             this.reset();

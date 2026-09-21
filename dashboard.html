@@ -639,17 +639,63 @@
             color: #1e293b;
         }
 
+        body.light-theme .panel-section *,
+        body.light-theme .panel-section .stat-card *,
+        body.light-theme .panel-section .history-section *,
+        body.light-theme .panel-section .table-responsive * {
+            border-color: #cbd5e1;
+        }
+
+        body.light-theme .panel-section .stat-card,
+        body.light-theme .panel-section .clickable-card,
+        body.light-theme .panel-section .history-section,
+        body.light-theme .panel-section .leave-table,
+        body.light-theme .panel-section .table-responsive,
+        body.light-theme .panel-section .management-export-controls,
+        body.light-theme .panel-section .filter-bar,
+        body.light-theme .panel-section .month-filter-box,
+        body.light-theme .panel-section .delete-history-toggle,
+        body.light-theme .panel-section .tl-approval-section {
+            background: #ffffff;
+            color: #111827;
+        }
+
+        body.light-theme .panel-section .stat-card-title,
+        body.light-theme .panel-section .stat-card span,
+        body.light-theme .panel-section .delete-history-toggle-label,
+        body.light-theme .panel-section .history-header,
+        body.light-theme .panel-section .leave-table th,
+        body.light-theme .panel-section .leave-table td,
+        body.light-theme .panel-section .table-responsive,
+        body.light-theme .panel-section .month-filter-box label {
+            color: #111827 !important;
+        }
+
+        body.light-theme .panel-section .leave-table thead,
+        body.light-theme .panel-section .leave-table tr,
+        body.light-theme .panel-section .leave-table tbody tr:nth-child(even) {
+            background: #ffffff;
+        }
+
+        body.light-theme .panel-section .leave-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
         body.light-theme .panel-section p,
         body.light-theme .panel-section .stat-card-title {
-            color: #475569 !important;
+            color: #111827 !important;
         }
 
         body.light-theme input,
         body.light-theme select,
         body.light-theme textarea {
             background-color: #ffffff;
-            color: #1e293b;
+            color: #111827;
             border-color: #cbd5e1;
+        }
+
+        body.light-theme .panel-section button:not(.theme-option-btn) {
+            color: #111827;
         }
 
         body.light-theme .theme-switcher-label {
@@ -1827,7 +1873,7 @@
                     <div class="theme-switcher" aria-label="Theme">
                         <span class="theme-switcher-label">Theme</span>
                         <div class="theme-switcher-options">
-                            <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">White</button>
+                            <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">Light</button>
                             <button type="button" class="theme-option-btn" data-theme-option="dark" onclick="applyTheme('dark')">Black</button>
                         </div>
                     </div>
@@ -2114,7 +2160,7 @@
                 <div class="theme-switcher" aria-label="Theme">
                     <span class="theme-switcher-label">Theme</span>
                     <div class="theme-switcher-options">
-                        <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">White</button>
+                        <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">Light</button>
                         <button type="button" class="theme-option-btn" data-theme-option="dark" onclick="applyTheme('dark')">Black</button>
                     </div>
                 </div>
@@ -2398,7 +2444,7 @@
                 <div class="theme-switcher" aria-label="Theme">
                     <span class="theme-switcher-label">Theme</span>
                     <div class="theme-switcher-options">
-                        <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">White</button>
+                        <button type="button" class="theme-option-btn" data-theme-option="light" onclick="applyTheme('light')">Light</button>
                         <button type="button" class="theme-option-btn" data-theme-option="dark" onclick="applyTheme('dark')">Black</button>
                     </div>
                 </div>

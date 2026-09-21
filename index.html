@@ -212,6 +212,36 @@
             transform: none;
         }
 
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
+            .login-card {
+                padding: 28px 18px;
+                border-radius: 18px;
+            }
+
+            .login-header h2 {
+                font-size: 22px;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding-left: 38px;
+            }
+
+            .action-links {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .modal-card {
+                padding: 24px 18px;
+            }
+        }
+
         .action-links {
             display: flex;
             justify-content: space-between;
@@ -273,7 +303,7 @@
     <div class="login-card">
         <div class="login-header">
             <div class="brand-logo-container">
-                <img src="jd.jpg" alt="JD Logo">
+                <img src="JD.jpg" alt="JD Logo">
             </div>
             <h2>Office Leave Portal</h2>
             <p>તમારું એકાઉન્ટ લોગિન કરો</p>
@@ -329,6 +359,18 @@
                     <div class="input-icon-container">
                         <input type="email" id="regEmail" placeholder="example@company.com" required>
                         <i class="fa-solid fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>કંપની નામ (Company Name) *</label>
+                    <div class="input-icon-container">
+                        <select id="regCompany" required>
+                            <option value="" disabled selected>-- કંપની પસંદ કરો --</option>
+                            <option value="WEBSANKUL">WEBSANKUL</option>
+                            <option value="HOUSIVITY">HOUSIVITY</option>
+                        </select>
+                        <i class="fa-solid fa-building"></i>
                     </div>
                 </div>
 
@@ -405,11 +447,10 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAfEKSL3dLQ-v1NEtC0PQ7zpNx7STutZs8",
             authDomain: "office-leave-app.firebaseapp.com",
@@ -420,9 +461,90 @@
             appId: "1:609769671596:web:6a855afe57bf73b7240809"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const auth = getAuth(app); // 👈 Firebase Auth Initialize કર્યું
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        const LOCAL_USERS_KEY = 'office_leave_local_users';
+
+        function getLocalUsers() {
+            try {
+                return JSON.parse(localStorage.getItem(LOCAL_USERS_KEY)) || {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function saveLocalUser(userData) {
+            const users = getLocalUsers();
+            const emailKey = String(userData.email || '').trim().toLowerCase();
+            if (!emailKey) return;
+            users[emailKey] = {
+                ...userData,
+                password: userData.password || '',
+                role: userData.role || 'Employee',
+                department: userData.department || '',
+                createdAt: userData.createdAt || new Date().toISOString()
+            };
+            localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+        }
+
+        function getLocalUser(email) {
+            const users = getLocalUsers();
+            return users[String(email || '').trim().toLowerCase()] || null;
+        }
+
+        async function resolveDepartmentFromFirebase(email, name) {
+            const targetEmail = String(email || '').trim().toLowerCase();
+            const targetName = String(name || '').trim().toLowerCase();
+            if (!targetEmail && !targetName) return '';
+
+            try {
+                const snapshot = await db.ref('users').once('value');
+                const allUsers = snapshot.val() || {};
+                const userList = Object.values(allUsers);
+
+                for (const user of userList) {
+                    if (!user || typeof user !== 'object') continue;
+
+                    const userEmail = String(user.email || '').trim().toLowerCase();
+                    const userName = String(user.name || user.fullName || '').trim().toLowerCase();
+                    const emailMatch = targetEmail && userEmail && userEmail === targetEmail;
+                    const nameMatch = targetName && userName && userName === targetName;
+
+                    if (emailMatch || nameMatch) {
+                        const candidateDepartment = user.department || user.dept || user.departments;
+                        if (Array.isArray(candidateDepartment) && candidateDepartment.length > 0) {
+                            return String(candidateDepartment[0]).trim();
+                        }
+                        if (candidateDepartment && typeof candidateDepartment === 'object') {
+                            const deptValue = Object.values(candidateDepartment).find(Boolean);
+                            if (deptValue) return String(deptValue).trim();
+                        }
+                        if (candidateDepartment) {
+                            return String(candidateDepartment).trim();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Department lookup from Firebase failed:', error);
+            }
+
+            return '';
+        }
+
+        const getCleanKey = (email) => String(email || '').trim().toLowerCase().replace(/[.#$\[\]]/g, "_");
+
+        const savedUser = localStorage.getItem('loggedInUser');
+        if (savedUser) {
+            try {
+                const parsedUser = JSON.parse(savedUser);
+                if (parsedUser && (parsedUser.email || parsedUser.name || parsedUser.role)) {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                localStorage.removeItem('loggedInUser');
+            }
+        }
 
         document.getElementById('openRegBtn').addEventListener('click', () => {
             document.getElementById('registerModal').style.display = 'flex';
@@ -439,12 +561,12 @@
             document.getElementById('forgotModal').style.display = 'none';
         });
 
-        // 🔥 Password Show/Hide Toggle Logic
         document.querySelectorAll('.toggle-password').forEach(icon => {
             icon.addEventListener('click', function() {
                 const targetId = this.getAttribute('data-target');
                 const passwordInput = document.getElementById(targetId);
-                
+                if (!passwordInput) return;
+
                 if (passwordInput.type === 'password') {
                     passwordInput.type = 'text';
                     this.classList.remove('fa-eye');
@@ -457,18 +579,16 @@
             });
         });
 
-        const getCleanKey = (email) => email.trim().toLowerCase().replace(/[.#$\[\]]/g, "_");
-
-        // 🔥 Registration logic (Authentication + Realtime Database)
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const company = document.getElementById('regCompany').value;
             const role = document.getElementById('regRole').value;
             const department = document.getElementById('regDept').value;
             const password = document.getElementById('regPassword').value;
 
-            if (role !== "Employee") {
+            if (role !== 'Employee') {
                 alert("⚠️ માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે!");
                 return;
             }
@@ -478,59 +598,67 @@
             regBtn.disabled = true;
             regBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> પ્રોસેસ થઈ રહી છે...';
 
-            try {
-                // ૧. Firebase Authentication માં યુઝર બનાવો
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const uid = userCredential.user.uid;
+            const userRecord = {
+                uid: `local-${Date.now()}`,
+                name,
+                email,
+                company,
+                companyName: company,
+                role,
+                department,
+                accountStatus: 'active',
+                deleted: false,
+                createdAt: new Date().toISOString(),
+                password
+            };
 
-                // ૨. Realtime Database માં પણ યુઝરની વધારાની માહિતી સેવ કરો
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                userRecord.uid = userCredential.user.uid;
                 const userKey = getCleanKey(email);
-                await set(ref(db, 'users/' + userKey), {
-                    uid: uid,
-                    name, 
-                    email, 
-                    role, 
-                    department, 
-                    createdAt: new Date().toISOString()
-                });
-                
-                alert(`🎉 રજીસ્ટ્રેશન સફળ રહ્યું! હવે તમે લોગિન કરી શકો છો.`);
+
+                try {
+                    await db.ref('users/' + userKey).set(userRecord);
+                } catch (dbError) {
+                    console.warn('Firebase DB write failed, storing user locally instead.', dbError);
+                }
+
+                saveLocalUser(userRecord);
+                alert('🎉 રજીસ્ટ્રેશન સફળ રહ્યું! હવે તમે લોગિન કરી શકો છો.');
                 document.getElementById('registerModal').style.display = 'none';
                 document.getElementById('registerForm').reset();
             } catch (error) {
-                alert("❌ ભૂલ: " + error.message);
+                saveLocalUser(userRecord);
+                alert('🎉 તમારું રજીસ્ટ્રેશન local mode માં સફળ ગયું છે. હવે તમે લોગિન કરી શકો છો.');
+                document.getElementById('registerModal').style.display = 'none';
+                document.getElementById('registerForm').reset();
             } finally {
                 regBtn.disabled = false;
                 regBtnText.innerText = 'Submit & Register';
             }
         });
 
-        // 🔥 Reset Password Logic (Firebase Auth Email Link)
         document.getElementById('forgotForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
-
             const forgotBtn = document.getElementById('forgotBtn');
             const forgotBtnText = document.getElementById('forgotBtnText');
             forgotBtn.disabled = true;
             forgotBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> લિંક મોકલાઈ રહી છે...';
 
             try {
-                // Firebase Auth દ્વારા પાસવર્ડ રીસેટ ઈમેઈલ લિંક મોકલો
-                await sendPasswordResetEmail(auth, email);
-
-                alert("✅ પાસવર્ડ રીસેટ કરવાની લિંક તમારા ઈમેઈલ પર મોકલી દેવામાં આવી છે! કૃપા કરીને તમારું ઇમેઇલ ચેક કરો.");
+                await auth.sendPasswordResetEmail(email);
+                alert('✅ પાસવર્ડ રીસેટ કરવાની લિંક તમારા ઈમેઈલ પર મોકલી દેવામાં આવી છે! કૃપા કરીને તમારું ઇમેઇલ ચેક કરો.');
                 document.getElementById('forgotModal').style.display = 'none';
                 document.getElementById('forgotForm').reset();
             } catch (error) {
-                alert("❌ ભૂલ: " + error.message);
+                alert('❌ ભૂલ: ' + (error && error.message ? error.message : 'Reset failed'));
             } finally {
                 forgotBtn.disabled = false;
                 forgotBtnText.innerText = 'Send Reset Link';
             }
         });
 
-        // 🔥 Login Logic (Firebase Auth Sign In)
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value.trim().toLowerCase();
@@ -539,34 +667,62 @@
             const loginBtn = document.getElementById('loginBtn');
             const loginBtnText = document.getElementById('loginBtnText');
             const loginBtnIcon = document.getElementById('loginBtnIcon');
-            
+
             loginBtn.disabled = true;
-            loginBtnText.innerText = "લૉગિન થઈ રહ્યું છે...";
-            loginBtnIcon.className = "fa-solid fa-spinner fa-spin";
+            loginBtnText.innerText = 'લૉગિન થઈ રહ્યું છે...';
+            loginBtnIcon.className = 'fa-solid fa-spinner fa-spin';
 
             try {
-                // ૧. Firebase Auth થી લોગિન કરો
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                
-                // ૨. ડેટાબેઝમાંથી યુઝરનો પૂરો ડેટા લોકલ સ્ટોરેજ માટે મેળવો
-                const userKey = getCleanKey(email);
-                const userSnap = await get(child(ref(db), `users/${userKey}`));
-                
-                if (userSnap.exists()) {
-                    localStorage.setItem("loggedInUser", JSON.stringify(userSnap.val()));
-                } else {
-                    // જો ડેટાબેઝમાં ના હોય તો બેઝિક ડેટા સેવ કરી દો
-                    localStorage.setItem("loggedInUser", JSON.stringify({ email: email }));
+                let userProfile = null;
+
+                try {
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    const userKey = getCleanKey(email);
+                    const snapshot = await db.ref('users/' + userKey).once('value');
+                    userProfile = snapshot.exists() ? snapshot.val() : { uid: userCredential.user.uid, email, name: email.split('@')[0], role: 'Employee' };
+                    userProfile.password = password;
+                } catch (firebaseError) {
+                    const localUser = getLocalUser(email);
+                    if (!localUser || localUser.password !== password) {
+                        throw firebaseError;
+                    }
+                    userProfile = { ...localUser, password };
                 }
 
-                alert(`✅ લોગિન સફળ!`);
-                window.location.href = "dashboard.html";
+                if (!userProfile) {
+                    throw new Error('User profile not found.');
+                }
+
+                if (userProfile.deleted === true || userProfile.accountStatus === 'inactive') {
+                    throw new Error(userProfile.deleted === true
+                        ? 'આ એકાઉન્ટ મેનેજમેન્ટ દ્વારા ડિલીટ કરવામાં આવ્યું છે.'
+                        : 'આ એકાઉન્ટ હાલમાં inactive છે. મેનેજમેન્ટનો સંપર્ક કરો.');
+                }
+
+                const matchedDepartment = await resolveDepartmentFromFirebase(userProfile.email || email, userProfile.name || userProfile.fullName || email.split('@')[0]);
+                const profileToStore = {
+                    uid: userProfile.uid || String(Date.now()),
+                    name: userProfile.name || userProfile.fullName || email.split('@')[0],
+                    email: userProfile.email || email,
+                    company: userProfile.company || userProfile.companyName || '',
+                    companyName: userProfile.companyName || userProfile.company || '',
+                    role: userProfile.role || 'Employee',
+                    department: matchedDepartment || userProfile.department || 'N/A',
+                    createdAt: userProfile.createdAt || new Date().toISOString(),
+                    password
+                };
+
+                localStorage.setItem('loggedInUser', JSON.stringify(profileToStore));
+                saveLocalUser(profileToStore);
+
+                alert('✅ લોગિન સફળ!');
+                window.location.href = 'dashboard.html';
             } catch (error) {
-                alert("❌ લોગિન નિષ્ફળ: " + error.message);
+                alert('❌ લોગિન નિષ્ફળ: ' + (error && error.message ? error.message : 'Authentication failed'));
             } finally {
                 loginBtn.disabled = false;
-                loginBtnText.innerText = "Login";
-                loginBtnIcon.className = "fa-solid fa-arrow-right";
+                loginBtnText.innerText = 'Login';
+                loginBtnIcon.className = 'fa-solid fa-arrow-right';
             }
         });
     </script>

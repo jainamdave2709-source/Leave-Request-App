@@ -2187,6 +2187,7 @@
                             <h4 id="sidebarUserName">User Name</h4>
                             <p id="sidebarUserEmail">email@example.com</p>
                             <p id="sidebarUserRole">Role: N/A</p>
+                            <p id="sidebarUserCompany">Company: N/A</p>
                             <p id="sidebarUserDept">Dept: N/A</p>
                         </div>
                     </div>
@@ -3484,6 +3485,46 @@
 
         let employeeTeamLeaderUsers = null;
 
+        async function getMatchingTeamLeaderEmails(company, department) {
+            const selectedCompany = normalizeCompanyName(company);
+            const selectedDepartment = normalizeDepartmentName(department);
+            if (!selectedDepartment) return [];
+
+            if (!employeeTeamLeaderUsers) {
+                const snapshot = await db.ref('users').once('value');
+                employeeTeamLeaderUsers = Object.values(snapshot.val() || {});
+            }
+
+            return employeeTeamLeaderUsers
+                .filter((user) => {
+                    if (!user || !['tl', 'teamleader'].includes(normalizeRole(user.role))) return false;
+                    const departments = [];
+                    const collect = (value) => {
+                        if (Array.isArray(value)) value.forEach(collect);
+                        else if (value && typeof value === 'object') Object.values(value).forEach(collect);
+                        else if (value !== null && value !== undefined) departments.push(String(value));
+                    };
+                    ['department', 'dept', 'departments', 'assignedDepartments', 'tlDepartments', 'managedDepartments']
+                        .forEach((key) => collect(user[key]));
+
+                    const teamLeaderCompanies = [user.company, user.companyName, user.companies]
+                        .flatMap((value) => {
+                            if (Array.isArray(value)) return value;
+                            if (value && typeof value === 'object') {
+                                return Object.entries(value)
+                                    .filter(([, enabled]) => enabled)
+                                    .map(([companyName]) => companyName);
+                            }
+                            return value ? [value] : [];
+                        });
+                    const companyMatches = !selectedCompany || teamLeaderCompanies.length === 0
+                        || teamLeaderCompanies.some((value) => normalizeCompanyName(value) === selectedCompany);
+                    return companyMatches && departments.some((value) => normalizeDepartmentName(value) === selectedDepartment);
+                })
+                .map((user) => String(user.email || '').trim().toLowerCase())
+                .filter(Boolean);
+        }
+
         async function updateEmployeeTeamLeader() {
             const departmentSelect = document.getElementById('departmentName');
             const teamLeaderDisplay = document.getElementById('employeeTeamLeader');
@@ -3497,27 +3538,13 @@
 
             teamLeaderDisplay.textContent = 'Team Leader શોધી રહ્યા છીએ...';
             try {
-                if (!employeeTeamLeaderUsers) {
-                    const snapshot = await db.ref('users').once('value');
-                    employeeTeamLeaderUsers = Object.values(snapshot.val() || {});
-                }
-
-                const teamLeaders = employeeTeamLeaderUsers.filter((user) => {
-                    if (!user || !['tl', 'teamleader'].includes(normalizeRole(user.role))) return false;
-                    const departments = [];
-                    const collect = (value) => {
-                        if (Array.isArray(value)) {
-                            value.forEach(collect);
-                        } else if (value && typeof value === 'object') {
-                            Object.values(value).forEach(collect);
-                        } else if (value !== null && value !== undefined) {
-                            departments.push(String(value));
-                        }
-                    };
-                    ['department', 'dept', 'departments', 'assignedDepartments', 'tlDepartments', 'managedDepartments']
-                        .forEach((key) => collect(user[key]));
-                    return departments.some((department) => normalizeDepartmentName(department) === selectedDepartment);
-                });
+                const teamLeaderEmails = await getMatchingTeamLeaderEmails(
+                    document.getElementById('companyName')?.value,
+                    selectedDepartment
+                );
+                const teamLeaders = employeeTeamLeaderUsers.filter((user) =>
+                    teamLeaderEmails.includes(String(user.email || '').trim().toLowerCase())
+                );
 
                 const names = Array.from(new Set(teamLeaders.map((user) => (
                     user.name || user.fullName || user.displayName || user.username || user.email
@@ -3570,8 +3597,10 @@
 
             const companySelect = document.getElementById('companyName');
             if (companySelect && !companySelect.value) {
-                const fallbackCompany = 'WEBSANKUL';
-                const matchedCompany = Array.from(companySelect.options).find(option => option.value === fallbackCompany);
+                const fallbackCompany = userData?.companyName || userData?.company || 'WEBSANKUL';
+                const matchedCompany = Array.from(companySelect.options).find(option =>
+                    normalizeCompanyName(option.value) === normalizeCompanyName(fallbackCompany)
+                );
                 if (matchedCompany) {
                     companySelect.value = matchedCompany.value;
                 }
@@ -3663,6 +3692,44 @@
                 .trim()
                 .replace(/\s+/g, ' ')
                 .toUpperCase();
+        }
+
+        function normalizeCompanyName(value) {
+            return String(value || '')
+                .replace(/\u00a0/g, ' ')
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toUpperCase();
+        }
+
+        function getUserCompanies() {
+            if (!userData) return [];
+            const rawCompanies = [
+                userData.company,
+                userData.companyName,
+                userData.companies
+            ];
+            const companies = [];
+            const collect = (value) => {
+                if (Array.isArray(value)) {
+                    value.forEach(collect);
+                } else if (value && typeof value === 'object') {
+                    Object.entries(value).forEach(([key, nestedValue]) => {
+                        if (typeof nestedValue === 'boolean') {
+                            if (nestedValue) companies.push(key);
+                        } else {
+                            collect(nestedValue);
+                        }
+                    });
+                } else if (value !== null && value !== undefined) {
+                    companies.push(String(value));
+                }
+            };
+            rawCompanies.forEach(collect);
+            return Array.from(new Set(companies
+                .flatMap((value) => value.split(/[,;|\n]+/))
+                .map((value) => value.trim())
+                .filter(Boolean)));
         }
 
         async function loadFullUserDepartmentAccess() {
@@ -3778,6 +3845,7 @@
             document.getElementById('sidebarUserName').innerText = displayName || userData.name || 'User';
             document.getElementById('sidebarUserEmail').innerText = userData.email || 'No Email';
             document.getElementById('sidebarUserRole').innerText = `Role: ${userRole}`;
+            document.getElementById('sidebarUserCompany').innerText = `Company: ${userData.companyName || userData.company || 'N/A'}`;
             document.getElementById('sidebarUserDept').innerText = `Dept: ${userDept}`;
               
             setEmployeeNameOnLeaveForm(displayName || userData.name || '');
@@ -3913,6 +3981,7 @@
         });
 
         document.getElementById('departmentName').addEventListener('change', updateEmployeeTeamLeader);
+        document.getElementById('companyName').addEventListener('change', updateEmployeeTeamLeader);
 
         document.getElementById('backToCardBtn').addEventListener('click', () => {
             document.getElementById('employeeFormView').classList.add('hidden');
@@ -4193,6 +4262,7 @@
             const departments = getDepartmentNotificationKeys()
                 .map((key) => key.replace(/^dept_notifications_/, ''))
                 .map((department) => normalizeDepartmentName(department));
+            const companies = getUserCompanies().map(normalizeCompanyName);
 
             return leaves
                 .filter((leave) => getEffectiveLeaveStatus(leave) === 'Pending')
@@ -4202,7 +4272,11 @@
                     const isOwnLeave = (currentEmail && leaveEmail === currentEmail)
                         || (currentName && leaveName === currentName);
                     if (isManagement) return true;
-                    return !isOwnLeave && departments.includes(normalizeDepartmentName(leave.departmentName));
+                    const leaveCompany = normalizeCompanyName(leave.companyName);
+                    const companyMatches = !leaveCompany || !companies.length || companies.includes(leaveCompany);
+                    return !isOwnLeave
+                        && companyMatches
+                        && departments.includes(normalizeDepartmentName(leave.departmentName));
                 })
                 .map((leave) => ({
                     id: `pending_${leave.id}_${normalizeDepartmentName(leave.departmentName)}`,
@@ -6780,7 +6854,10 @@
             if (currentTlEmail && assignedTlEmails.includes(currentTlEmail)) return true;
 
             const allowedDepartments = getUserDepartments().map(normalizeDepartmentName);
-            return allowedDepartments.includes(normalizeDepartmentName(leave.departmentName));
+            const allowedCompanies = getUserCompanies().map(normalizeCompanyName);
+            const leaveCompany = normalizeCompanyName(leave.companyName);
+            return allowedDepartments.includes(normalizeDepartmentName(leave.departmentName))
+                && (!leaveCompany || !allowedCompanies.length || allowedCompanies.includes(leaveCompany));
         }
 
         function setReviewedState(leave, panel, isReviewed) {
@@ -6817,13 +6894,17 @@
                     ? deptList.map(normalizeDepartmentName)
                     : [normalizeDepartmentName(userDept)];
                 const currentTlEmail = String(userIdentifier || '').trim().toLowerCase();
+                const allowedCompanies = getUserCompanies().map(normalizeCompanyName);
                 departmentLeaves = allLeaves.filter((leave) => {
                     if (Array.isArray(leave.assignedTlEmails) && leave.assignedTlEmails.length) {
                         return leave.assignedTlEmails
                             .map((email) => String(email || '').trim().toLowerCase())
                             .includes(currentTlEmail);
                     }
-                    return normalizedUserDept.includes(normalizeDepartmentName(leave.departmentName));
+                    return normalizedUserDept.includes(normalizeDepartmentName(leave.departmentName))
+                        && (!normalizeCompanyName(leave.companyName)
+                            || !allowedCompanies.length
+                            || allowedCompanies.includes(normalizeCompanyName(leave.companyName)));
                 });
             }
             if (selectedDeptFilter && selectedDeptFilter !== 'all' && selectedDeptFilter !== '__none__') {
@@ -7969,7 +8050,7 @@
             return `<td><div class="leave-date-list">${dateItems}</div></td><td><div class="leave-date-list">${monthYearItems}</div></td>`;
         }
 
-        document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
+        document.getElementById('leaveRequestForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const fullName = getLoggedInUserDisplayName() || document.getElementById('employeeFullName').value.trim();
@@ -8004,12 +8085,25 @@
                 alert('⚠️ Please select a department before submitting the leave request.');
                 return;
             }
+            const selectedCompany = String(document.getElementById('companyName')?.value || '').trim();
+            if (!selectedCompany) {
+                alert('⚠️ Please select a company before submitting the leave request.');
+                return;
+            }
+
+            let assignedTlEmails = [];
+            try {
+                assignedTlEmails = await getMatchingTeamLeaderEmails(selectedCompany, selectedDept);
+            } catch (error) {
+                console.warn('Team Leader assignment lookup failed:', error);
+            }
 
             const newLeave = {
                 id: Date.now(),
                 employeeEmail: userIdentifier,
-                companyName: document.getElementById('companyName').value,
+                companyName: selectedCompany,
                 departmentName: selectedDept.replace(/\s+/g, ' '),
+                assignedTlEmails,
                 employeeFullName: fullName,
                 leaveReason: document.getElementById('leaveReason').value,
                 reportFillDate: document.getElementById('reportFillDate').value,
@@ -8036,14 +8130,26 @@
 
             const notificationDateText = getNotificationDateText(newLeave);
             addNotification(userIdentifier, `Your leave request was submitted successfully to the ${selectedDept} Team Leader for review. ${notificationDateText}`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
+            assignedTlEmails.forEach((email) => {
+                addNotification(
+                    email,
+                    `New leave request from ${fullName} (${selectedCompany} - ${selectedDept}) is waiting for your review. ${notificationDateText}`,
+                    { title: 'Submitted', type: 'submitted', leaveId: newLeave.id }
+                );
+            });
 
-            const deptNotifsKey = `dept_notifications_${normalizeDepartmentName(selectedDept)}`;
+            const deptNotifsKey = `dept_notifications_${normalizeCompanyName(selectedCompany)}_${normalizeDepartmentName(selectedDept)}`;
             addSharedNotification(
                 deptNotifsKey,
-                `New leave request from ${fullName} (${selectedDept}) is waiting for your review. ${notificationDateText}`,
+                `New leave request from ${fullName} (${selectedCompany} - ${selectedDept}) is waiting for your review. ${notificationDateText}`,
                 { title: 'Submitted', type: 'submitted', leaveId: newLeave.id }
             );
-            addManagementNotification(`New leave request submitted by ${fullName} for the ${selectedDept} department. Status: Pending. ${notificationDateText}`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
+            addSharedNotification(
+                `dept_notifications_${normalizeDepartmentName(selectedDept)}`,
+                `New leave request from ${fullName} (${selectedCompany} - ${selectedDept}) is waiting for your review. ${notificationDateText}`,
+                { title: 'Submitted', type: 'submitted', leaveId: newLeave.id }
+            );
+            addManagementNotification(`New leave request submitted by ${fullName} for ${selectedCompany} - ${selectedDept}. Status: Pending. ${notificationDateText}`, { title: 'Submitted', type: 'submitted', leaveId: newLeave.id });
 
             alert('✅ Your leave request was submitted successfully. The department Team Leader has been notified.');
             this.reset();

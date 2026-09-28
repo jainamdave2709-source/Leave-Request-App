@@ -303,7 +303,7 @@
     <div class="login-card">
         <div class="login-header">
             <div class="brand-logo-container">
-                <img src="jd.jpg" alt="JD Logo">
+                <img src="JD.jpg" alt="JD Logo">
             </div>
             <h2>Office Leave Portal</h2>
             <p>તમારું એકાઉન્ટ લોગિન કરો</p>
@@ -333,96 +333,9 @@
             </button>
 
             <div class="action-links">
-                <a class="link-btn" id="openRegBtn"><i class="fa-solid fa-user-plus"></i> New Register</a>
                 <a class="link-btn" id="openForgotBtn"><i class="fa-solid fa-key"></i> Reset Password?</a>
             </div>
         </form>
-    </div>
-
-    <!-- Registration Modal -->
-    <div class="modal-overlay" id="registerModal">
-        <div class="modal-card">
-            <span class="close-btn" id="closeRegBtn"><i class="fa-solid fa-xmark"></i></span>
-            <h3><i class="fa-solid fa-user-plus" style="color: #818cf8; margin-right: 8px;"></i>New Registration</h3>
-
-            <form id="registerForm">
-                <div class="form-group">
-                    <label>પૂરું નામ (Full Name) *</label>
-                    <div class="input-icon-container">
-                        <input type="text" id="regName" placeholder="તમારું પૂરું નામ" required>
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>ઈમેઈલ (Email) *</label>
-                    <div class="input-icon-container">
-                        <input type="email" id="regEmail" placeholder="example@company.com" required>
-                        <i class="fa-solid fa-envelope"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>કંપની નામ (Company Name) *</label>
-                    <div class="input-icon-container">
-                        <select id="regCompany" required>
-                            <option value="" disabled selected>-- કંપની પસંદ કરો --</option>
-                            <option value="WEBSANKUL">WEBSANKUL</option>
-                            <option value="HOUSIVITY">HOUSIVITY</option>
-                        </select>
-                        <i class="fa-solid fa-building"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>રોલ (Role) *</label>
-                    <div class="input-icon-container">
-                        <select id="regRole" required>
-                            <option value="" disabled selected>-- રોલ પસંદ કરો --</option>
-                            <option value="Employee">Employee</option>
-                        </select>
-                        <i class="fa-solid fa-briefcase"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>ડિપાર્ટમેન્ટ (કોઈપણ એક સિલેક્ટ કરો) *</label>
-                    <div class="input-icon-container">
-                        <select id="regDept" required>
-                            <option value="" disabled selected>-- ડિપાર્ટમેન્ટ પસંદ કરો --</option>
-                            <option value="FACULTY">FACULTY</option>
-                            <option value="TYPING">TYPING</option>
-                            <option value="CONTENT">CONTENT</option>
-                            <option value="GRAPHIC">GRAPHIC</option>
-                            <option value="VIDEO EDITING">VIDEO EDITING</option>
-                            <option value="VIDEO RECORDING">VIDEO RECORDING</option>
-                            <option value="OFFLINE">OFFLINE</option>
-                            <option value="CALLING">CALLING</option>
-                            <option value="MARKETING">MARKETING</option>
-                            <option value="SALES">SALES</option>
-                            <option value="MANAGEMENT">MANAGEMENT</option>
-                            <option value="ACCOUNT">ACCOUNT</option>
-                            <option value="IT">IT</option>
-                            <option value="BOOK">BOOK</option>
-                        </select>
-                        <i class="fa-solid fa-building"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>નવો પાસવર્ડ *</label>
-                    <div class="input-icon-container">
-                        <input type="password" id="regPassword" placeholder="••••••••" required>
-                        <i class="fa-solid fa-lock"></i>
-                        <i class="fa-solid fa-eye toggle-password" data-target="regPassword"></i>
-                    </div>
-                </div>
-
-                <button type="submit" id="regBtn" class="login-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
-                    <span id="regBtnText">Submit & Register</span>
-                </button>
-            </form>
-        </div>
     </div>
 
     <!-- Reset Password Modal -->
@@ -546,14 +459,6 @@
             }
         }
 
-        document.getElementById('openRegBtn').addEventListener('click', () => {
-            document.getElementById('registerModal').style.display = 'flex';
-        });
-
-        document.getElementById('closeRegBtn').addEventListener('click', () => {
-            document.getElementById('registerModal').style.display = 'none';
-        });
-
         document.getElementById('openForgotBtn').addEventListener('click', () => {
             document.getElementById('forgotModal').style.display = 'flex';
         });
@@ -577,65 +482,6 @@
                     this.classList.add('fa-eye');
                 }
             });
-        });
-
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const name = document.getElementById('regName').value.trim();
-            const email = document.getElementById('regEmail').value.trim().toLowerCase();
-            const company = document.getElementById('regCompany').value;
-            const role = document.getElementById('regRole').value;
-            const department = document.getElementById('regDept').value;
-            const password = document.getElementById('regPassword').value;
-
-            if (role !== 'Employee') {
-                alert("⚠️ માત્ર 'Employee' જ નવું રજીસ્ટ્રેશન કરી શકે છે!");
-                return;
-            }
-
-            const regBtn = document.getElementById('regBtn');
-            const regBtnText = document.getElementById('regBtnText');
-            regBtn.disabled = true;
-            regBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> પ્રોસેસ થઈ રહી છે...';
-
-            const userRecord = {
-                uid: `local-${Date.now()}`,
-                name,
-                email,
-                company,
-                companyName: company,
-                role,
-                department,
-                accountStatus: 'active',
-                deleted: false,
-                createdAt: new Date().toISOString(),
-                password
-            };
-
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                userRecord.uid = userCredential.user.uid;
-                const userKey = getCleanKey(email);
-
-                try {
-                    await db.ref('users/' + userKey).set(userRecord);
-                } catch (dbError) {
-                    console.warn('Firebase DB write failed, storing user locally instead.', dbError);
-                }
-
-                saveLocalUser(userRecord);
-                alert('🎉 રજીસ્ટ્રેશન સફળ રહ્યું! હવે તમે લોગિન કરી શકો છો.');
-                document.getElementById('registerModal').style.display = 'none';
-                document.getElementById('registerForm').reset();
-            } catch (error) {
-                saveLocalUser(userRecord);
-                alert('🎉 તમારું રજીસ્ટ્રેશન local mode માં સફળ ગયું છે. હવે તમે લોગિન કરી શકો છો.');
-                document.getElementById('registerModal').style.display = 'none';
-                document.getElementById('registerForm').reset();
-            } finally {
-                regBtn.disabled = false;
-                regBtnText.innerText = 'Submit & Register';
-            }
         });
 
         document.getElementById('forgotForm').addEventListener('submit', async function(e) {

@@ -950,6 +950,81 @@
             grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
+        .management-registration-box {
+            padding: 22px;
+            border: 1px solid rgba(125, 211, 252, 0.45);
+            border-radius: 18px;
+            background: linear-gradient(145deg, #075985, #1d4ed8);
+            box-shadow: 0 12px 28px rgba(2, 132, 199, 0.22);
+        }
+
+        .management-registration-page {
+            max-width: 680px;
+        }
+
+        .management-registration-box h4 {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #fff;
+            font-size: 17px;
+            margin-bottom: 7px;
+        }
+
+        .management-registration-box > p {
+            color: #dbeafe;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .management-registration-form {
+            display: grid;
+            gap: 11px;
+        }
+
+        .management-registration-form .form-group {
+            gap: 5px;
+        }
+
+        .management-registration-form .form-group label {
+            color: #eff6ff;
+            font-size: 12px;
+        }
+
+        .management-registration-form .form-group input,
+        .management-registration-form .form-group select {
+            width: 100%;
+            min-width: 0;
+            padding: 10px 12px;
+            border-radius: 9px;
+            background: rgba(15, 23, 42, 0.72);
+        }
+
+        .management-register-btn {
+            width: 100%;
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 10px;
+            background: #fff;
+            color: #1d4ed8;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .management-register-btn:hover {
+            background: #eff6ff;
+            transform: translateY(-1px);
+        }
+
+        .management-register-btn:disabled {
+            cursor: wait;
+            opacity: 0.7;
+            transform: none;
+        }
+
         .stat-card {
             flex: 1;
             min-width: 240px;
@@ -1303,6 +1378,17 @@
 
         .report-dropdown-item:hover {
             background: rgba(99, 102, 241, 0.12);
+        }
+
+        .management-register-nav-item {
+            background: rgba(37, 99, 235, 0.22);
+            color: #93c5fd;
+            font-weight: 700;
+        }
+
+        .management-register-nav-item:hover {
+            background: rgba(37, 99, 235, 0.42);
+            color: #fff;
         }
 
         .daily-report-view {
@@ -2090,6 +2176,9 @@
                         <i class="fa-solid fa-chevron-down panel-menu-chevron" aria-hidden="true"></i>
                     </a>
                     <div id="managementReportMenu" class="management-submenu hidden">
+                        <button type="button" id="managementRegisterNavBtn" class="report-dropdown-item management-register-nav-item">
+                            <i class="fa-solid fa-user-plus"></i> New Register
+                        </button>
                         <button type="button" class="report-dropdown-item" data-report-type="Daily Report">Daily Report</button>
                         <button type="button" class="report-dropdown-item" data-report-type="Monthly Report">Monthly Report</button>
                         <button type="button" class="report-dropdown-item" data-report-type="Periodic Report">Periodic Report</button>
@@ -3135,6 +3224,61 @@
                 </div>
             </div>
 
+            <div id="managementRegistrationView" class="hidden">
+                <button type="button" id="managementRegistrationBackBtn" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Management
+                </button>
+                <section class="management-registration-box management-registration-page" aria-labelledby="managementRegistrationTitle">
+                    <h4 id="managementRegistrationTitle"><i class="fa-solid fa-user-plus"></i> New Employee Register</h4>
+                    <p>Management can create a new employee account here.</p>
+                    <form id="managementRegistrationForm" class="management-registration-form">
+                        <div class="form-group">
+                            <label for="managementRegName">Full Name *</label>
+                            <input type="text" id="managementRegName" placeholder="Employee full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="managementRegEmail">Email *</label>
+                            <input type="email" id="managementRegEmail" placeholder="employee@company.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="managementRegCompany">Company *</label>
+                            <select id="managementRegCompany" required>
+                                <option value="" disabled selected>-- Select company --</option>
+                                <option value="WEBSANKUL">WEBSANKUL</option>
+                                <option value="HOUSIVITY">HOUSIVITY</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="managementRegDepartment">Department *</label>
+                            <select id="managementRegDepartment" required>
+                                <option value="" disabled selected>-- Select department --</option>
+                                <option value="FACULTY">FACULTY</option>
+                                <option value="TYPING">TYPING</option>
+                                <option value="CONTENT">CONTENT</option>
+                                <option value="GRAPHIC">GRAPHIC</option>
+                                <option value="VIDEO EDITING">VIDEO EDITING</option>
+                                <option value="VIDEO RECORDING">VIDEO RECORDING</option>
+                                <option value="OFFLINE">OFFLINE</option>
+                                <option value="CALLING">CALLING</option>
+                                <option value="MARKETING">MARKETING</option>
+                                <option value="SALES">SALES</option>
+                                <option value="MANAGEMENT">MANAGEMENT</option>
+                                <option value="ACCOUNT">ACCOUNT</option>
+                                <option value="IT">IT</option>
+                                <option value="BOOK">BOOK</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="managementRegPassword">Password (at least 6 characters) *</label>
+                            <input type="password" id="managementRegPassword" minlength="6" autocomplete="new-password" required>
+                        </div>
+                        <button type="submit" id="managementRegisterBtn" class="management-register-btn">
+                            <i class="fa-solid fa-user-plus"></i> Submit & Register
+                        </button>
+                    </form>
+                </section>
+            </div>
+
             <div id="dailyReportView" class="daily-report-view hidden">
                 <div class="daily-report-header">
                     <h2 id="dailyReportTitle">Daily Report</h2>
@@ -3248,6 +3392,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
         function initializeReportDateField(inputId = 'reportFillDate') {
@@ -6163,6 +6308,9 @@
 
         const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
         const db = firebase.database(firebaseApp);
+        const managementAuth = firebase.auth(firebaseApp);
+        const registrationApp = firebase.initializeApp(firebaseConfig, 'managementRegistration');
+        const registrationAuth = registrationApp.auth();
         const FIREBASE_LEAVES_KEY = 'officeLeaveRequests';
         const FIREBASE_DELETE_HISTORY_KEY = 'deletedLeaveHistory';
         const MANAGEMENT_USERS_KEY = 'users';
@@ -6170,6 +6318,91 @@
         function getUserRecordKey(email) {
             return String(email || '').trim().toLowerCase().replace(/[.#$\[\]]/g, '_');
         }
+
+        async function hasManagementRegistrationAccess() {
+            const authenticatedUser = await new Promise((resolve, reject) => {
+                let unsubscribe = () => {};
+                unsubscribe = managementAuth.onAuthStateChanged((user) => {
+                    unsubscribe();
+                    resolve(user);
+                }, (error) => {
+                    unsubscribe();
+                    reject(error);
+                });
+            });
+            if (!authenticatedUser || String(userData?.uid || '') !== authenticatedUser.uid) return false;
+
+            const profileSnapshot = await db.ref(`${MANAGEMENT_USERS_KEY}/${getUserRecordKey(authenticatedUser.email)}`).once('value');
+            const profile = profileSnapshot.val();
+            return Boolean(
+                profile &&
+                profile.uid === authenticatedUser.uid &&
+                normalizeRole(profile.role) === 'management' &&
+                profile.deleted !== true &&
+                profile.accountStatus !== 'inactive'
+            );
+        }
+
+        document.getElementById('managementRegistrationForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!isRole('Management')) {
+                alert('🔒 Only Management can register new employees.');
+                return;
+            }
+
+            const form = event.currentTarget;
+            const registerButton = document.getElementById('managementRegisterBtn');
+            const name = document.getElementById('managementRegName').value.trim();
+            const email = document.getElementById('managementRegEmail').value.trim().toLowerCase();
+            const company = document.getElementById('managementRegCompany').value;
+            const department = document.getElementById('managementRegDepartment').value;
+            const password = document.getElementById('managementRegPassword').value;
+            let createdAuthUser = null;
+
+            registerButton.disabled = true;
+            registerButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering...';
+
+            try {
+                if (!await hasManagementRegistrationAccess()) {
+                    alert('🔒 Only an active Management account can register new employees.');
+                    return;
+                }
+
+                const credential = await registrationAuth.createUserWithEmailAndPassword(email, password);
+                createdAuthUser = credential.user;
+                const userRecord = {
+                    uid: credential.user.uid,
+                    name,
+                    email,
+                    company,
+                    companyName: company,
+                    role: 'Employee',
+                    department,
+                    accountStatus: 'active',
+                    deleted: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                await db.ref(`${MANAGEMENT_USERS_KEY}/${getUserRecordKey(email)}`).set(userRecord);
+                alert('🎉 Employee account registered successfully.');
+                form.reset();
+                loadManagementUserAccounts();
+            } catch (error) {
+                let message = error && error.message ? error.message : 'Registration failed.';
+                if (createdAuthUser) {
+                    try {
+                        await createdAuthUser.delete();
+                    } catch (cleanupError) {
+                        console.error('Could not remove the Auth account after profile creation failed.', cleanupError);
+                        message += ' The authentication account was created, but automatic cleanup failed.';
+                    }
+                }
+                alert(`❌ Registration failed: ${message}`);
+            } finally {
+                registerButton.disabled = false;
+                registerButton.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit & Register';
+            }
+        });
 
         function getAccountStatusLabel(user) {
             if (user.deleted === true) return 'Deleted';
@@ -6566,6 +6799,7 @@
         function setManagementReportView(reportType) {
             currentManagementReportType = reportType || 'Management';
             const managementMainView = document.getElementById('managementMainView');
+            const managementRegistrationView = document.getElementById('managementRegistrationView');
             const dailyReportView = document.getElementById('dailyReportView');
             const reportTitle = document.getElementById('dailyReportTitle');
             const reportTypes = ['Daily Report', 'Monthly Report', 'Periodic Report'];
@@ -6573,6 +6807,10 @@
 
             if (managementMainView) {
                 managementMainView.classList.toggle('hidden', isReportView);
+            }
+
+            if (managementRegistrationView) {
+                managementRegistrationView.classList.add('hidden');
             }
 
             if (dailyReportView) {
@@ -6624,6 +6862,26 @@
             setMenuChevron(employeeMenuChevron, false);
             setMenuChevron(tlMenuChevron, false);
             populateDailyReportLists();
+        });
+
+        document.getElementById('managementRegisterNavBtn').addEventListener('click', (event) => {
+            event.preventDefault();
+            if (!isRole('Management')) {
+                alert('🔒 Access Denied! This panel is locked for your current role.');
+                return;
+            }
+
+            switchTab('management');
+            setManagementReportView('Management');
+            document.getElementById('managementMainView').classList.add('hidden');
+            document.getElementById('managementRegistrationView').classList.remove('hidden');
+            document.getElementById('managementReportMenu').classList.add('hidden');
+            setMenuChevron(managementMenuChevron, false);
+        });
+
+        document.getElementById('managementRegistrationBackBtn').addEventListener('click', () => {
+            document.getElementById('managementRegistrationView').classList.add('hidden');
+            document.getElementById('managementMainView').classList.remove('hidden');
         });
 
         const DEPARTMENTS = ["FACULTY","TYPING","CONTENT","GRAPHIC","VIDEO EDITING","VIDEO RECORDING","OFFLINE","CALLING","MARKETING","SALES","MANAGEMENT","ACCOUNT","IT","BOOK"];
@@ -7553,7 +7811,7 @@
         const managementReportMenu = document.getElementById('managementReportMenu');
         const managementNavLink = document.getElementById('menuManagement');
         if (managementReportMenu) {
-            document.querySelectorAll('.report-dropdown-item').forEach((button) => {
+            document.querySelectorAll('.report-dropdown-item[data-report-type]').forEach((button) => {
                 button.addEventListener('click', () => {
                     const type = button.dataset.reportType || 'Report';
                     const clickedMenu = button.closest('.management-submenu');

@@ -6330,13 +6330,15 @@
                     reject(error);
                 });
             });
-            if (!authenticatedUser || String(userData?.uid || '') !== authenticatedUser.uid) return false;
+            const authenticatedEmail = String(authenticatedUser?.email || '').trim().toLowerCase();
+            const sessionEmail = String(userData?.email || '').trim().toLowerCase();
+            if (!authenticatedEmail || sessionEmail !== authenticatedEmail) return false;
 
-            const profileSnapshot = await db.ref(`${MANAGEMENT_USERS_KEY}/${getUserRecordKey(authenticatedUser.email)}`).once('value');
+            const profileSnapshot = await db.ref(`${MANAGEMENT_USERS_KEY}/${getUserRecordKey(authenticatedEmail)}`).once('value');
             const profile = profileSnapshot.val();
             return Boolean(
                 profile &&
-                profile.uid === authenticatedUser.uid &&
+                (!profile.email || String(profile.email).trim().toLowerCase() === authenticatedEmail) &&
                 normalizeRole(profile.role) === 'management' &&
                 profile.deleted !== true &&
                 profile.accountStatus !== 'inactive'

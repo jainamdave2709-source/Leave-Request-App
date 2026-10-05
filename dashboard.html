@@ -1001,6 +1001,37 @@
             background: rgba(15, 23, 42, 0.72);
         }
 
+        .management-password-input {
+            position: relative;
+        }
+
+        .management-password-input input {
+            padding-right: 46px !important;
+        }
+
+        .management-password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 0;
+            border-radius: 7px;
+            background: transparent;
+            color: #cbd5e1;
+            cursor: pointer;
+            transform: translateY(-50%);
+        }
+
+        .management-password-toggle:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
         .management-register-btn {
             width: 100%;
             padding: 12px 16px;
@@ -3270,7 +3301,12 @@
                         </div>
                         <div class="form-group">
                             <label for="managementRegPassword">Password (at least 6 characters) *</label>
-                            <input type="password" id="managementRegPassword" minlength="6" autocomplete="new-password" required>
+                            <div class="management-password-input">
+                                <input type="password" id="managementRegPassword" minlength="6" autocomplete="new-password" required>
+                                <button type="button" id="managementRegPasswordToggle" class="management-password-toggle" aria-label="Show password" aria-pressed="false">
+                                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         </div>
                         <button type="submit" id="managementRegisterBtn" class="management-register-btn">
                             <i class="fa-solid fa-user-plus"></i> Submit & Register
@@ -6406,6 +6442,21 @@
             }
         });
 
+        const managementRegPassword = document.getElementById('managementRegPassword');
+        const managementRegPasswordToggle = document.getElementById('managementRegPasswordToggle');
+        const setManagementPasswordVisibility = (isVisible) => {
+            managementRegPassword.type = isVisible ? 'text' : 'password';
+            managementRegPasswordToggle.setAttribute('aria-label', isVisible ? 'Hide password' : 'Show password');
+            managementRegPasswordToggle.setAttribute('aria-pressed', String(isVisible));
+            managementRegPasswordToggle.innerHTML = `<i class="fa-solid ${isVisible ? 'fa-eye-slash' : 'fa-eye'}" aria-hidden="true"></i>`;
+        };
+        managementRegPasswordToggle.addEventListener('click', () => {
+            setManagementPasswordVisibility(managementRegPassword.type === 'password');
+        });
+        document.getElementById('managementRegistrationForm').addEventListener('reset', () => {
+            setManagementPasswordVisibility(false);
+        });
+
         function getAccountStatusLabel(user) {
             if (user.deleted === true) return 'Deleted';
             return user.accountStatus === 'inactive' ? 'Inactive' : 'Active';
@@ -6413,6 +6464,35 @@
 
         function getAccountRoleLabel(user) {
             return ['TL', 'TeamLeader', 'Team Leader'].includes(user.role) ? 'TL' : 'Employee';
+        }
+
+        function getManagedUserDepartments(user) {
+            const departments = [];
+            const collect = (value) => {
+                if (Array.isArray(value)) {
+                    value.forEach(collect);
+                } else if (value && typeof value === 'object') {
+                    Object.entries(value).forEach(([key, nestedValue]) => {
+                        if (typeof nestedValue === 'boolean') {
+                            if (nestedValue) departments.push(key);
+                        } else {
+                            collect(nestedValue);
+                        }
+                    });
+                } else if (value !== null && value !== undefined) {
+                    departments.push(...String(value).split(/[,;|]+/));
+                }
+            };
+
+            ['department', 'dept', 'departments', 'departmentList', 'assignedDepartments', 'tlDepartments', 'managedDepartments']
+                .forEach((key) => collect(user[key]));
+
+            return Array.from(new Map(
+                departments
+                    .map((department) => department.trim())
+                    .filter(Boolean)
+                    .map((department) => [department.toUpperCase(), department])
+            ).values());
         }
 
         async function populateTlLeaveApprovers() {
@@ -6475,7 +6555,8 @@
                 const departmentFilter = document.getElementById('managementUserDepartmentFilter')?.value || 'all';
                 const statusFilter = document.getElementById('managementUserStatusFilter')?.value || 'all';
                 const departmentSelect = document.getElementById('managementUserDepartmentFilter');
-                const departments = [...new Set(users.map((user) => user.department || user.dept).filter(Boolean))].sort();
+                const departments = [...new Set(users.flatMap(getManagedUserDepartments))]
+                    .sort((a, b) => a.localeCompare(b));
 
                 if (departmentSelect) {
                     const previousDepartment = departmentSelect.value;
@@ -6486,11 +6567,11 @@
                 const filteredUsers = users.filter((user) => {
                     const name = String(user.name || user.fullName || '').toLowerCase();
                     const role = getAccountRoleLabel(user);
-                    const department = String(user.department || user.dept || '');
+                    const userDepartments = getManagedUserDepartments(user);
                     const status = getAccountStatusLabel(user);
                     return (!nameFilter || name.includes(nameFilter))
                         && (roleFilter === 'all' || role === roleFilter)
-                        && (departmentFilter === 'all' || department === departmentFilter)
+                        && (departmentFilter === 'all' || userDepartments.some((department) => department.toUpperCase() === departmentFilter.toUpperCase()))
                         && (statusFilter === 'all' || status === statusFilter);
                 });
 
@@ -6510,12 +6591,13 @@
                         const email = String(user.email || '');
                         const status = getAccountStatusLabel(user);
                         const statusColor = status === 'Active' ? '#10b981' : status === 'Inactive' ? '#f59e0b' : '#ef4444';
+                        const departments = getManagedUserDepartments(user).join(', ');
                         return `
                             <tr>
                                 <td>${escapeDeleteHistoryText(user.name || user.fullName || '-')}</td>
                                 <td>${escapeDeleteHistoryText(email || '-')}</td>
                                 <td>${escapeDeleteHistoryText(getAccountRoleLabel(user))}</td>
-                                <td>${escapeDeleteHistoryText(user.department || user.dept || '-')}</td>
+                                <td>${escapeDeleteHistoryText(departments || '-')}</td>
                                 <td style="color: ${statusColor}; font-weight: 700;">${status}</td>
                                 <td>
                                     <button type="button" class="report-dropdown-item" style="display: inline-block; color: #10b981;" onclick="updateManagedUserStatus('${encodeURIComponent(email)}', 'active')">Active</button>
@@ -6546,11 +6628,11 @@
                 .filter((user) => {
                     const name = String(user.name || user.fullName || '').toLowerCase();
                     const role = getAccountRoleLabel(user);
-                    const department = String(user.department || user.dept || '');
+                    const userDepartments = getManagedUserDepartments(user);
                     const status = getAccountStatusLabel(user);
                     return (!nameFilter || name.includes(nameFilter))
                         && (roleFilter === 'all' || role === roleFilter)
-                        && (departmentFilter === 'all' || department === departmentFilter)
+                        && (departmentFilter === 'all' || userDepartments.some((department) => department.toUpperCase() === departmentFilter.toUpperCase()))
                         && (statusFilter === 'all' || status === statusFilter);
                 })
                 .sort((a, b) => String(a.name || a.email).localeCompare(String(b.name || b.email)));
@@ -6559,7 +6641,7 @@
                 Name: user.name || user.fullName || '',
                 Email: user.email || '',
                 Role: getAccountRoleLabel(user),
-                Department: user.department || user.dept || '',
+                Department: getManagedUserDepartments(user).join(', '),
                 Status: getAccountStatusLabel(user)
             }));
             if (!rows.length) {

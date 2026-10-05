@@ -2969,6 +2969,12 @@
                                 <input type="text" id="managementUserNameFilter" placeholder="Search name..." style="width: 160px;">
                             </div>
                             <div class="month-filter-box">
+                                <label for="managementUserCompanyFilter">Company:</label>
+                                <select id="managementUserCompanyFilter" style="width: 160px;">
+                                    <option value="all">All Companies</option>
+                                </select>
+                            </div>
+                            <div class="month-filter-box">
                                 <label for="managementUserRoleFilter">Role:</label>
                                 <select id="managementUserRoleFilter" style="width: 140px;">
                                     <option value="all">All Roles</option>
@@ -3015,6 +3021,7 @@
                                     <tr>
                                         <th>Name</th>
                                         <th>Email</th>
+                                        <th>Company</th>
                                         <th>Role</th>
                                         <th>Department</th>
                                         <th>Status</th>
@@ -6570,12 +6577,22 @@
                     .filter((user) => user && ['Employee', 'TL', 'TeamLeader', 'Team Leader'].includes(user.role));
                 updateManagementAccountCounters(users);
                 const nameFilter = (document.getElementById('managementUserNameFilter')?.value || '').trim().toLowerCase();
+                const companyFilter = document.getElementById('managementUserCompanyFilter')?.value || 'all';
                 const roleFilter = document.getElementById('managementUserRoleFilter')?.value || 'all';
                 const departmentFilter = document.getElementById('managementUserDepartmentFilter')?.value || 'all';
                 const statusFilter = document.getElementById('managementUserStatusFilter')?.value || 'all';
+                const companySelect = document.getElementById('managementUserCompanyFilter');
                 const departmentSelect = document.getElementById('managementUserDepartmentFilter');
+                const companies = [...new Set(users.flatMap(getManagedUserCompanies))]
+                    .sort((a, b) => a.localeCompare(b));
                 const departments = [...new Set(users.flatMap(getManagedUserDepartments))]
                     .sort((a, b) => a.localeCompare(b));
+
+                if (companySelect) {
+                    const previousCompany = companySelect.value;
+                    companySelect.innerHTML = `<option value="all">All Companies</option>${companies.map((company) => `<option value="${escapeDeleteHistoryText(company)}">${escapeDeleteHistoryText(company)}</option>`).join('')}`;
+                    companySelect.value = companies.includes(previousCompany) ? previousCompany : 'all';
+                }
 
                 if (departmentSelect) {
                     const previousDepartment = departmentSelect.value;
@@ -6585,22 +6602,24 @@
 
                 const filteredUsers = users.filter((user) => {
                     const name = String(user.name || user.fullName || '').toLowerCase();
+                    const userCompanies = getManagedUserCompanies(user);
                     const role = getAccountRoleLabel(user);
                     const userDepartments = getManagedUserDepartments(user);
                     const status = getAccountStatusLabel(user);
                     return (!nameFilter || name.includes(nameFilter))
+                        && (companyFilter === 'all' || userCompanies.includes(companyFilter))
                         && (roleFilter === 'all' || role === roleFilter)
                         && (departmentFilter === 'all' || userDepartments.some((department) => department.toUpperCase() === departmentFilter.toUpperCase()))
                         && (statusFilter === 'all' || status === statusFilter);
                 });
 
                 if (!users.length) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="no-data">No employee or TL accounts found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">No employee or TL accounts found.</td></tr>';
                     return;
                 }
 
                 if (!filteredUsers.length) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="no-data">No accounts match the selected filters.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">No accounts match the selected filters.</td></tr>';
                     return;
                 }
 
@@ -6610,11 +6629,13 @@
                         const email = String(user.email || '');
                         const status = getAccountStatusLabel(user);
                         const statusColor = status === 'Active' ? '#10b981' : status === 'Inactive' ? '#f59e0b' : '#ef4444';
+                        const companies = getManagedUserCompanies(user).join(', ');
                         const departments = getManagedUserDepartments(user).join(', ');
                         return `
                             <tr>
                                 <td>${escapeDeleteHistoryText(user.name || user.fullName || '-')}</td>
                                 <td>${escapeDeleteHistoryText(email || '-')}</td>
+                                <td>${escapeDeleteHistoryText(companies || '-')}</td>
                                 <td>${escapeDeleteHistoryText(getAccountRoleLabel(user))}</td>
                                 <td>${escapeDeleteHistoryText(departments || '-')}</td>
                                 <td style="color: ${statusColor}; font-weight: 700;">${status}</td>
@@ -6628,7 +6649,7 @@
                     }).join('');
             } catch (error) {
                 console.warn('User account list failed:', error);
-                tbody.innerHTML = '<tr><td colspan="6" class="no-data">Unable to load accounts.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">Unable to load accounts.</td></tr>';
             }
         }
 
@@ -6639,6 +6660,7 @@
         async function exportManagementAccounts() {
             const snapshot = await db.ref(MANAGEMENT_USERS_KEY).once('value');
             const nameFilter = (document.getElementById('managementUserNameFilter')?.value || '').trim().toLowerCase();
+            const companyFilter = document.getElementById('managementUserCompanyFilter')?.value || 'all';
             const roleFilter = document.getElementById('managementUserRoleFilter')?.value || 'all';
             const departmentFilter = document.getElementById('managementUserDepartmentFilter')?.value || 'all';
             const statusFilter = document.getElementById('managementUserStatusFilter')?.value || 'all';
@@ -6646,10 +6668,12 @@
                 .filter((user) => user && ['Employee', 'TL', 'TeamLeader', 'Team Leader'].includes(user.role))
                 .filter((user) => {
                     const name = String(user.name || user.fullName || '').toLowerCase();
+                    const userCompanies = getManagedUserCompanies(user);
                     const role = getAccountRoleLabel(user);
                     const userDepartments = getManagedUserDepartments(user);
                     const status = getAccountStatusLabel(user);
                     return (!nameFilter || name.includes(nameFilter))
+                        && (companyFilter === 'all' || userCompanies.includes(companyFilter))
                         && (roleFilter === 'all' || role === roleFilter)
                         && (departmentFilter === 'all' || userDepartments.some((department) => department.toUpperCase() === departmentFilter.toUpperCase()))
                         && (statusFilter === 'all' || status === statusFilter);
@@ -6659,6 +6683,7 @@
             const rows = users.map((user) => ({
                 Name: user.name || user.fullName || '',
                 Email: user.email || '',
+                Company: getManagedUserCompanies(user).join(', '),
                 Role: getAccountRoleLabel(user),
                 Department: getManagedUserDepartments(user).join(', '),
                 Status: getAccountStatusLabel(user)
@@ -6676,7 +6701,7 @@
                     showExportNotice('Excel export is currently unavailable.');
                     return;
                 }
-                const worksheet = formatExportWorksheet(XLSX.utils.json_to_sheet(rows), [22, 28, 12, 20, 16]);
+                const worksheet = formatExportWorksheet(XLSX.utils.json_to_sheet(rows), [22, 28, 34, 12, 20, 16]);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, 'Accounts');
                 XLSX.writeFile(workbook, `${fileName}.xlsx`);
@@ -6691,8 +6716,8 @@
                 doc.text('Employee and TL Accounts', 14, 16);
                 doc.setFontSize(9);
                 let y = 26;
-                const columns = ['Name', 'Email', 'Role', 'Department', 'Status'];
-                const widths = [45, 75, 25, 55, 35];
+                const columns = ['Name', 'Email', 'Company', 'Role', 'Department', 'Status'];
+                const widths = [38, 65, 38, 20, 50, 30];
                 const drawHeader = () => {
                     doc.setFillColor(30, 41, 59);
                     doc.setTextColor(255, 255, 255);
@@ -7904,7 +7929,7 @@
                 toggleManagementAccounts();
             }
         });
-        ['managementUserNameFilter', 'managementUserRoleFilter', 'managementUserDepartmentFilter', 'managementUserStatusFilter']
+        ['managementUserNameFilter', 'managementUserCompanyFilter', 'managementUserRoleFilter', 'managementUserDepartmentFilter', 'managementUserStatusFilter']
             .forEach((id) => {
                 const element = document.getElementById(id);
                 if (element) {
